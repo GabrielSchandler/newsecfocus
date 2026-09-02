@@ -105,6 +105,7 @@ const ROTAS = [
   ["/painel/administracao", "Administração"],
   ["/painel/administracao?aba=pessoas", "Administração — pessoas"],
   ["/painel/administracao?aba=classificacao", "Administração — classificação"],
+  ["/painel/administracao?aba=agente", "Administração — agente"],
   ["/painel/administracao?aba=empresa", "Administração — empresa"],
   ["/plataforma", "Plataforma"],
 ];

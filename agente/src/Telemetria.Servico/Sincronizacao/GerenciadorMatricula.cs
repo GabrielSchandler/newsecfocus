@@ -68,6 +68,19 @@ public sealed class GerenciadorMatricula
 
         CofreLocal.GravarToken(CaminhosAplicacao.TokenDispositivo, resposta.TokenDispositivo);
         _tokenMemoria = resposta.TokenDispositivo;
+
+        // A máquina já nasce com a configuração da empresa, sem esperar o
+        // primeiro envio de lote.
+        try
+        {
+            if (AplicadorConfiguracao.Aplicar(resposta.Configuracao, _opcoes))
+                _log.LogInformation("Configuração da empresa aplicada na matrícula.");
+        }
+        catch (Exception ex)
+        {
+            _log.LogWarning(ex, "Matrícula concluída, mas a configuração não pôde ser gravada.");
+        }
+
         _log.LogInformation("Máquina matriculada. Dispositivo {id}.", resposta.IdDispositivo);
         return resposta.TokenDispositivo;
     }

@@ -16,8 +16,10 @@ public static class CarregadorConfiguracao
             .SetBasePath(diretorioBase)
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-        if (File.Exists(CaminhosAplicacao.ConfiguracaoSobreposta))
-            construtor.AddJsonFile(CaminhosAplicacao.ConfiguracaoSobreposta, optional: true, reloadOnChange: true);
+        // Sempre adicionado, mesmo sem existir ainda: é ele que o servidor grava
+        // quando a configuração muda no painel. Se só fosse incluído quando já
+        // existisse, a primeira configuração remota nunca seria observada.
+        construtor.AddJsonFile(CaminhosAplicacao.ConfiguracaoSobreposta, optional: true, reloadOnChange: true);
 
         construtor.AddEnvironmentVariables("TELEMETRIA_");
 

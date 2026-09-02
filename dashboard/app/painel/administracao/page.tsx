@@ -2,6 +2,7 @@ import { Settings } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
+import { PainelAgente } from "./formulario-agente";
 import {
   PainelClassificacao,
   PainelColaboradores,
@@ -19,6 +20,7 @@ import {
 } from "@/lib/consultas";
 import { cn } from "@/lib/utils";
 import type { ParamsPagina } from "@/lib/filtros-url";
+import type { ConfiguracaoAgente } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +28,7 @@ const ABAS = [
   { chave: "equipes", rotulo: "Equipes" },
   { chave: "pessoas", rotulo: "Colaboradores" },
   { chave: "classificacao", rotulo: "Classificação" },
+  { chave: "agente", rotulo: "Agente" },
   { chave: "empresa", rotulo: "Empresa" },
 ] as const;
 
@@ -58,12 +61,14 @@ export default async function PaginaAdministracao({
       (async () => {
         const { data } = await supabase
           .from("organizations")
-          .select("sync_interval_minutes")
+          .select(
+            "sync_interval_minutes, agente_segundos_ocioso, agente_janela_inicio, agente_janela_fim, agente_extrair_dominio, agente_mostrar_bandeja, agente_redigir_numeros, agente_tamanho_lote, agente_dias_buffer, agente_processos_sigilosos",
+          )
           .eq("id", contexto.empresa.id)
           .maybeSingle();
-        return (data?.sync_interval_minutes ?? null) as number | null;
+        return (data ?? null) as ConfiguracaoAgente | null;
       })(),
-      null as number | null,
+      null as ConfiguracaoAgente | null,
     ),
   ]);
 
@@ -121,8 +126,18 @@ export default async function PaginaAdministracao({
         <PainelClassificacao categorias={categorias.dados} mapeamentos={mapeamentos.dados} />
       )}
 
+      {aba === "agente" && (
+        <PainelAgente
+          config={organizacao.dados}
+          somenteLeitura={!podeAdministrar(contexto)}
+        />
+      )}
+
       {aba === "empresa" && (
-        <PainelEmpresa contexto={contexto} intervaloSync={organizacao.dados} />
+        <PainelEmpresa
+          contexto={contexto}
+          intervaloSync={organizacao.dados?.sync_interval_minutes ?? null}
+        />
       )}
     </div>
   );

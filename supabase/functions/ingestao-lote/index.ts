@@ -151,11 +151,19 @@ Deno.serve(async (req) => {
   // Conta suspensa ou cancelada: o agente para de coletar até a regularização.
   const contaAtiva = org?.status !== "SUSPENSA" && org?.status !== "CANCELADA";
 
+  // Configuração remota: é o que permite mudar como a frota coleta e envia sem
+  // visitar máquina por máquina. O agente compara a assinatura com a que já
+  // aplicou e só regrava o arquivo local quando mudou de fato.
+  const { data: configuracao } = await supabase.rpc("configuracao_agente", {
+    p_org: dispositivo.org_id,
+  });
+
   return json({
     accepted: aceitos,
     duplicates: duplicados,
     next_sync_minutes: org?.sync_interval_minutes ?? null,
     collection_enabled: contaAtiva,
+    config: configuracao ?? null,
   });
 });
 

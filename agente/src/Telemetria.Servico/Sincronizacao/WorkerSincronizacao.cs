@@ -133,6 +133,7 @@ public sealed class WorkerSincronizacao : BackgroundService
                 resposta.Aceitos, resposta.Duplicados, removidos);
 
             AjustarIntervalo(resposta.ProximaSincronizacaoEmMinutos);
+            AplicarConfiguracaoRemota(resposta.Configuracao);
 
             if (lote.Count < _opcoes.TamanhoLote)
                 break; // Último lote parcial: acabou o pendente.
@@ -140,6 +141,34 @@ public sealed class WorkerSincronizacao : BackgroundService
 
         if (totalEnviado > 0)
             _buffer.CompactarSePreciso();
+    }
+
+    /// <summary>
+    /// Grava a configuração vinda do painel em ProgramData. O coletor, que é
+    /// outro processo, lê esse mesmo arquivo e passa a obedecer sem reinstalação
+    /// e sem ninguém tocar na máquina.
+    /// </summary>
+    private void AplicarConfiguracaoRemota(ConfiguracaoRemota? configuracao)
+    {
+        try
+        {
+            if (AplicadorConfiguracao.Aplicar(configuracao, _opcoes))
+            {
+                _intervaloMinutos = Math.Max(1, _opcoes.MinutosEntreSincronizacoes);
+                _log.LogInformation(
+                    "Configuração atualizada pelo servidor. Sync {m} min, ócio {o}s, janela {i}-{f}.",
+                    _opcoes.MinutosEntreSincronizacoes,
+                    _opcoes.SegundosParaOcioso,
+                    string.IsNullOrEmpty(_opcoes.JanelaColetaInicio) ? "24h" : _opcoes.JanelaColetaInicio,
+                    string.IsNullOrEmpty(_opcoes.JanelaColetaFim) ? "24h" : _opcoes.JanelaColetaFim);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Falha ao gravar não pode derrubar a sincronização: o lote já foi
+            // aceito e a configuração antiga continua válida.
+            _log.LogWarning(ex, "Não foi possível aplicar a configuração remota.");
+        }
     }
 
     private void AjustarIntervalo(int? sugestaoServidor)

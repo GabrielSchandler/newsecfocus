@@ -88,6 +88,20 @@ export interface Dispositivo {
   agent_version: string | null;
 }
 
+/** Configuração que a frota recebe na próxima sincronização. */
+export interface ConfiguracaoAgente {
+  sync_interval_minutes: number | null;
+  agente_segundos_ocioso: number;
+  agente_janela_inicio: string | null;
+  agente_janela_fim: string | null;
+  agente_extrair_dominio: boolean;
+  agente_mostrar_bandeja: boolean;
+  agente_redigir_numeros: boolean;
+  agente_tamanho_lote: number;
+  agente_dias_buffer: number;
+  agente_processos_sigilosos: string[];
+}
+
 export interface Categoria {
   id: string;
   name: string;

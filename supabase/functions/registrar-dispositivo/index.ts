@@ -81,5 +81,18 @@ Deno.serve(async (req) => {
     return erro("Não foi possível registrar o dispositivo.", 500);
   }
 
-  return json({ device_id: dispositivo.id, device_token: token }, 200);
+  // O agente recém-matriculado já sai com a configuração da empresa, sem
+  // precisar esperar a primeira sincronização.
+  const { data: configuracao } = await supabase.rpc("configuracao_agente", {
+    p_org: org.id,
+  });
+
+  return json(
+    {
+      device_id: dispositivo.id,
+      device_token: token,
+      config: configuracao ?? null,
+    },
+    200,
+  );
 });

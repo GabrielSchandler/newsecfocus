@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Telemetria.Nucleo.Configuracao;
 
 namespace Telemetria.Nucleo.Modelos;
 
@@ -33,6 +34,10 @@ public sealed class RespostaMatricula
 
     [JsonPropertyName("device_token")]
     public string TokenDispositivo { get; set; } = string.Empty;
+
+    /// <summary>Configuração da empresa, já na matrícula — sem esperar o primeiro envio.</summary>
+    [JsonPropertyName("config")]
+    public ConfiguracaoRemota? Configuracao { get; set; }
 }
 
 /// <summary>Corpo do POST para a Edge Function ingestao-lote.</summary>
@@ -68,4 +73,11 @@ public sealed class RespostaIngestao
     /// </summary>
     [JsonPropertyName("collection_enabled")]
     public bool? ColetaHabilitada { get; set; }
+
+    /// <summary>
+    /// Configuração remota da empresa. Chega em toda sincronização; o agente só
+    /// regrava o arquivo local quando a assinatura muda.
+    /// </summary>
+    [JsonPropertyName("config")]
+    public ConfiguracaoRemota? Configuracao { get; set; }
 }

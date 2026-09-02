@@ -319,6 +319,84 @@ export async function salvarEmpresa(
 }
 
 // ----------------------------------------------------------------------------
+//  Configuração do agente (aplicada remotamente na frota)
+// ----------------------------------------------------------------------------
+
+/**
+ * Muda como os agentes coletam e enviam. Não mexe em binário: as estações
+ * recebem isto na próxima sincronização e passam a obedecer sem ninguém tocar
+ * nelas.
+ */
+export async function salvarConfiguracaoAgente(
+  _anterior: ResultadoAcao | null,
+  dados: FormData,
+): Promise<ResultadoAcao> {
+  const supabase = await criarClienteServidor();
+  const contexto = await carregarContexto(supabase);
+  if (!contexto) return FALHA("Sessão expirada.");
+  if (!contexto.papel || !["OWNER", "MANAGER"].includes(contexto.papel)) {
+    return FALHA("Sem permissão para alterar a configuração do agente.");
+  }
+
+  const horario = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+  const inicio = texto(dados, "agente_janela_inicio");
+  const fim = texto(dados, "agente_janela_fim");
+
+  if ((inicio && !horario.test(inicio)) || (fim && !horario.test(fim))) {
+    return FALHA("Horário inválido. Use HH:MM, por exemplo 08:00.");
+  }
+  if ((inicio && !fim) || (!inicio && fim)) {
+    return FALHA("Preencha os dois horários da janela, ou deixe ambos vazios para 24 horas.");
+  }
+
+  const ocioso = inteiro(dados, "agente_segundos_ocioso", 180);
+  if (ocioso < 30 || ocioso > 3600) {
+    return FALHA("O tempo até marcar como ocioso precisa ficar entre 30 e 3600 segundos.");
+  }
+
+  const lote = inteiro(dados, "agente_tamanho_lote", 120);
+  if (lote < 10 || lote > 500) return FALHA("O tamanho do lote precisa ficar entre 10 e 500.");
+
+  const buffer = inteiro(dados, "agente_dias_buffer", 14);
+  if (buffer < 1 || buffer > 90) {
+    return FALHA("O buffer local precisa ficar entre 1 e 90 dias.");
+  }
+
+  const sigilosos = (texto(dados, "agente_processos_sigilosos") ?? "")
+    .split(/[\r\n,;]+/)
+    .map((p) => p.trim().toLowerCase())
+    .filter(Boolean);
+
+  const sincronizacao = Number(dados.get("sync_interval_minutes")) || null;
+  if (sincronizacao !== null && (sincronizacao < 5 || sincronizacao > 720)) {
+    return FALHA("O intervalo de sincronização precisa ficar entre 5 e 720 minutos.");
+  }
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({
+      sync_interval_minutes: sincronizacao,
+      agente_segundos_ocioso: ocioso,
+      agente_janela_inicio: inicio,
+      agente_janela_fim: fim,
+      agente_extrair_dominio: dados.get("agente_extrair_dominio") === "on",
+      agente_mostrar_bandeja: dados.get("agente_mostrar_bandeja") === "on",
+      agente_redigir_numeros: dados.get("agente_redigir_numeros") === "on",
+      agente_tamanho_lote: lote,
+      agente_dias_buffer: buffer,
+      agente_processos_sigilosos: sigilosos,
+    })
+    .eq("id", contexto.empresa.id);
+
+  if (error) return FALHA(error.message);
+
+  atualizarTelas();
+  return OK(
+    `Configuração salva. As estações aplicam na próxima sincronização (até ${sincronizacao ?? 60} minutos).`,
+  );
+}
+
+// ----------------------------------------------------------------------------
 //  Recálculo do histórico após mudar a classificação
 // ----------------------------------------------------------------------------
 

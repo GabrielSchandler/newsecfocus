@@ -92,6 +92,31 @@ internal static class Program
         using var cts = new CancellationTokenSource();
         var tarefaAmostragem = Task.Run(() => amostrador.ExecutarAsync(cts.Token));
 
+        // O serviço grava a configuração vinda do painel em ProgramData. Aqui,
+        // relemos periodicamente e regravamos NA MESMA instância de OpcoesAgente
+        // — como o amostrador, o inspetor e o extrator seguram essa referência,
+        // todos passam a obedecer sem reiniciar o coletor.
+        var tarefaConfiguracao = Task.Run(async () =>
+        {
+            while (!cts.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromMinutes(2), cts.Token);
+                    config.Reload();
+                    config.GetSection(OpcoesAgente.Secao).Bind(opcoes);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logGeral.LogWarning(ex, "Falha ao recarregar a configuração local.");
+                }
+            }
+        });
+
         // Encerra de forma limpa em logoff/shutdown da sessão.
         SystemEvents_HookSessionEnd(cts);
 
@@ -99,6 +124,7 @@ internal static class Program
         {
             cts.Cancel();
             try { tarefaAmostragem.Wait(TimeSpan.FromSeconds(3)); } catch { /* melhor esforço */ }
+            try { tarefaConfiguracao.Wait(TimeSpan.FromSeconds(1)); } catch { /* melhor esforço */ }
             bandeja?.Dispose();
             contadores.Dispose();
         };
