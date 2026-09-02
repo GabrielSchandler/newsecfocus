@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,12 @@ export function FormularioLogin() {
           </>
         )}
       </Button>
+
+      <p className="text-center text-xs text-slate-500">
+        <Link href="/entrar/recuperar" className="transition-colors hover:text-cyan-300">
+          Esqueci minha senha
+        </Link>
+      </p>
     </form>
   );
 }

@@ -142,7 +142,26 @@ for (const [rota, nome] of ROTAS) {
 }
 
 // ---------------------------------------------------------------------------
-//  4. Exportação: o arquivo precisa sair, não só responder 200
+//  4. Telas públicas — precisam abrir SEM sessão
+// ---------------------------------------------------------------------------
+console.log();
+for (const [rota, nome] of [
+  ["/entrar", "Login"],
+  ["/entrar/recuperar", "Recuperar senha"],
+  ["/redefinir-senha", "Definir nova senha"],
+]) {
+  const r = await fetch(BASE + rota, { redirect: "manual" });
+  const html = r.status === 200 ? await r.text() : "";
+  const erro = MARCAS_DE_ERRO.find((m) => html.includes(m));
+  const ok = r.status === 200 && !erro;
+  if (!ok) falhas++;
+  console.log(
+    `  ${(nome + " (sem sessão)").padEnd(34)} ${ok ? `ok (${(html.length / 1024).toFixed(0)} KB)` : `HTTP ${r.status} ${erro ?? ""}`}`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+//  5. Exportação: o arquivo precisa sair, não só responder 200
 // ---------------------------------------------------------------------------
 console.log();
 for (const tipo of ["diario", "colaboradores", "equipes", "aplicativos"]) {

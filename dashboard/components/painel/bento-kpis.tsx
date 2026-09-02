@@ -23,7 +23,7 @@ import {
   formatarPorcentagem,
   formatarVariacao,
 } from "@/lib/formato";
-import type { KpisComparados } from "@/lib/tipos";
+import type { Kpis, KpisComparados } from "@/lib/tipos";
 
 interface Props {
   dados: KpisComparados;
@@ -31,24 +31,53 @@ interface Props {
 }
 
 /**
+ * Média de tempo ativo por pessoa e por dia.
+ *
+ * É o número que responde "quanto minha equipe trabalha", e por isso virou o
+ * protagonista do painel. O TOTAL do período não julga nada: 297 horas pode ser
+ * uma equipe excelente de cinco pessoas ou uma equipe fraca de vinte, e a mesma
+ * equipe muda de total só porque o mês tem mais dias úteis.
+ */
+function mediaDiariaPorPessoa(k: Kpis): number | null {
+  if (k.colaboradores === 0 || k.diasComRegistro === 0) return null;
+  return k.minutosAtivos / k.colaboradores / k.diasComRegistro;
+}
+
+function mediaInteracoesPorPessoaDia(k: Kpis): number | null {
+  if (k.colaboradores === 0 || k.diasComRegistro === 0) return null;
+  return (k.teclas + k.cliques) / k.colaboradores / k.diasComRegistro;
+}
+
+/** Variação percentual entre duas médias. NULL quando não há base. */
+function variacao(atual: number | null, anterior: number | null): number | null {
+  if (atual === null || anterior === null || anterior === 0) return null;
+  return Number((((atual - anterior) / anterior) * 100).toFixed(1));
+}
+
+/**
  * Topo do painel em duas camadas:
- *   1. quatro cartões de leitura imediata (o gestor entende em 5 segundos);
- *   2. uma faixa técnica com a composição do tempo e a densidade de interação,
- *      para quem quer entender o porquê do número.
+ *   1. cartões de leitura imediata, em MÉDIA por pessoa/dia — números
+ *      comparáveis entre equipes de tamanhos diferentes e entre períodos de
+ *      durações diferentes;
+ *   2. uma faixa técnica com a composição do tempo, para quem quer entender o
+ *      porquê do número.
  */
 export function BentoKpis({ dados, rotuloComparacao }: Props) {
-  const { atual, variacao } = dados;
+  const { atual, anterior } = dados;
   const faixa = faixaIndice(atual.indice);
 
-  const aderencia =
-    atual.jornadaEsperada > 0
-      ? (atual.minutosAtivos / atual.jornadaEsperada) * 100
-      : null;
+  const media = mediaDiariaPorPessoa(atual);
+  const mediaAnterior = mediaDiariaPorPessoa(anterior);
 
-  const mediaPorPessoaDia =
-    atual.colaboradores > 0 && atual.diasComRegistro > 0
-      ? atual.minutosAtivos / atual.colaboradores / atual.diasComRegistro
-      : 0;
+  const interacoes = mediaInteracoesPorPessoaDia(atual);
+  const interacoesAnterior = mediaInteracoesPorPessoaDia(anterior);
+
+  const aderencia =
+    atual.jornadaEsperada > 0 ? (atual.minutosAtivos / atual.jornadaEsperada) * 100 : null;
+  const aderenciaAnterior =
+    anterior.jornadaEsperada > 0
+      ? (anterior.minutosAtivos / anterior.jornadaEsperada) * 100
+      : null;
 
   return (
     <div className="space-y-4">
@@ -61,9 +90,7 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
                 <Gauge className="h-4 w-4 text-cyan-400" />
                 Índice de produtividade
               </span>
-              <Badge variante={atual.indice === null ? "neutro" : "ciano"}>
-                {faixa.rotulo}
-              </Badge>
+              <Badge variante={atual.indice === null ? "neutro" : "ciano"}>{faixa.rotulo}</Badge>
             </div>
 
             {atual.indice === null ? (
@@ -81,7 +108,7 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
                     {formatarPorcentagem(atual.indice, 1)}
                   </span>
                   <Comparacao
-                    valor={variacao.indice}
+                    valor={dados.variacao.indice}
                     sufixo=" p.p."
                     rotulo={rotuloComparacao}
                   />
@@ -101,11 +128,13 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
           </div>
         </GlowCard>
 
+        {/* O número que responde "quanto minha equipe trabalha". */}
         <CartaoKpi
           icone={<Activity className="h-4 w-4 text-emerald-400" />}
-          rotulo="Tempo ativo"
-          valor={formatarHoras(atual.minutosAtivos)}
-          rodape={<Comparacao valor={variacao.minutosAtivos} rotulo={rotuloComparacao} />}
+          rotulo="Média por pessoa/dia"
+          valor={media === null ? "—" : formatarHoras(media)}
+          rodape={<Comparacao valor={variacao(media, mediaAnterior)} rotulo={rotuloComparacao} />}
+          detalhe={`${formatarHoras(atual.minutosAtivos)} no total do período`}
         />
 
         <CartaoKpi
@@ -113,11 +142,16 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
           rotulo="Aderência à jornada"
           valor={aderencia === null ? "—" : formatarPorcentagem(aderencia, 0)}
           rodape={
-            <span className="text-slate-500">
-              {atual.jornadaEsperada > 0
-                ? `${formatarHoras(atual.minutosAtivos)} de ${formatarHoras(atual.jornadaEsperada)} previstas`
-                : "sem jornada configurada"}
-            </span>
+            <Comparacao
+              valor={variacao(aderencia, aderenciaAnterior)}
+              sufixo=" p.p."
+              rotulo={rotuloComparacao}
+            />
+          }
+          detalhe={
+            atual.jornadaEsperada > 0
+              ? `de ${formatarHoras(atual.jornadaEsperada)} previstas`
+              : "sem jornada configurada"
           }
         />
 
@@ -128,7 +162,7 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
           rodape={
             <span className="text-slate-500">
               {atual.dispositivos} {atual.dispositivos === 1 ? "estação" : "estações"} ·{" "}
-              {atual.diasComRegistro} {atual.diasComRegistro === 1 ? "dia" : "dias"}
+              {atual.diasComRegistro} {atual.diasComRegistro === 1 ? "dia" : "dias"} com dado
             </span>
           }
         />
@@ -143,20 +177,25 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
 
         <CartaoKpi
           icone={<Keyboard className="h-4 w-4 text-amber-400" />}
-          rotulo="Interações"
-          valor={formatarNumeroCompacto(atual.teclas + atual.cliques)}
+          rotulo="Interações por pessoa/dia"
+          valor={interacoes === null ? "—" : formatarNumeroCompacto(interacoes)}
           rodape={
-            <span className="flex flex-wrap items-center gap-1 text-slate-500">
-              <MousePointerClick className="h-3.5 w-3.5" />
+            <Comparacao
+              valor={variacao(interacoes, interacoesAnterior)}
+              rotulo={rotuloComparacao}
+            />
+          }
+          detalhe={
+            <span className="flex flex-wrap items-center gap-1">
+              <MousePointerClick className="h-3 w-3" />
               {formatarNumeroCompacto(atual.cliques)} cliques ·{" "}
-              {formatarNumeroCompacto(atual.teclas)} teclas
+              {formatarNumeroCompacto(atual.teclas)} teclas no total
             </span>
           }
         />
       </section>
 
-      {/* Camada técnica: composição do tempo. */}
-      <ComposicaoTempo kpis={dados} mediaPorPessoaDia={mediaPorPessoaDia} />
+      <ComposicaoTempo kpis={dados} media={media} />
     </div>
   );
 }
@@ -166,12 +205,14 @@ function CartaoKpi({
   rotulo,
   valor,
   rodape,
+  detalhe,
   valorClasse = "text-2xl",
 }: {
   icone: React.ReactNode;
   rotulo: string;
   valor: string;
   rodape?: React.ReactNode;
+  detalhe?: React.ReactNode;
   valorClasse?: string;
 }) {
   return (
@@ -182,7 +223,10 @@ function CartaoKpi({
           {rotulo}
         </span>
         <p className={`mt-3 font-semibold text-slate-100 ${valorClasse}`}>{valor}</p>
-        <div className="mt-3 text-xs">{rodape}</div>
+        <div className="mt-3 space-y-1 text-xs">
+          {rodape}
+          {detalhe && <div className="text-slate-600">{detalhe}</div>}
+        </div>
       </div>
     </GlowCard>
   );
@@ -205,11 +249,7 @@ function Comparacao({
   const neutro = Math.abs(valor) < 0.05;
   const positivo = valor > 0;
   const Icone = neutro ? Minus : positivo ? TrendingUp : TrendingDown;
-  const cor = neutro
-    ? "text-slate-500"
-    : positivo
-      ? "text-emerald-400"
-      : "text-rose-400";
+  const cor = neutro ? "text-slate-500" : positivo ? "text-emerald-400" : "text-rose-400";
 
   const texto =
     sufixo === "%"
@@ -217,7 +257,7 @@ function Comparacao({
       : `${valor > 0 ? "+" : valor < 0 ? "−" : ""}${Math.abs(valor).toFixed(1).replace(".", ",")}${sufixo}`;
 
   return (
-    <span className={`flex items-center gap-1 ${cor}`}>
+    <span className={`flex flex-wrap items-center gap-1 ${cor}`}>
       <Icone className="h-3.5 w-3.5" />
       {texto}
       <span className="text-slate-600">vs. {rotulo}</span>
@@ -225,13 +265,7 @@ function Comparacao({
   );
 }
 
-function ComposicaoTempo({
-  kpis,
-  mediaPorPessoaDia,
-}: {
-  kpis: KpisComparados;
-  mediaPorPessoaDia: number;
-}) {
+function ComposicaoTempo({ kpis, media }: { kpis: KpisComparados; media: number | null }) {
   const { atual } = kpis;
 
   const faixas = [
@@ -242,13 +276,16 @@ function ComposicaoTempo({
   ];
 
   const totalAtivo = faixas.reduce((s, f) => s + f.minutos, 0);
+  const podeMediar = atual.colaboradores > 0 && atual.diasComRegistro > 0;
 
   return (
     <section className="rounded-xl2 border border-borda vidro p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-sm font-medium text-slate-200">Composição do tempo ativo</h3>
         <p className="text-xs text-slate-500">
-          média de {formatarHoras(mediaPorPessoaDia)} ativos por pessoa/dia
+          {media === null
+            ? "sem registro no período"
+            : `média de ${formatarHoras(media)} ativos por pessoa/dia`}
         </p>
       </div>
 
@@ -274,6 +311,12 @@ function ComposicaoTempo({
           <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {faixas.map((f) => {
               const pct = (f.minutos / totalAtivo) * 100;
+              // Mesmo raciocínio do topo, aplicado à composição: média por
+              // pessoa/dia dentro de cada faixa.
+              const mediaFaixa = podeMediar
+                ? f.minutos / atual.colaboradores / atual.diasComRegistro
+                : null;
+
               return (
                 <div key={f.chave} className="flex flex-col gap-1">
                   <dt className="flex items-center gap-1.5 text-xs text-slate-400">
@@ -284,10 +327,15 @@ function ComposicaoTempo({
                     {ROTULOS_TIPO[f.chave]}
                   </dt>
                   <dd className="text-sm font-medium text-slate-100">
-                    {formatarHoras(f.minutos)}
+                    {formatarHoras(mediaFaixa ?? f.minutos)}
                     <span className="ml-1.5 text-xs font-normal text-slate-500">
                       {formatarPorcentagem(pct, 0)}
                     </span>
+                    {mediaFaixa !== null && (
+                      <span className="block text-xs font-normal text-slate-600">
+                        por pessoa/dia
+                      </span>
+                    )}
                   </dd>
                 </div>
               );
@@ -295,10 +343,10 @@ function ComposicaoTempo({
           </dl>
 
           {atual.minutosSemClassificar > 0 && (
-            <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-300/90">
+            <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs leading-relaxed text-amber-300/90">
               {formatarPorcentagem((atual.minutosSemClassificar / totalAtivo) * 100, 0)} do
-              tempo ativo está em aplicativos ainda sem categoria — esse tempo fica de fora
-              do índice. Classifique em Administração para o número refletir a operação.
+              tempo ativo está em aplicativos ainda sem categoria — esse tempo fica de fora do
+              índice. Classifique em Administração para o número refletir a operação.
             </p>
           )}
         </>

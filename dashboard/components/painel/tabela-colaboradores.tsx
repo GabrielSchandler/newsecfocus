@@ -64,6 +64,21 @@ export function TabelaColaboradores({ linhas, recorte, mostrarEquipe = true }: P
       ),
     },
     {
+      chave: "mediaDia",
+      rotulo: "Média/dia",
+      alinhar: "direita",
+      valorOrdenacao: (l) => (l.diasComRegistro > 0 ? l.minutosAtivos / l.diasComRegistro : 0),
+      render: (l) => (
+        // O total do período depende de quantos dias a pessoa apareceu; a média
+        // é o que dá para comparar duas pessoas lado a lado.
+        <span className="tabular-nums text-slate-200">
+          {l.diasComRegistro > 0
+            ? formatarHorasCurto(l.minutosAtivos / l.diasComRegistro)
+            : "—"}
+        </span>
+      ),
+    },
+    {
       chave: "ocioso",
       rotulo: "Ocioso",
       alinhar: "direita",

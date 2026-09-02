@@ -58,6 +58,18 @@ export function TabelaEquipes({
       ),
     },
     {
+      chave: "mediaPessoa",
+      rotulo: "Média/pessoa",
+      alinhar: "direita",
+      valorOrdenacao: (l) => (l.pessoas > 0 ? l.minutosAtivos / l.pessoas : 0),
+      render: (l) => (
+        // Sem isso, uma equipe de dez sempre parece melhor que uma de três.
+        <span className="tabular-nums text-slate-200">
+          {l.pessoas > 0 ? formatarHorasCurto(l.minutosAtivos / l.pessoas) : "—"}
+        </span>
+      ),
+    },
+    {
       chave: "produtivo",
       rotulo: "Produtivo",
       alinhar: "direita",
