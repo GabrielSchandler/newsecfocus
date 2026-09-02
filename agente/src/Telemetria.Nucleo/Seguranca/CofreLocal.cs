@@ -64,7 +64,14 @@ public static class CofreLocal
         }
     }
 
-    /// <summary>Converte a chave binária no literal hexadecimal que o PRAGMA key do SQLCipher espera.</summary>
+    /// <summary>
+    /// Converte a chave binária no literal que o PRAGMA key do SQLCipher espera.
+    ///
+    /// O literal de blob precisa vir ENTRE ASPAS DUPLAS: <c>PRAGMA key = "x'...'"</c>.
+    /// A gramática de PRAGMA do SQLite não aceita blob literal solto — sem as aspas o
+    /// banco responde <c>SQLite Error 1: near "x'...'": syntax error</c> e o agente
+    /// morre na abertura do buffer, antes de conseguir registrar qualquer log.
+    /// </summary>
     public static string ChaveParaPragma(byte[] chave) =>
-        "x'" + Convert.ToHexString(chave).ToLowerInvariant() + "'";
+        "\"x'" + Convert.ToHexString(chave).ToLowerInvariant() + "'\"";
 }

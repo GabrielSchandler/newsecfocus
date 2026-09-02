@@ -62,7 +62,20 @@ internal static class Program
 
         var buffer = new BufferTelemetria(CaminhosAplicacao.BancoLocal, chave,
             loggerFactory.CreateLogger<BufferTelemetria>());
-        buffer.Inicializar();
+
+        try
+        {
+            buffer.Inicializar();
+        }
+        catch (Exception ex)
+        {
+            // Sem este catch, uma falha aqui derruba o processo sem escrever nada:
+            // o operador vê o coletor "sumir" da máquina do cliente e não tem log
+            // nenhum para investigar. Foi exatamente o que aconteceu no primeiro
+            // teste real (PRAGMA key sem aspas).
+            logGeral.LogCritical(ex, "Falha ao abrir o buffer local. Coletor não iniciará.");
+            return;
+        }
 
         var contadores = new ContadoresEntrada(loggerFactory.CreateLogger<ContadoresEntrada>());
         var inspetor = new InspetorJanela(loggerFactory.CreateLogger<InspetorJanela>());
