@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
+    <!-- O agente so fala portugues: nao empacotar as traducoes de recurso do
+         .NET. Sao dezenas de arquivos que nunca sao lidos e engordam o MSI. -->
+    <SatelliteResourceLanguages>pt-BR</SatelliteResourceLanguages>
     <RootNamespace>Telemetria.Servico</RootNamespace>
     <AssemblyName>Telemetria.Servico</AssemblyName>
     <OutputType>Exe</OutputType>

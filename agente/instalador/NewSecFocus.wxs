@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   Instalador do NewSec Focus (MSI)
+
+   Um único instalador serve a TODAS as empresas clientes. O que identifica a
+   empresa é a chave de matrícula, passada como propriedade e gravada no
+   registro — é assim que dá para empurrar para 30 máquinas de uma vez por GPO
+   ou Intune, sem editar arquivo em nenhuma delas:
+
+     msiexec /i NewSecFocus.msi /qn ^
+       URLSUPABASE=https://xxxx.supabase.co ^
+       CHAVEANONIMA=eyJhbGciOi... ^
+       CHAVEMATRICULA=a7a9fe99...
+
+   Instalação interativa (duplo clique) também funciona: sem as propriedades, o
+   agente sobe e fica aguardando configuração, que pode chegar depois por GPO.
+
+   Compilar:  wix build NewSecFocus.wxs -d Publicado=..\publicado-msi -o NewSecFocus.msi
+  ============================================================================
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package
+      Name="NewSec Focus"
+      Manufacturer="NewSec"
+      Version="1.0.0.0"
+      UpgradeCode="8f3b21c4-5d7a-4e26-9a10-6c4f2b8d9e13"
+      Scope="perMachine"
+      Language="1046"
+      Codepage="1252">
+
+    <!-- Atualizar por cima remove a versão antiga sozinho: reinstalar não
+         duplica serviço nem deixa binário órfão. -->
+    <MajorUpgrade
+        AllowSameVersionUpgrades="yes"
+        DowngradeErrorMessage="Já existe uma versão mais recente do NewSec Focus nesta máquina." />
+
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <SummaryInformation
+        Description="Agente de telemetria de produtividade"
+        Keywords="produtividade,telemetria,NewSec" />
+
+    <!-- ==================================================================
+         Identidade da empresa, recebida na linha de comando
+         ================================================================== -->
+    <!-- Secure="yes" permite que a propriedade sobreviva à elevação quando o
+         MSI roda sem interface, que é o caso da implantação por GPO. -->
+    <Property Id="URLSUPABASE" Secure="yes" />
+    <Property Id="CHAVEANONIMA" Secure="yes" />
+    <Property Id="CHAVEMATRICULA" Secure="yes" />
+
+    <!-- ==================================================================
+         Onde instala
+         ================================================================== -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="NewSec Focus" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="PASTADADOS" Name="TelemetriaProdutividade">
+        <Directory Id="PASTALOGS" Name="logs" />
+      </Directory>
+    </StandardDirectory>
+
+    <!-- ==================================================================
+         Arquivos
+         ================================================================== -->
+    <!-- Tudo menos o executável do serviço, que ganha componente próprio por
+         causa das declarações de serviço. -->
+    <!-- A lista de arquivos vem de Arquivos.wxs, gerado por
+         instalador/gerar-arquivos.py a cada republicação do agente. -->
+
+    <Component Id="ServicoSupervisor" Directory="INSTALLFOLDER" Guid="2c9e4a17-8b35-4f61-a2d7-1e5c8f30b6a9">
+      <File Id="ExecutavelServico"
+            Source="!(bindpath.Publicado)\Telemetria.Servico.exe"
+            KeyPath="yes" />
+
+      <!-- SYSTEM porque o serviço precisa lançar o coletor dentro da sessão de
+           cada usuário logado, o que exige privilégio de sistema. -->
+      <ServiceInstall
+          Id="InstalarServico"
+          Name="TelemetriaProdutividade"
+          DisplayName="NewSec Focus"
+          Description="Coleta de metadados de produtividade em conformidade com a LGPD. Nao registra conteudo digitado, telas ou mensagens."
+          Type="ownProcess"
+          Start="auto"
+          ErrorControl="normal"
+          Account="NT AUTHORITY\SYSTEM"
+          Vital="yes">
+        <!-- Recupera sozinho de falha: 5s, 10s e 30s, zerando a contagem a cada 24h. -->
+        <util:ServiceConfig
+            FirstFailureActionType="restart"
+            SecondFailureActionType="restart"
+            ThirdFailureActionType="restart"
+            RestartServiceDelayInSeconds="5"
+            ResetPeriodInDays="1" />
+      </ServiceInstall>
+
+      <ServiceControl
+          Id="ControlarServico"
+          Name="TelemetriaProdutividade"
+          Start="install"
+          Stop="both"
+          Remove="uninstall"
+          Wait="yes" />
+    </Component>
+
+    <!-- ==================================================================
+         Identidade da empresa no registro
+         ================================================================== -->
+    <Component Id="ConfiguracaoEmpresa" Directory="INSTALLFOLDER" Guid="6d1a83f2-47c9-4b58-8e30-9f21c7a4d5b6">
+      <RegistryKey Root="HKLM" Key="SOFTWARE\NewSecFocus" ForceDeleteOnUninstall="yes">
+        <RegistryValue Name="UrlSupabase"    Type="string" Value="[URLSUPABASE]"    KeyPath="yes" />
+        <RegistryValue Name="ChaveAnonima"   Type="string" Value="[CHAVEANONIMA]" />
+        <RegistryValue Name="ChaveMatricula" Type="string" Value="[CHAVEMATRICULA]" />
+        <RegistryValue Name="Versao"         Type="string" Value="1.0.0.0" />
+      </RegistryKey>
+    </Component>
+
+    <!-- ==================================================================
+         Pasta de dados
+         ================================================================== -->
+    <!-- Criada aqui para já existir quando o serviço subir. O banco cifrado e
+         os logs ficam nela; a desinstalação NÃO apaga, para não destruir dado
+         que ainda não subiu para o servidor. -->
+    <Component Id="PastaDeDados" Directory="PASTADADOS" Guid="b4728e05-3c16-49da-9f87-2a0d6be1c834">
+      <CreateFolder />
+      <RegistryValue Root="HKLM" Key="SOFTWARE\NewSecFocus" Name="PastaDados"
+                     Type="string" Value="[PASTADADOS]" KeyPath="yes" />
+    </Component>
+
+    <Component Id="PastaDeLogs" Directory="PASTALOGS" Guid="e91c6d38-70b4-4a52-bc19-5d83f2470ae6">
+      <CreateFolder />
+      <RegistryValue Root="HKLM" Key="SOFTWARE\NewSecFocus" Name="PastaLogs"
+                     Type="string" Value="[PASTALOGS]" KeyPath="yes" />
+    </Component>
+
+    <!-- ==================================================================
+         O que entra na instalação
+         ================================================================== -->
+    <Feature Id="Principal" Title="NewSec Focus" Level="1">
+      <ComponentGroupRef Id="ArquivosDoAgente" />
+      <ComponentRef Id="ServicoSupervisor" />
+      <ComponentRef Id="ConfiguracaoEmpresa" />
+      <ComponentRef Id="PastaDeDados" />
+      <ComponentRef Id="PastaDeLogs" />
+    </Feature>
+
+  </Package>
+</Wix>

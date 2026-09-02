@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
+    <!-- O agente so fala portugues: nao empacotar as traducoes de recurso do
+         .NET. Sao dezenas de arquivos que nunca sao lidos e engordam o MSI. -->
+    <SatelliteResourceLanguages>pt-BR</SatelliteResourceLanguages>
     <UseWindowsForms>true</UseWindowsForms>
     <!-- UseWPF só para ter acesso ao System.Windows.Automation (UI Automation gerenciado),
          usado na extração do domínio do navegador. Nenhuma janela WPF é criada. -->

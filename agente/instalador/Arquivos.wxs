@@ -1,0 +1,1582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GERADO por instalador/gerar-arquivos.py. Nao editar a mao.
+  Rodar de novo sempre que o agente for republicado.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="DIR_coletor" Name="coletor" />
+      <Directory Id="DIR_coletor_pt_BR" Name="coletor\pt-BR" />
+    </DirectoryRef>
+
+    <ComponentGroup Id="ArquivosDoAgente">
+      <Component Id="cmp_Microsoft_CSharp_dll_967e91fa" Directory="INSTALLFOLDER" Guid="{967E91FA-FA39-5D60-9E86-07921170631D}">
+        <File Id="fil_Microsoft_CSharp_dll_967e91fa" Source="!(bindpath.Publicado)\Microsoft.CSharp.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Data_Sqlite_dll_edbdcfb4" Directory="INSTALLFOLDER" Guid="{EDBDCFB4-DD4C-5645-B82B-FDBC202D4776}">
+        <File Id="fil_Microsoft_Data_Sqlite_dll_edbdcfb4" Source="!(bindpath.Publicado)\Microsoft.Data.Sqlite.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_DiaSymReader_Native_amd64_dll_9a8423c2" Directory="INSTALLFOLDER" Guid="{9A8423C2-CED5-5F3E-A2C7-E38E7EDE63FE}">
+        <File Id="fil_Microsoft_DiaSymReader_Native_amd64_dll_9a8423c2" Source="!(bindpath.Publicado)\Microsoft.DiaSymReader.Native.amd64.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_rosoft_Extensions_Configuration_Abstractions_dll_b061ca73" Directory="INSTALLFOLDER" Guid="{B061CA73-AA14-517D-B989-3C25707AEFB9}">
+        <File Id="fil_rosoft_Extensions_Configuration_Abstractions_dll_b061ca73" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Configuration_Binder_dll_8bfa748f" Directory="INSTALLFOLDER" Guid="{8BFA748F-ADF2-5B8F-99C8-F93A71FDCD5C}">
+        <File Id="fil_Microsoft_Extensions_Configuration_Binder_dll_8bfa748f" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.Binder.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_crosoft_Extensions_Configuration_CommandLine_dll_869681fc" Directory="INSTALLFOLDER" Guid="{869681FC-9194-5BD1-A733-92CD9CD3DCE8}">
+        <File Id="fil_crosoft_Extensions_Configuration_CommandLine_dll_869681fc" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.CommandLine.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_xtensions_Configuration_EnvironmentVariables_dll_5dd0454b" Directory="INSTALLFOLDER" Guid="{5DD0454B-71D3-5F70-94A0-43E3A2F9C0B8}">
+        <File Id="fil_xtensions_Configuration_EnvironmentVariables_dll_5dd0454b" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_soft_Extensions_Configuration_FileExtensions_dll_2a6b8c4f" Directory="INSTALLFOLDER" Guid="{2A6B8C4F-967E-5A57-9BDF-2D6956CD183F}">
+        <File Id="fil_soft_Extensions_Configuration_FileExtensions_dll_2a6b8c4f" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.FileExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Configuration_Json_dll_b9a887b8" Directory="INSTALLFOLDER" Guid="{B9A887B8-07F7-5259-A95C-7BB3F015D98D}">
+        <File Id="fil_Microsoft_Extensions_Configuration_Json_dll_b9a887b8" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_crosoft_Extensions_Configuration_UserSecrets_dll_6425d3be" Directory="INSTALLFOLDER" Guid="{6425D3BE-F931-50E7-AC10-4E367E2E6F8B}">
+        <File Id="fil_crosoft_Extensions_Configuration_UserSecrets_dll_6425d3be" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.UserSecrets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Configuration_dll_bd5757d9" Directory="INSTALLFOLDER" Guid="{BD5757D9-9E5F-5570-BCD0-51808E59A6B7}">
+        <File Id="fil_Microsoft_Extensions_Configuration_dll_bd5757d9" Source="!(bindpath.Publicado)\Microsoft.Extensions.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__Extensions_DependencyInjection_Abstractions_dll_4457f712" Directory="INSTALLFOLDER" Guid="{4457F712-DAC7-5B18-92ED-3DCB64B24A09}">
+        <File Id="fil__Extensions_DependencyInjection_Abstractions_dll_4457f712" Source="!(bindpath.Publicado)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_DependencyInjection_dll_78fc6b5d" Directory="INSTALLFOLDER" Guid="{78FC6B5D-9A28-5689-9C62-951E108DA7A1}">
+        <File Id="fil_Microsoft_Extensions_DependencyInjection_dll_78fc6b5d" Source="!(bindpath.Publicado)\Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_icrosoft_Extensions_Diagnostics_Abstractions_dll_fa38ace5" Directory="INSTALLFOLDER" Guid="{FA38ACE5-5D65-51D3-8AE3-8B47B2AFA6C0}">
+        <File Id="fil_icrosoft_Extensions_Diagnostics_Abstractions_dll_fa38ace5" Source="!(bindpath.Publicado)\Microsoft.Extensions.Diagnostics.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Diagnostics_dll_6cd061f7" Directory="INSTALLFOLDER" Guid="{6CD061F7-A6C5-5B4C-B9B8-70CFD483C775}">
+        <File Id="fil_Microsoft_Extensions_Diagnostics_dll_6cd061f7" Source="!(bindpath.Publicado)\Microsoft.Extensions.Diagnostics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_rosoft_Extensions_FileProviders_Abstractions_dll_6412d2d2" Directory="INSTALLFOLDER" Guid="{6412D2D2-AB13-5BEC-ABDB-23CAC8812F30}">
+        <File Id="fil_rosoft_Extensions_FileProviders_Abstractions_dll_6412d2d2" Source="!(bindpath.Publicado)\Microsoft.Extensions.FileProviders.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_FileProviders_Physical_dll_78cda3a5" Directory="INSTALLFOLDER" Guid="{78CDA3A5-6D2E-558E-8474-4985B184B31A}">
+        <File Id="fil_Microsoft_Extensions_FileProviders_Physical_dll_78cda3a5" Source="!(bindpath.Publicado)\Microsoft.Extensions.FileProviders.Physical.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_FileSystemGlobbing_dll_79f527e4" Directory="INSTALLFOLDER" Guid="{79F527E4-FDE0-5DE7-9617-0C78D0C65382}">
+        <File Id="fil_Microsoft_Extensions_FileSystemGlobbing_dll_79f527e4" Source="!(bindpath.Publicado)\Microsoft.Extensions.FileSystemGlobbing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Hosting_Abstractions_dll_cac95523" Directory="INSTALLFOLDER" Guid="{CAC95523-2BBB-507F-A2E2-5CA7B191DBAF}">
+        <File Id="fil_Microsoft_Extensions_Hosting_Abstractions_dll_cac95523" Source="!(bindpath.Publicado)\Microsoft.Extensions.Hosting.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Hosting_WindowsServices_dll_fc3ce8dd" Directory="INSTALLFOLDER" Guid="{FC3CE8DD-6528-5C80-9B29-3D84F811652C}">
+        <File Id="fil_Microsoft_Extensions_Hosting_WindowsServices_dll_fc3ce8dd" Source="!(bindpath.Publicado)\Microsoft.Extensions.Hosting.WindowsServices.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Hosting_dll_fb7a3a64" Directory="INSTALLFOLDER" Guid="{FB7A3A64-698A-5E3E-BDA8-E552B91D3902}">
+        <File Id="fil_Microsoft_Extensions_Hosting_dll_fb7a3a64" Source="!(bindpath.Publicado)\Microsoft.Extensions.Hosting.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Http_dll_22b30b45" Directory="INSTALLFOLDER" Guid="{22B30B45-F8AC-58BC-A079-9CF6A3AE6089}">
+        <File Id="fil_Microsoft_Extensions_Http_dll_22b30b45" Source="!(bindpath.Publicado)\Microsoft.Extensions.Http.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_Abstractions_dll_c49ea4a0" Directory="INSTALLFOLDER" Guid="{C49EA4A0-0300-53BC-92C4-4341EF2BA93C}">
+        <File Id="fil_Microsoft_Extensions_Logging_Abstractions_dll_c49ea4a0" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_Configuration_dll_fd34275c" Directory="INSTALLFOLDER" Guid="{FD34275C-7236-53D0-A3AA-2C53AE9C7BBE}">
+        <File Id="fil_Microsoft_Extensions_Logging_Configuration_dll_fd34275c" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_Console_dll_37a07be2" Directory="INSTALLFOLDER" Guid="{37A07BE2-907B-5436-9E95-C29346F84E51}">
+        <File Id="fil_Microsoft_Extensions_Logging_Console_dll_37a07be2" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.Console.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_Debug_dll_00c539fe" Directory="INSTALLFOLDER" Guid="{00C539FE-D385-59A0-8E5B-6B0549838931}">
+        <File Id="fil_Microsoft_Extensions_Logging_Debug_dll_00c539fe" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.Debug.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_EventLog_dll_013c15bb" Directory="INSTALLFOLDER" Guid="{013C15BB-9A7B-53FA-B441-324A0F697D49}">
+        <File Id="fil_Microsoft_Extensions_Logging_EventLog_dll_013c15bb" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.EventLog.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_EventSource_dll_a3b97be1" Directory="INSTALLFOLDER" Guid="{A3B97BE1-1CA3-58E9-ADF8-774EC1BA674D}">
+        <File Id="fil_Microsoft_Extensions_Logging_EventSource_dll_a3b97be1" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.EventSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Logging_dll_4d45ff36" Directory="INSTALLFOLDER" Guid="{4D45FF36-72F7-58C9-BFC0-59BF61F182D9}">
+        <File Id="fil_Microsoft_Extensions_Logging_dll_4d45ff36" Source="!(bindpath.Publicado)\Microsoft.Extensions.Logging.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_t_Extensions_Options_ConfigurationExtensions_dll_4a367571" Directory="INSTALLFOLDER" Guid="{4A367571-C789-5F15-9502-A2703A938C25}">
+        <File Id="fil_t_Extensions_Options_ConfigurationExtensions_dll_4a367571" Source="!(bindpath.Publicado)\Microsoft.Extensions.Options.ConfigurationExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Options_dll_87ba1a65" Directory="INSTALLFOLDER" Guid="{87BA1A65-BB92-54B4-BF45-030EFD92851F}">
+        <File Id="fil_Microsoft_Extensions_Options_dll_87ba1a65" Source="!(bindpath.Publicado)\Microsoft.Extensions.Options.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Extensions_Primitives_dll_2f3fa1fb" Directory="INSTALLFOLDER" Guid="{2F3FA1FB-F07A-5943-92EB-B2DAA6EFB01F}">
+        <File Id="fil_Microsoft_Extensions_Primitives_dll_2f3fa1fb" Source="!(bindpath.Publicado)\Microsoft.Extensions.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_VisualBasic_Core_dll_a07c76c0" Directory="INSTALLFOLDER" Guid="{A07C76C0-31FC-5429-818A-804EC3AF69BF}">
+        <File Id="fil_Microsoft_VisualBasic_Core_dll_a07c76c0" Source="!(bindpath.Publicado)\Microsoft.VisualBasic.Core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_VisualBasic_dll_afa8227c" Directory="INSTALLFOLDER" Guid="{AFA8227C-DD0C-5E4F-8374-F047D3DB4824}">
+        <File Id="fil_Microsoft_VisualBasic_dll_afa8227c" Source="!(bindpath.Publicado)\Microsoft.VisualBasic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Win32_Primitives_dll_7566d965" Directory="INSTALLFOLDER" Guid="{7566D965-EA42-5CA2-BF5A-A9DEA7401FBE}">
+        <File Id="fil_Microsoft_Win32_Primitives_dll_7566d965" Source="!(bindpath.Publicado)\Microsoft.Win32.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Microsoft_Win32_Registry_dll_891d08de" Directory="INSTALLFOLDER" Guid="{891D08DE-470B-574E-AEE6-1A6CBF235D13}">
+        <File Id="fil_Microsoft_Win32_Registry_dll_891d08de" Source="!(bindpath.Publicado)\Microsoft.Win32.Registry.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_SQLitePCLRaw_batteries_v2_dll_c40d15ec" Directory="INSTALLFOLDER" Guid="{C40D15EC-1B18-507E-A1FA-3EC8F1DCEB22}">
+        <File Id="fil_SQLitePCLRaw_batteries_v2_dll_c40d15ec" Source="!(bindpath.Publicado)\SQLitePCLRaw.batteries_v2.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_SQLitePCLRaw_core_dll_aba2043d" Directory="INSTALLFOLDER" Guid="{ABA2043D-4551-5857-8531-512BE58E3B9A}">
+        <File Id="fil_SQLitePCLRaw_core_dll_aba2043d" Source="!(bindpath.Publicado)\SQLitePCLRaw.core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_SQLitePCLRaw_provider_e_sqlcipher_dll_6be58c51" Directory="INSTALLFOLDER" Guid="{6BE58C51-6C3A-5C0C-95FA-F649DADC1E2C}">
+        <File Id="fil_SQLitePCLRaw_provider_e_sqlcipher_dll_6be58c51" Source="!(bindpath.Publicado)\SQLitePCLRaw.provider.e_sqlcipher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_AppContext_dll_f98830c9" Directory="INSTALLFOLDER" Guid="{F98830C9-3278-59F3-8683-2E4665292343}">
+        <File Id="fil_System_AppContext_dll_f98830c9" Source="!(bindpath.Publicado)\System.AppContext.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Buffers_dll_c1551a03" Directory="INSTALLFOLDER" Guid="{C1551A03-279E-5424-9016-0B264BA80C89}">
+        <File Id="fil_System_Buffers_dll_c1551a03" Source="!(bindpath.Publicado)\System.Buffers.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Collections_Concurrent_dll_e8de7fa9" Directory="INSTALLFOLDER" Guid="{E8DE7FA9-ADF4-5D6F-8623-594831CC3B00}">
+        <File Id="fil_System_Collections_Concurrent_dll_e8de7fa9" Source="!(bindpath.Publicado)\System.Collections.Concurrent.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Collections_Immutable_dll_8bb41d80" Directory="INSTALLFOLDER" Guid="{8BB41D80-C230-5D37-BB33-73169F57435E}">
+        <File Id="fil_System_Collections_Immutable_dll_8bb41d80" Source="!(bindpath.Publicado)\System.Collections.Immutable.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Collections_NonGeneric_dll_1c5cb694" Directory="INSTALLFOLDER" Guid="{1C5CB694-CAD1-5918-9B5A-4BF9F328DCA7}">
+        <File Id="fil_System_Collections_NonGeneric_dll_1c5cb694" Source="!(bindpath.Publicado)\System.Collections.NonGeneric.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Collections_Specialized_dll_970d93fd" Directory="INSTALLFOLDER" Guid="{970D93FD-BE4C-5056-999D-B18B702FBAB9}">
+        <File Id="fil_System_Collections_Specialized_dll_970d93fd" Source="!(bindpath.Publicado)\System.Collections.Specialized.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Collections_dll_38aa5c0f" Directory="INSTALLFOLDER" Guid="{38AA5C0F-C60B-5C50-920E-DBCDF2287535}">
+        <File Id="fil_System_Collections_dll_38aa5c0f" Source="!(bindpath.Publicado)\System.Collections.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_Annotations_dll_762912d4" Directory="INSTALLFOLDER" Guid="{762912D4-18A6-5FA3-9484-AB085739FC6A}">
+        <File Id="fil_System_ComponentModel_Annotations_dll_762912d4" Source="!(bindpath.Publicado)\System.ComponentModel.Annotations.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_DataAnnotations_dll_e44bfe87" Directory="INSTALLFOLDER" Guid="{E44BFE87-A35B-5E5A-BE7A-636544240E67}">
+        <File Id="fil_System_ComponentModel_DataAnnotations_dll_e44bfe87" Source="!(bindpath.Publicado)\System.ComponentModel.DataAnnotations.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_EventBasedAsync_dll_35bb4a2e" Directory="INSTALLFOLDER" Guid="{35BB4A2E-77F6-524B-A22C-B1BCA1C76E25}">
+        <File Id="fil_System_ComponentModel_EventBasedAsync_dll_35bb4a2e" Source="!(bindpath.Publicado)\System.ComponentModel.EventBasedAsync.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_Primitives_dll_b626e962" Directory="INSTALLFOLDER" Guid="{B626E962-8286-54AD-AD60-683ED00788D8}">
+        <File Id="fil_System_ComponentModel_Primitives_dll_b626e962" Source="!(bindpath.Publicado)\System.ComponentModel.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_TypeConverter_dll_8b198b5c" Directory="INSTALLFOLDER" Guid="{8B198B5C-4DFB-5BEB-8628-3EDA60B8F7EB}">
+        <File Id="fil_System_ComponentModel_TypeConverter_dll_8b198b5c" Source="!(bindpath.Publicado)\System.ComponentModel.TypeConverter.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ComponentModel_dll_b8cdf77a" Directory="INSTALLFOLDER" Guid="{B8CDF77A-CC35-56F4-8FF4-686F24BCF697}">
+        <File Id="fil_System_ComponentModel_dll_b8cdf77a" Source="!(bindpath.Publicado)\System.ComponentModel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Configuration_dll_efd7ddeb" Directory="INSTALLFOLDER" Guid="{EFD7DDEB-8127-5C1A-9DE1-2EC3F339FB47}">
+        <File Id="fil_System_Configuration_dll_efd7ddeb" Source="!(bindpath.Publicado)\System.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Console_dll_4adff23f" Directory="INSTALLFOLDER" Guid="{4ADFF23F-B931-58C5-A429-E3977382D52E}">
+        <File Id="fil_System_Console_dll_4adff23f" Source="!(bindpath.Publicado)\System.Console.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Core_dll_12694066" Directory="INSTALLFOLDER" Guid="{12694066-6812-580C-AA5C-3A50589C3F9F}">
+        <File Id="fil_System_Core_dll_12694066" Source="!(bindpath.Publicado)\System.Core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Data_Common_dll_389015fc" Directory="INSTALLFOLDER" Guid="{389015FC-F830-5316-9639-73B343DE4CEF}">
+        <File Id="fil_System_Data_Common_dll_389015fc" Source="!(bindpath.Publicado)\System.Data.Common.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Data_DataSetExtensions_dll_7be4bccc" Directory="INSTALLFOLDER" Guid="{7BE4BCCC-31E5-577D-9DBC-8D39098F1E1A}">
+        <File Id="fil_System_Data_DataSetExtensions_dll_7be4bccc" Source="!(bindpath.Publicado)\System.Data.DataSetExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Data_dll_9ec23dc0" Directory="INSTALLFOLDER" Guid="{9EC23DC0-A6AB-5EE9-9634-50768F23B0C4}">
+        <File Id="fil_System_Data_dll_9ec23dc0" Source="!(bindpath.Publicado)\System.Data.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_Contracts_dll_e8315965" Directory="INSTALLFOLDER" Guid="{E8315965-ADF1-5545-A3BB-AC7F8F99A00F}">
+        <File Id="fil_System_Diagnostics_Contracts_dll_e8315965" Source="!(bindpath.Publicado)\System.Diagnostics.Contracts.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_Debug_dll_f64ffdb3" Directory="INSTALLFOLDER" Guid="{F64FFDB3-0FC4-54CD-AD17-AA21E41B400F}">
+        <File Id="fil_System_Diagnostics_Debug_dll_f64ffdb3" Source="!(bindpath.Publicado)\System.Diagnostics.Debug.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_DiagnosticSource_dll_5e119809" Directory="INSTALLFOLDER" Guid="{5E119809-3E5E-56AA-8CA1-56F5DC65D7C5}">
+        <File Id="fil_System_Diagnostics_DiagnosticSource_dll_5e119809" Source="!(bindpath.Publicado)\System.Diagnostics.DiagnosticSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_EventLog_Messages_dll_25400821" Directory="INSTALLFOLDER" Guid="{25400821-8E13-5720-AB05-ACA038C93146}">
+        <File Id="fil_System_Diagnostics_EventLog_Messages_dll_25400821" Source="!(bindpath.Publicado)\System.Diagnostics.EventLog.Messages.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_EventLog_dll_bf56cff8" Directory="INSTALLFOLDER" Guid="{BF56CFF8-A329-5B7C-8B68-896FE4C73C82}">
+        <File Id="fil_System_Diagnostics_EventLog_dll_bf56cff8" Source="!(bindpath.Publicado)\System.Diagnostics.EventLog.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_FileVersionInfo_dll_e5bddbc6" Directory="INSTALLFOLDER" Guid="{E5BDDBC6-3E1A-53AB-9B01-B709F177F637}">
+        <File Id="fil_System_Diagnostics_FileVersionInfo_dll_e5bddbc6" Source="!(bindpath.Publicado)\System.Diagnostics.FileVersionInfo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_Process_dll_8f4278ef" Directory="INSTALLFOLDER" Guid="{8F4278EF-4F02-5D99-9B0E-562704C12364}">
+        <File Id="fil_System_Diagnostics_Process_dll_8f4278ef" Source="!(bindpath.Publicado)\System.Diagnostics.Process.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_StackTrace_dll_7e3aebfe" Directory="INSTALLFOLDER" Guid="{7E3AEBFE-6943-55B8-BDC3-DC84114DA8B8}">
+        <File Id="fil_System_Diagnostics_StackTrace_dll_7e3aebfe" Source="!(bindpath.Publicado)\System.Diagnostics.StackTrace.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_TextWriterTraceListener_dll_3719e3e2" Directory="INSTALLFOLDER" Guid="{3719E3E2-F62C-57EB-9E44-024B8C607724}">
+        <File Id="fil_System_Diagnostics_TextWriterTraceListener_dll_3719e3e2" Source="!(bindpath.Publicado)\System.Diagnostics.TextWriterTraceListener.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_Tools_dll_c73cb2b1" Directory="INSTALLFOLDER" Guid="{C73CB2B1-CBF0-549D-A2EE-CC3BFCC70999}">
+        <File Id="fil_System_Diagnostics_Tools_dll_c73cb2b1" Source="!(bindpath.Publicado)\System.Diagnostics.Tools.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_TraceSource_dll_73526790" Directory="INSTALLFOLDER" Guid="{73526790-F8CE-5D1C-9F80-B9BAC691021D}">
+        <File Id="fil_System_Diagnostics_TraceSource_dll_73526790" Source="!(bindpath.Publicado)\System.Diagnostics.TraceSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Diagnostics_Tracing_dll_f42fb5d6" Directory="INSTALLFOLDER" Guid="{F42FB5D6-1175-5445-A066-4A735CA3BD54}">
+        <File Id="fil_System_Diagnostics_Tracing_dll_f42fb5d6" Source="!(bindpath.Publicado)\System.Diagnostics.Tracing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Drawing_Primitives_dll_567a1998" Directory="INSTALLFOLDER" Guid="{567A1998-0494-5F6E-BB5B-C10A14B245B8}">
+        <File Id="fil_System_Drawing_Primitives_dll_567a1998" Source="!(bindpath.Publicado)\System.Drawing.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Drawing_dll_a9b6298b" Directory="INSTALLFOLDER" Guid="{A9B6298B-3E2C-52C9-9D60-129032D4A904}">
+        <File Id="fil_System_Drawing_dll_a9b6298b" Source="!(bindpath.Publicado)\System.Drawing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Dynamic_Runtime_dll_f34f11fe" Directory="INSTALLFOLDER" Guid="{F34F11FE-16CE-5B8D-80FA-A6F4C1285FF6}">
+        <File Id="fil_System_Dynamic_Runtime_dll_f34f11fe" Source="!(bindpath.Publicado)\System.Dynamic.Runtime.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Formats_Asn1_dll_b3dab730" Directory="INSTALLFOLDER" Guid="{B3DAB730-E998-533B-9518-C25575602D2B}">
+        <File Id="fil_System_Formats_Asn1_dll_b3dab730" Source="!(bindpath.Publicado)\System.Formats.Asn1.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Formats_Tar_dll_ccbe7520" Directory="INSTALLFOLDER" Guid="{CCBE7520-EDC4-56A0-AF3F-6D9AB43EE14E}">
+        <File Id="fil_System_Formats_Tar_dll_ccbe7520" Source="!(bindpath.Publicado)\System.Formats.Tar.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Globalization_Calendars_dll_947bb9d8" Directory="INSTALLFOLDER" Guid="{947BB9D8-86BC-5A47-B1B7-241612E5967D}">
+        <File Id="fil_System_Globalization_Calendars_dll_947bb9d8" Source="!(bindpath.Publicado)\System.Globalization.Calendars.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Globalization_Extensions_dll_80786869" Directory="INSTALLFOLDER" Guid="{80786869-03F1-5432-8494-5731CDF3A9DC}">
+        <File Id="fil_System_Globalization_Extensions_dll_80786869" Source="!(bindpath.Publicado)\System.Globalization.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Globalization_dll_46cb2846" Directory="INSTALLFOLDER" Guid="{46CB2846-1D40-554B-9F80-C162FF9FEAC3}">
+        <File Id="fil_System_Globalization_dll_46cb2846" Source="!(bindpath.Publicado)\System.Globalization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Compression_Brotli_dll_ad32e8df" Directory="INSTALLFOLDER" Guid="{AD32E8DF-BA2F-5838-9E95-995707A8327A}">
+        <File Id="fil_System_IO_Compression_Brotli_dll_ad32e8df" Source="!(bindpath.Publicado)\System.IO.Compression.Brotli.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Compression_FileSystem_dll_24d810ab" Directory="INSTALLFOLDER" Guid="{24D810AB-E9DD-5D40-BB7F-FA5E837BE3E2}">
+        <File Id="fil_System_IO_Compression_FileSystem_dll_24d810ab" Source="!(bindpath.Publicado)\System.IO.Compression.FileSystem.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Compression_Native_dll_a57ddb86" Directory="INSTALLFOLDER" Guid="{A57DDB86-92BD-599B-81C5-B5A8906AC0DF}">
+        <File Id="fil_System_IO_Compression_Native_dll_a57ddb86" Source="!(bindpath.Publicado)\System.IO.Compression.Native.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Compression_ZipFile_dll_3cb65bfa" Directory="INSTALLFOLDER" Guid="{3CB65BFA-38CB-5AA2-981C-D1ADA69AC59B}">
+        <File Id="fil_System_IO_Compression_ZipFile_dll_3cb65bfa" Source="!(bindpath.Publicado)\System.IO.Compression.ZipFile.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Compression_dll_b1abffe6" Directory="INSTALLFOLDER" Guid="{B1ABFFE6-E527-5E83-A7DF-57DECF21021D}">
+        <File Id="fil_System_IO_Compression_dll_b1abffe6" Source="!(bindpath.Publicado)\System.IO.Compression.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_FileSystem_AccessControl_dll_6f30ee5a" Directory="INSTALLFOLDER" Guid="{6F30EE5A-AB54-5C2C-A771-202B443ED65D}">
+        <File Id="fil_System_IO_FileSystem_AccessControl_dll_6f30ee5a" Source="!(bindpath.Publicado)\System.IO.FileSystem.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_FileSystem_DriveInfo_dll_0cd8c531" Directory="INSTALLFOLDER" Guid="{0CD8C531-9852-53E5-BFC2-C2BE237BB89C}">
+        <File Id="fil_System_IO_FileSystem_DriveInfo_dll_0cd8c531" Source="!(bindpath.Publicado)\System.IO.FileSystem.DriveInfo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_FileSystem_Primitives_dll_d24712c7" Directory="INSTALLFOLDER" Guid="{D24712C7-560D-577F-8C01-E81D3A63A815}">
+        <File Id="fil_System_IO_FileSystem_Primitives_dll_d24712c7" Source="!(bindpath.Publicado)\System.IO.FileSystem.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_FileSystem_Watcher_dll_e80a7c6d" Directory="INSTALLFOLDER" Guid="{E80A7C6D-42A0-5E59-918B-7708E4FE90A4}">
+        <File Id="fil_System_IO_FileSystem_Watcher_dll_e80a7c6d" Source="!(bindpath.Publicado)\System.IO.FileSystem.Watcher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_FileSystem_dll_ff0d27eb" Directory="INSTALLFOLDER" Guid="{FF0D27EB-58B9-5257-AD44-5C2E1C97E425}">
+        <File Id="fil_System_IO_FileSystem_dll_ff0d27eb" Source="!(bindpath.Publicado)\System.IO.FileSystem.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_IsolatedStorage_dll_638b9d1d" Directory="INSTALLFOLDER" Guid="{638B9D1D-0792-502F-9476-618A5C5A591F}">
+        <File Id="fil_System_IO_IsolatedStorage_dll_638b9d1d" Source="!(bindpath.Publicado)\System.IO.IsolatedStorage.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_MemoryMappedFiles_dll_f3816a64" Directory="INSTALLFOLDER" Guid="{F3816A64-48BF-53B8-A6C4-48488DC3C8F6}">
+        <File Id="fil_System_IO_MemoryMappedFiles_dll_f3816a64" Source="!(bindpath.Publicado)\System.IO.MemoryMappedFiles.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Pipes_AccessControl_dll_e49ce05b" Directory="INSTALLFOLDER" Guid="{E49CE05B-1C68-513D-B0EC-82A715687A7F}">
+        <File Id="fil_System_IO_Pipes_AccessControl_dll_e49ce05b" Source="!(bindpath.Publicado)\System.IO.Pipes.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_Pipes_dll_8fdb7ce5" Directory="INSTALLFOLDER" Guid="{8FDB7CE5-5FD4-5B98-A0F4-A4FA512723A9}">
+        <File Id="fil_System_IO_Pipes_dll_8fdb7ce5" Source="!(bindpath.Publicado)\System.IO.Pipes.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_UnmanagedMemoryStream_dll_3b1ce47e" Directory="INSTALLFOLDER" Guid="{3B1CE47E-178B-559E-8F41-532173529BCC}">
+        <File Id="fil_System_IO_UnmanagedMemoryStream_dll_3b1ce47e" Source="!(bindpath.Publicado)\System.IO.UnmanagedMemoryStream.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_IO_dll_3f22eaa6" Directory="INSTALLFOLDER" Guid="{3F22EAA6-CDB9-5429-9A49-78FBB0178F03}">
+        <File Id="fil_System_IO_dll_3f22eaa6" Source="!(bindpath.Publicado)\System.IO.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Linq_Expressions_dll_e417903d" Directory="INSTALLFOLDER" Guid="{E417903D-6924-58CE-AD7E-ED81816D4498}">
+        <File Id="fil_System_Linq_Expressions_dll_e417903d" Source="!(bindpath.Publicado)\System.Linq.Expressions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Linq_Parallel_dll_693c57b9" Directory="INSTALLFOLDER" Guid="{693C57B9-BDCD-5D71-952D-A7F9B74ABEA9}">
+        <File Id="fil_System_Linq_Parallel_dll_693c57b9" Source="!(bindpath.Publicado)\System.Linq.Parallel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Linq_Queryable_dll_017c3c93" Directory="INSTALLFOLDER" Guid="{017C3C93-B461-5E6B-B1F1-44D6B3C4FD04}">
+        <File Id="fil_System_Linq_Queryable_dll_017c3c93" Source="!(bindpath.Publicado)\System.Linq.Queryable.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Linq_dll_45ec0719" Directory="INSTALLFOLDER" Guid="{45EC0719-FB30-5FD9-AC42-5B088EF277D7}">
+        <File Id="fil_System_Linq_dll_45ec0719" Source="!(bindpath.Publicado)\System.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Memory_dll_dd3915d3" Directory="INSTALLFOLDER" Guid="{DD3915D3-D5DD-5488-8F51-1316DC60C1F8}">
+        <File Id="fil_System_Memory_dll_dd3915d3" Source="!(bindpath.Publicado)\System.Memory.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Http_Json_dll_d2ef0eb5" Directory="INSTALLFOLDER" Guid="{D2EF0EB5-6993-57BE-A86D-296FC1023F7D}">
+        <File Id="fil_System_Net_Http_Json_dll_d2ef0eb5" Source="!(bindpath.Publicado)\System.Net.Http.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Http_dll_ded7f0c4" Directory="INSTALLFOLDER" Guid="{DED7F0C4-14DF-5730-925B-46E16A5F08D7}">
+        <File Id="fil_System_Net_Http_dll_ded7f0c4" Source="!(bindpath.Publicado)\System.Net.Http.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_HttpListener_dll_0c49ec76" Directory="INSTALLFOLDER" Guid="{0C49EC76-6813-5192-8AB9-16F789721507}">
+        <File Id="fil_System_Net_HttpListener_dll_0c49ec76" Source="!(bindpath.Publicado)\System.Net.HttpListener.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Mail_dll_44f64b57" Directory="INSTALLFOLDER" Guid="{44F64B57-261C-5D2D-970D-E7778D197A5A}">
+        <File Id="fil_System_Net_Mail_dll_44f64b57" Source="!(bindpath.Publicado)\System.Net.Mail.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_NameResolution_dll_9e16906f" Directory="INSTALLFOLDER" Guid="{9E16906F-7B78-5380-B9FC-12F9EC2D6D2C}">
+        <File Id="fil_System_Net_NameResolution_dll_9e16906f" Source="!(bindpath.Publicado)\System.Net.NameResolution.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_NetworkInformation_dll_e906a8d7" Directory="INSTALLFOLDER" Guid="{E906A8D7-8B21-5469-84E0-1857FE66CF9D}">
+        <File Id="fil_System_Net_NetworkInformation_dll_e906a8d7" Source="!(bindpath.Publicado)\System.Net.NetworkInformation.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Ping_dll_e2d0d72f" Directory="INSTALLFOLDER" Guid="{E2D0D72F-18CA-5CBC-800D-D636A34C44A0}">
+        <File Id="fil_System_Net_Ping_dll_e2d0d72f" Source="!(bindpath.Publicado)\System.Net.Ping.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Primitives_dll_3db27643" Directory="INSTALLFOLDER" Guid="{3DB27643-69A2-554D-84BD-474BAC2D66ED}">
+        <File Id="fil_System_Net_Primitives_dll_3db27643" Source="!(bindpath.Publicado)\System.Net.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Quic_dll_e0ebafdb" Directory="INSTALLFOLDER" Guid="{E0EBAFDB-3FDD-5556-A14D-2F19054C2731}">
+        <File Id="fil_System_Net_Quic_dll_e0ebafdb" Source="!(bindpath.Publicado)\System.Net.Quic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Requests_dll_feb521b3" Directory="INSTALLFOLDER" Guid="{FEB521B3-E6FF-5441-8DFD-8BA4E0AAFE45}">
+        <File Id="fil_System_Net_Requests_dll_feb521b3" Source="!(bindpath.Publicado)\System.Net.Requests.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Security_dll_e6410251" Directory="INSTALLFOLDER" Guid="{E6410251-10EC-5322-AE5E-3290BD4EB76B}">
+        <File Id="fil_System_Net_Security_dll_e6410251" Source="!(bindpath.Publicado)\System.Net.Security.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_ServicePoint_dll_45e08874" Directory="INSTALLFOLDER" Guid="{45E08874-7EFF-5761-B491-846143B45E26}">
+        <File Id="fil_System_Net_ServicePoint_dll_45e08874" Source="!(bindpath.Publicado)\System.Net.ServicePoint.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_Sockets_dll_9d696998" Directory="INSTALLFOLDER" Guid="{9D696998-CAD8-553A-9385-17A7D69130B0}">
+        <File Id="fil_System_Net_Sockets_dll_9d696998" Source="!(bindpath.Publicado)\System.Net.Sockets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_WebClient_dll_a082c8a0" Directory="INSTALLFOLDER" Guid="{A082C8A0-AF22-5461-AD3F-FF3F42D9FE77}">
+        <File Id="fil_System_Net_WebClient_dll_a082c8a0" Source="!(bindpath.Publicado)\System.Net.WebClient.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_WebHeaderCollection_dll_0b46fdfc" Directory="INSTALLFOLDER" Guid="{0B46FDFC-A34E-5980-8D2F-C8AFF64744BD}">
+        <File Id="fil_System_Net_WebHeaderCollection_dll_0b46fdfc" Source="!(bindpath.Publicado)\System.Net.WebHeaderCollection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_WebProxy_dll_bfbfe5a4" Directory="INSTALLFOLDER" Guid="{BFBFE5A4-DEEC-51AC-9079-5500570C77F5}">
+        <File Id="fil_System_Net_WebProxy_dll_bfbfe5a4" Source="!(bindpath.Publicado)\System.Net.WebProxy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_WebSockets_Client_dll_c0aca392" Directory="INSTALLFOLDER" Guid="{C0ACA392-E5EF-5D5E-8F0B-393CE9DF3A98}">
+        <File Id="fil_System_Net_WebSockets_Client_dll_c0aca392" Source="!(bindpath.Publicado)\System.Net.WebSockets.Client.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_WebSockets_dll_eb9e6ad2" Directory="INSTALLFOLDER" Guid="{EB9E6AD2-42DA-57F4-8A47-60682EC406BE}">
+        <File Id="fil_System_Net_WebSockets_dll_eb9e6ad2" Source="!(bindpath.Publicado)\System.Net.WebSockets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Net_dll_c48c64f5" Directory="INSTALLFOLDER" Guid="{C48C64F5-77C1-5F4E-ABBA-B3112026EAAA}">
+        <File Id="fil_System_Net_dll_c48c64f5" Source="!(bindpath.Publicado)\System.Net.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Numerics_Vectors_dll_014df74c" Directory="INSTALLFOLDER" Guid="{014DF74C-6690-51E7-AAFB-60049197072D}">
+        <File Id="fil_System_Numerics_Vectors_dll_014df74c" Source="!(bindpath.Publicado)\System.Numerics.Vectors.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Numerics_dll_fa474d80" Directory="INSTALLFOLDER" Guid="{FA474D80-5390-5B8B-B988-EAA71BB05448}">
+        <File Id="fil_System_Numerics_dll_fa474d80" Source="!(bindpath.Publicado)\System.Numerics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ObjectModel_dll_b3bd7d18" Directory="INSTALLFOLDER" Guid="{B3BD7D18-6778-547F-8E40-80BB9AAFBC2E}">
+        <File Id="fil_System_ObjectModel_dll_b3bd7d18" Source="!(bindpath.Publicado)\System.ObjectModel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Private_CoreLib_dll_04d68342" Directory="INSTALLFOLDER" Guid="{04D68342-CCE6-53D3-AE8E-B75C156C0CF8}">
+        <File Id="fil_System_Private_CoreLib_dll_04d68342" Source="!(bindpath.Publicado)\System.Private.CoreLib.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Private_DataContractSerialization_dll_1c3daabf" Directory="INSTALLFOLDER" Guid="{1C3DAABF-1933-5FA0-A53B-B92369317D13}">
+        <File Id="fil_System_Private_DataContractSerialization_dll_1c3daabf" Source="!(bindpath.Publicado)\System.Private.DataContractSerialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Private_Uri_dll_881a2507" Directory="INSTALLFOLDER" Guid="{881A2507-4F12-54AB-9DF4-E5FDB6692573}">
+        <File Id="fil_System_Private_Uri_dll_881a2507" Source="!(bindpath.Publicado)\System.Private.Uri.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Private_Xml_Linq_dll_430fc1a1" Directory="INSTALLFOLDER" Guid="{430FC1A1-1E54-56DF-A74E-3F0189F7C89A}">
+        <File Id="fil_System_Private_Xml_Linq_dll_430fc1a1" Source="!(bindpath.Publicado)\System.Private.Xml.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Private_Xml_dll_406452dd" Directory="INSTALLFOLDER" Guid="{406452DD-8481-59FB-AE34-94FA139B4D0F}">
+        <File Id="fil_System_Private_Xml_dll_406452dd" Source="!(bindpath.Publicado)\System.Private.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_DispatchProxy_dll_5a1ae1d8" Directory="INSTALLFOLDER" Guid="{5A1AE1D8-CAFE-5741-B5DF-E93C2909D86A}">
+        <File Id="fil_System_Reflection_DispatchProxy_dll_5a1ae1d8" Source="!(bindpath.Publicado)\System.Reflection.DispatchProxy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Emit_ILGeneration_dll_28661f28" Directory="INSTALLFOLDER" Guid="{28661F28-99E7-5C10-9BB8-201EB91B41CE}">
+        <File Id="fil_System_Reflection_Emit_ILGeneration_dll_28661f28" Source="!(bindpath.Publicado)\System.Reflection.Emit.ILGeneration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Emit_Lightweight_dll_8237012f" Directory="INSTALLFOLDER" Guid="{8237012F-0E2B-527B-875E-C955086F827E}">
+        <File Id="fil_System_Reflection_Emit_Lightweight_dll_8237012f" Source="!(bindpath.Publicado)\System.Reflection.Emit.Lightweight.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Emit_dll_975a7f36" Directory="INSTALLFOLDER" Guid="{975A7F36-5E6E-57F6-99BA-F99BCCDE0D11}">
+        <File Id="fil_System_Reflection_Emit_dll_975a7f36" Source="!(bindpath.Publicado)\System.Reflection.Emit.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Extensions_dll_9ce7ece5" Directory="INSTALLFOLDER" Guid="{9CE7ECE5-D145-5404-B474-FD82DF399FDF}">
+        <File Id="fil_System_Reflection_Extensions_dll_9ce7ece5" Source="!(bindpath.Publicado)\System.Reflection.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Metadata_dll_4d823fdd" Directory="INSTALLFOLDER" Guid="{4D823FDD-F98F-5CAD-869B-2CD5E1052B17}">
+        <File Id="fil_System_Reflection_Metadata_dll_4d823fdd" Source="!(bindpath.Publicado)\System.Reflection.Metadata.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_Primitives_dll_32337577" Directory="INSTALLFOLDER" Guid="{32337577-ED87-56A6-A69F-6ACD9459C8D2}">
+        <File Id="fil_System_Reflection_Primitives_dll_32337577" Source="!(bindpath.Publicado)\System.Reflection.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_TypeExtensions_dll_0b41df94" Directory="INSTALLFOLDER" Guid="{0B41DF94-DDFF-5688-B446-5A8984BD5352}">
+        <File Id="fil_System_Reflection_TypeExtensions_dll_0b41df94" Source="!(bindpath.Publicado)\System.Reflection.TypeExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Reflection_dll_b2e7e28b" Directory="INSTALLFOLDER" Guid="{B2E7E28B-B95B-52C1-B67E-3F868EF126D3}">
+        <File Id="fil_System_Reflection_dll_b2e7e28b" Source="!(bindpath.Publicado)\System.Reflection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Resources_Reader_dll_ce8fa4a0" Directory="INSTALLFOLDER" Guid="{CE8FA4A0-2D6F-5DF4-8310-8570F2320F7F}">
+        <File Id="fil_System_Resources_Reader_dll_ce8fa4a0" Source="!(bindpath.Publicado)\System.Resources.Reader.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Resources_ResourceManager_dll_457706ba" Directory="INSTALLFOLDER" Guid="{457706BA-2085-5F04-A215-A12BF0615B06}">
+        <File Id="fil_System_Resources_ResourceManager_dll_457706ba" Source="!(bindpath.Publicado)\System.Resources.ResourceManager.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Resources_Writer_dll_10025800" Directory="INSTALLFOLDER" Guid="{10025800-C66B-5547-98FA-6B2DF4A12D75}">
+        <File Id="fil_System_Resources_Writer_dll_10025800" Source="!(bindpath.Publicado)\System.Resources.Writer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_CompilerServices_Unsafe_dll_6bcc6d7a" Directory="INSTALLFOLDER" Guid="{6BCC6D7A-C738-57C3-869E-E36A31A96A24}">
+        <File Id="fil_System_Runtime_CompilerServices_Unsafe_dll_6bcc6d7a" Source="!(bindpath.Publicado)\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_CompilerServices_VisualC_dll_35efeeee" Directory="INSTALLFOLDER" Guid="{35EFEEEE-EAC4-5F9E-84C3-73BAADDFD5F0}">
+        <File Id="fil_System_Runtime_CompilerServices_VisualC_dll_35efeeee" Source="!(bindpath.Publicado)\System.Runtime.CompilerServices.VisualC.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Extensions_dll_1a351b56" Directory="INSTALLFOLDER" Guid="{1A351B56-8186-580D-BC49-A6AF9E001E08}">
+        <File Id="fil_System_Runtime_Extensions_dll_1a351b56" Source="!(bindpath.Publicado)\System.Runtime.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Handles_dll_cd2b5723" Directory="INSTALLFOLDER" Guid="{CD2B5723-ED08-5493-9C5A-B0F7CDE0FF05}">
+        <File Id="fil_System_Runtime_Handles_dll_cd2b5723" Source="!(bindpath.Publicado)\System.Runtime.Handles.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_InteropServices_JavaScript_dll_9025174f" Directory="INSTALLFOLDER" Guid="{9025174F-6CCA-5B62-B876-9871BD383F8E}">
+        <File Id="fil_System_Runtime_InteropServices_JavaScript_dll_9025174f" Source="!(bindpath.Publicado)\System.Runtime.InteropServices.JavaScript.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_m_Runtime_InteropServices_RuntimeInformation_dll_8c730e94" Directory="INSTALLFOLDER" Guid="{8C730E94-CDA0-5E33-AE93-14BE4D4EFDF0}">
+        <File Id="fil_m_Runtime_InteropServices_RuntimeInformation_dll_8c730e94" Source="!(bindpath.Publicado)\System.Runtime.InteropServices.RuntimeInformation.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_InteropServices_dll_847409b1" Directory="INSTALLFOLDER" Guid="{847409B1-62F6-5D73-8BF6-C3F9F7717745}">
+        <File Id="fil_System_Runtime_InteropServices_dll_847409b1" Source="!(bindpath.Publicado)\System.Runtime.InteropServices.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Intrinsics_dll_5fcde24f" Directory="INSTALLFOLDER" Guid="{5FCDE24F-B275-530F-854C-FB7586141742}">
+        <File Id="fil_System_Runtime_Intrinsics_dll_5fcde24f" Source="!(bindpath.Publicado)\System.Runtime.Intrinsics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Loader_dll_fdfba315" Directory="INSTALLFOLDER" Guid="{FDFBA315-8080-5420-8543-759C4E5C8FDE}">
+        <File Id="fil_System_Runtime_Loader_dll_fdfba315" Source="!(bindpath.Publicado)\System.Runtime.Loader.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Numerics_dll_7b4c0e53" Directory="INSTALLFOLDER" Guid="{7B4C0E53-D150-5EFF-AE95-F25CEE0331FF}">
+        <File Id="fil_System_Runtime_Numerics_dll_7b4c0e53" Source="!(bindpath.Publicado)\System.Runtime.Numerics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Serialization_Formatters_dll_deb61c26" Directory="INSTALLFOLDER" Guid="{DEB61C26-6F6B-5D0D-B7C8-82EE8BEE8368}">
+        <File Id="fil_System_Runtime_Serialization_Formatters_dll_deb61c26" Source="!(bindpath.Publicado)\System.Runtime.Serialization.Formatters.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Serialization_Json_dll_637f8c1d" Directory="INSTALLFOLDER" Guid="{637F8C1D-4940-5567-8739-E4222B48FC98}">
+        <File Id="fil_System_Runtime_Serialization_Json_dll_637f8c1d" Source="!(bindpath.Publicado)\System.Runtime.Serialization.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Serialization_Primitives_dll_99d3139b" Directory="INSTALLFOLDER" Guid="{99D3139B-F5FB-5C4E-B74F-4517290BBE43}">
+        <File Id="fil_System_Runtime_Serialization_Primitives_dll_99d3139b" Source="!(bindpath.Publicado)\System.Runtime.Serialization.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Serialization_Xml_dll_c1bfedb8" Directory="INSTALLFOLDER" Guid="{C1BFEDB8-6D1A-589C-B1FA-0954F49EA32B}">
+        <File Id="fil_System_Runtime_Serialization_Xml_dll_c1bfedb8" Source="!(bindpath.Publicado)\System.Runtime.Serialization.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_Serialization_dll_08f72d5f" Directory="INSTALLFOLDER" Guid="{08F72D5F-FADC-5AFC-9F36-726A3933224C}">
+        <File Id="fil_System_Runtime_Serialization_dll_08f72d5f" Source="!(bindpath.Publicado)\System.Runtime.Serialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Runtime_dll_a3bc9ebc" Directory="INSTALLFOLDER" Guid="{A3BC9EBC-E9F9-501D-85A9-D32E5A6354C4}">
+        <File Id="fil_System_Runtime_dll_a3bc9ebc" Source="!(bindpath.Publicado)\System.Runtime.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_AccessControl_dll_d3192289" Directory="INSTALLFOLDER" Guid="{D3192289-188E-5A35-A22A-AE6221934780}">
+        <File Id="fil_System_Security_AccessControl_dll_d3192289" Source="!(bindpath.Publicado)\System.Security.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Claims_dll_5bbe0d87" Directory="INSTALLFOLDER" Guid="{5BBE0D87-0AD1-5CF4-B96C-A612159F8C21}">
+        <File Id="fil_System_Security_Claims_dll_5bbe0d87" Source="!(bindpath.Publicado)\System.Security.Claims.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_Algorithms_dll_4babcb0b" Directory="INSTALLFOLDER" Guid="{4BABCB0B-560E-55F0-A125-DFBE81969FB9}">
+        <File Id="fil_System_Security_Cryptography_Algorithms_dll_4babcb0b" Source="!(bindpath.Publicado)\System.Security.Cryptography.Algorithms.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_Cng_dll_0857a27d" Directory="INSTALLFOLDER" Guid="{0857A27D-DF77-5C2E-BF1B-4152A2F91E1D}">
+        <File Id="fil_System_Security_Cryptography_Cng_dll_0857a27d" Source="!(bindpath.Publicado)\System.Security.Cryptography.Cng.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_Csp_dll_6b5f0faf" Directory="INSTALLFOLDER" Guid="{6B5F0FAF-A731-5FED-ABB7-42AC23E39027}">
+        <File Id="fil_System_Security_Cryptography_Csp_dll_6b5f0faf" Source="!(bindpath.Publicado)\System.Security.Cryptography.Csp.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_Encoding_dll_bd3aebea" Directory="INSTALLFOLDER" Guid="{BD3AEBEA-C931-5E9D-BAA8-39C5EB8184EF}">
+        <File Id="fil_System_Security_Cryptography_Encoding_dll_bd3aebea" Source="!(bindpath.Publicado)\System.Security.Cryptography.Encoding.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_OpenSsl_dll_c63f5e08" Directory="INSTALLFOLDER" Guid="{C63F5E08-9538-52D6-8740-20939F174659}">
+        <File Id="fil_System_Security_Cryptography_OpenSsl_dll_c63f5e08" Source="!(bindpath.Publicado)\System.Security.Cryptography.OpenSsl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_Primitives_dll_cdda8435" Directory="INSTALLFOLDER" Guid="{CDDA8435-03D8-5866-9C71-921D444AEF9C}">
+        <File Id="fil_System_Security_Cryptography_Primitives_dll_cdda8435" Source="!(bindpath.Publicado)\System.Security.Cryptography.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_ProtectedData_dll_e30fb066" Directory="INSTALLFOLDER" Guid="{E30FB066-9906-59FE-90F4-2DB54FAA483F}">
+        <File Id="fil_System_Security_Cryptography_ProtectedData_dll_e30fb066" Source="!(bindpath.Publicado)\System.Security.Cryptography.ProtectedData.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_ystem_Security_Cryptography_X509Certificates_dll_f3b72673" Directory="INSTALLFOLDER" Guid="{F3B72673-1B44-56A0-9196-3198399BA3BD}">
+        <File Id="fil_ystem_Security_Cryptography_X509Certificates_dll_f3b72673" Source="!(bindpath.Publicado)\System.Security.Cryptography.X509Certificates.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Cryptography_dll_61e31e75" Directory="INSTALLFOLDER" Guid="{61E31E75-72A7-56F5-AB59-D5F12FF111D2}">
+        <File Id="fil_System_Security_Cryptography_dll_61e31e75" Source="!(bindpath.Publicado)\System.Security.Cryptography.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Principal_Windows_dll_12ba8bb9" Directory="INSTALLFOLDER" Guid="{12BA8BB9-8585-5CAD-9ABE-D55BEEA48976}">
+        <File Id="fil_System_Security_Principal_Windows_dll_12ba8bb9" Source="!(bindpath.Publicado)\System.Security.Principal.Windows.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_Principal_dll_dadec92c" Directory="INSTALLFOLDER" Guid="{DADEC92C-C7F6-58BF-A712-2982701E63D4}">
+        <File Id="fil_System_Security_Principal_dll_dadec92c" Source="!(bindpath.Publicado)\System.Security.Principal.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_SecureString_dll_5a831798" Directory="INSTALLFOLDER" Guid="{5A831798-000C-5154-A6A7-DBAEA188E6BB}">
+        <File Id="fil_System_Security_SecureString_dll_5a831798" Source="!(bindpath.Publicado)\System.Security.SecureString.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Security_dll_bc62bfc5" Directory="INSTALLFOLDER" Guid="{BC62BFC5-ACA2-522A-B9CE-F131D543C975}">
+        <File Id="fil_System_Security_dll_bc62bfc5" Source="!(bindpath.Publicado)\System.Security.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ServiceModel_Web_dll_4857a413" Directory="INSTALLFOLDER" Guid="{4857A413-6A4E-54BE-BF43-178F857E2457}">
+        <File Id="fil_System_ServiceModel_Web_dll_4857a413" Source="!(bindpath.Publicado)\System.ServiceModel.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ServiceProcess_ServiceController_dll_ae953fc6" Directory="INSTALLFOLDER" Guid="{AE953FC6-AED5-5E0C-82AF-B72BE00C3F7B}">
+        <File Id="fil_System_ServiceProcess_ServiceController_dll_ae953fc6" Source="!(bindpath.Publicado)\System.ServiceProcess.ServiceController.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ServiceProcess_dll_e1e17494" Directory="INSTALLFOLDER" Guid="{E1E17494-E410-52C6-A4C6-9F3A8B84EC7A}">
+        <File Id="fil_System_ServiceProcess_dll_e1e17494" Source="!(bindpath.Publicado)\System.ServiceProcess.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_Encoding_CodePages_dll_6713ff50" Directory="INSTALLFOLDER" Guid="{6713FF50-F3D7-50E4-B314-71D90E681E1E}">
+        <File Id="fil_System_Text_Encoding_CodePages_dll_6713ff50" Source="!(bindpath.Publicado)\System.Text.Encoding.CodePages.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_Encoding_Extensions_dll_4264184a" Directory="INSTALLFOLDER" Guid="{4264184A-9D60-52BE-BB13-007E08779FA2}">
+        <File Id="fil_System_Text_Encoding_Extensions_dll_4264184a" Source="!(bindpath.Publicado)\System.Text.Encoding.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_Encoding_dll_b010f837" Directory="INSTALLFOLDER" Guid="{B010F837-135D-538A-8381-DB4B43BC16AD}">
+        <File Id="fil_System_Text_Encoding_dll_b010f837" Source="!(bindpath.Publicado)\System.Text.Encoding.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_Encodings_Web_dll_5e1f06e5" Directory="INSTALLFOLDER" Guid="{5E1F06E5-AB46-556B-821E-AD0F6889B851}">
+        <File Id="fil_System_Text_Encodings_Web_dll_5e1f06e5" Source="!(bindpath.Publicado)\System.Text.Encodings.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_Json_dll_320e7651" Directory="INSTALLFOLDER" Guid="{320E7651-FD65-5108-9EE4-7B58B8053CB3}">
+        <File Id="fil_System_Text_Json_dll_320e7651" Source="!(bindpath.Publicado)\System.Text.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Text_RegularExpressions_dll_810a7a54" Directory="INSTALLFOLDER" Guid="{810A7A54-7465-539D-BE72-E2E76361D891}">
+        <File Id="fil_System_Text_RegularExpressions_dll_810a7a54" Source="!(bindpath.Publicado)\System.Text.RegularExpressions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Channels_dll_e5a5a360" Directory="INSTALLFOLDER" Guid="{E5A5A360-9106-51E6-9CC7-FD8325173CD2}">
+        <File Id="fil_System_Threading_Channels_dll_e5a5a360" Source="!(bindpath.Publicado)\System.Threading.Channels.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Overlapped_dll_2c08fedc" Directory="INSTALLFOLDER" Guid="{2C08FEDC-827F-5683-9FF5-C01E56A51C0D}">
+        <File Id="fil_System_Threading_Overlapped_dll_2c08fedc" Source="!(bindpath.Publicado)\System.Threading.Overlapped.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Tasks_Dataflow_dll_e7a25aed" Directory="INSTALLFOLDER" Guid="{E7A25AED-527D-5135-999A-6A3E07F85AD8}">
+        <File Id="fil_System_Threading_Tasks_Dataflow_dll_e7a25aed" Source="!(bindpath.Publicado)\System.Threading.Tasks.Dataflow.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Tasks_Extensions_dll_4caf6e5b" Directory="INSTALLFOLDER" Guid="{4CAF6E5B-AE46-5D79-A155-75B24159FBE2}">
+        <File Id="fil_System_Threading_Tasks_Extensions_dll_4caf6e5b" Source="!(bindpath.Publicado)\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Tasks_Parallel_dll_beb94dba" Directory="INSTALLFOLDER" Guid="{BEB94DBA-0B4C-5F58-A347-3BC0167166C3}">
+        <File Id="fil_System_Threading_Tasks_Parallel_dll_beb94dba" Source="!(bindpath.Publicado)\System.Threading.Tasks.Parallel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Tasks_dll_8f3656c8" Directory="INSTALLFOLDER" Guid="{8F3656C8-D286-553A-9AC3-CF8141A929F7}">
+        <File Id="fil_System_Threading_Tasks_dll_8f3656c8" Source="!(bindpath.Publicado)\System.Threading.Tasks.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Thread_dll_47c49b05" Directory="INSTALLFOLDER" Guid="{47C49B05-9D99-5F6B-884C-045634A8A9CE}">
+        <File Id="fil_System_Threading_Thread_dll_47c49b05" Source="!(bindpath.Publicado)\System.Threading.Thread.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_ThreadPool_dll_898062ec" Directory="INSTALLFOLDER" Guid="{898062EC-552F-5B2F-ACF5-28A4C3289CD6}">
+        <File Id="fil_System_Threading_ThreadPool_dll_898062ec" Source="!(bindpath.Publicado)\System.Threading.ThreadPool.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_Timer_dll_9ade887f" Directory="INSTALLFOLDER" Guid="{9ADE887F-1776-516E-B07F-AB08FBBC7FE7}">
+        <File Id="fil_System_Threading_Timer_dll_9ade887f" Source="!(bindpath.Publicado)\System.Threading.Timer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Threading_dll_92e828ba" Directory="INSTALLFOLDER" Guid="{92E828BA-B908-5934-A704-9C6EBEC1A473}">
+        <File Id="fil_System_Threading_dll_92e828ba" Source="!(bindpath.Publicado)\System.Threading.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Transactions_Local_dll_c5961a94" Directory="INSTALLFOLDER" Guid="{C5961A94-1F4E-58D8-B8F0-FBF97596478F}">
+        <File Id="fil_System_Transactions_Local_dll_c5961a94" Source="!(bindpath.Publicado)\System.Transactions.Local.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Transactions_dll_0600a7d3" Directory="INSTALLFOLDER" Guid="{0600A7D3-D5C6-51F3-ABF0-B942275B573D}">
+        <File Id="fil_System_Transactions_dll_0600a7d3" Source="!(bindpath.Publicado)\System.Transactions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_ValueTuple_dll_1e61fc71" Directory="INSTALLFOLDER" Guid="{1E61FC71-75AB-5955-80C3-31D58865385C}">
+        <File Id="fil_System_ValueTuple_dll_1e61fc71" Source="!(bindpath.Publicado)\System.ValueTuple.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Web_HttpUtility_dll_73eaf2b2" Directory="INSTALLFOLDER" Guid="{73EAF2B2-6F49-5679-9323-829B027CEF13}">
+        <File Id="fil_System_Web_HttpUtility_dll_73eaf2b2" Source="!(bindpath.Publicado)\System.Web.HttpUtility.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Web_dll_48c81bb5" Directory="INSTALLFOLDER" Guid="{48C81BB5-82C2-5EB4-BAD9-71D4AB199E44}">
+        <File Id="fil_System_Web_dll_48c81bb5" Source="!(bindpath.Publicado)\System.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Windows_dll_b7413597" Directory="INSTALLFOLDER" Guid="{B7413597-89CA-563C-BD75-CC0150AA0475}">
+        <File Id="fil_System_Windows_dll_b7413597" Source="!(bindpath.Publicado)\System.Windows.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_Linq_dll_39c4a2d0" Directory="INSTALLFOLDER" Guid="{39C4A2D0-E163-59DD-9433-08888033ACEA}">
+        <File Id="fil_System_Xml_Linq_dll_39c4a2d0" Source="!(bindpath.Publicado)\System.Xml.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_ReaderWriter_dll_2a85e421" Directory="INSTALLFOLDER" Guid="{2A85E421-2DC5-5474-8F87-5EC812CD6499}">
+        <File Id="fil_System_Xml_ReaderWriter_dll_2a85e421" Source="!(bindpath.Publicado)\System.Xml.ReaderWriter.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_Serialization_dll_8ad63d6d" Directory="INSTALLFOLDER" Guid="{8AD63D6D-7F8A-5067-BC9A-9947144B7267}">
+        <File Id="fil_System_Xml_Serialization_dll_8ad63d6d" Source="!(bindpath.Publicado)\System.Xml.Serialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_XDocument_dll_959e3674" Directory="INSTALLFOLDER" Guid="{959E3674-BD77-5280-9EC4-039A39222738}">
+        <File Id="fil_System_Xml_XDocument_dll_959e3674" Source="!(bindpath.Publicado)\System.Xml.XDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_XPath_XDocument_dll_82469ba1" Directory="INSTALLFOLDER" Guid="{82469BA1-B6A8-5753-806B-5DE65C86FF72}">
+        <File Id="fil_System_Xml_XPath_XDocument_dll_82469ba1" Source="!(bindpath.Publicado)\System.Xml.XPath.XDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_XPath_dll_6db0c208" Directory="INSTALLFOLDER" Guid="{6DB0C208-AC67-5379-9A38-673E948D0101}">
+        <File Id="fil_System_Xml_XPath_dll_6db0c208" Source="!(bindpath.Publicado)\System.Xml.XPath.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_XmlDocument_dll_94f256c0" Directory="INSTALLFOLDER" Guid="{94F256C0-66F2-5855-B5FF-991C46290368}">
+        <File Id="fil_System_Xml_XmlDocument_dll_94f256c0" Source="!(bindpath.Publicado)\System.Xml.XmlDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_XmlSerializer_dll_5ce026fe" Directory="INSTALLFOLDER" Guid="{5CE026FE-A9C4-5B06-A897-341163BAC66B}">
+        <File Id="fil_System_Xml_XmlSerializer_dll_5ce026fe" Source="!(bindpath.Publicado)\System.Xml.XmlSerializer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Xml_dll_f4cb3fd0" Directory="INSTALLFOLDER" Guid="{F4CB3FD0-1C0B-5F54-89A4-9BCE9EC63AB7}">
+        <File Id="fil_System_Xml_dll_f4cb3fd0" Source="!(bindpath.Publicado)\System.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_dll_2c7a345d" Directory="INSTALLFOLDER" Guid="{2C7A345D-4337-5073-B668-26814D17F0B9}">
+        <File Id="fil_System_dll_2c7a345d" Source="!(bindpath.Publicado)\System.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Nucleo_dll_3e84a98a" Directory="INSTALLFOLDER" Guid="{3E84A98A-E2CE-52CE-B3CB-9A97C1541822}">
+        <File Id="fil_Telemetria_Nucleo_dll_3e84a98a" Source="!(bindpath.Publicado)\Telemetria.Nucleo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Nucleo_pdb_4622093a" Directory="INSTALLFOLDER" Guid="{4622093A-12AA-5126-8314-202BC78B35E2}">
+        <File Id="fil_Telemetria_Nucleo_pdb_4622093a" Source="!(bindpath.Publicado)\Telemetria.Nucleo.pdb" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Servico_deps_json_25bba793" Directory="INSTALLFOLDER" Guid="{25BBA793-DE4B-5724-8918-6CE57CEA03F0}">
+        <File Id="fil_Telemetria_Servico_deps_json_25bba793" Source="!(bindpath.Publicado)\Telemetria.Servico.deps.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Servico_dll_b24b6b3a" Directory="INSTALLFOLDER" Guid="{B24B6B3A-3A95-5E2B-8B61-CB067AC96B28}">
+        <File Id="fil_Telemetria_Servico_dll_b24b6b3a" Source="!(bindpath.Publicado)\Telemetria.Servico.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Servico_pdb_2a558ba9" Directory="INSTALLFOLDER" Guid="{2A558BA9-BEAE-500E-9BFF-00694CEC1457}">
+        <File Id="fil_Telemetria_Servico_pdb_2a558ba9" Source="!(bindpath.Publicado)\Telemetria.Servico.pdb" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_Telemetria_Servico_runtimeconfig_json_ccae892e" Directory="INSTALLFOLDER" Guid="{CCAE892E-C342-5806-9FC8-2950BD0A9451}">
+        <File Id="fil_Telemetria_Servico_runtimeconfig_json_ccae892e" Source="!(bindpath.Publicado)\Telemetria.Servico.runtimeconfig.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_WindowsBase_dll_b2abf7e2" Directory="INSTALLFOLDER" Guid="{B2ABF7E2-00FF-542C-BEEA-28E345B00D6D}">
+        <File Id="fil_WindowsBase_dll_b2abf7e2" Source="!(bindpath.Publicado)\WindowsBase.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_appsettings_json_58bb159c" Directory="INSTALLFOLDER" Guid="{58BB159C-951E-5FF9-8510-E23087596D25}">
+        <File Id="fil_appsettings_json_58bb159c" Source="!(bindpath.Publicado)\appsettings.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_clretwrc_dll_ffab2c78" Directory="INSTALLFOLDER" Guid="{FFAB2C78-05C5-50B4-AE94-552F5646104C}">
+        <File Id="fil_clretwrc_dll_ffab2c78" Source="!(bindpath.Publicado)\clretwrc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_clrgc_dll_799d97c3" Directory="INSTALLFOLDER" Guid="{799D97C3-AE5A-5BC3-95B3-C5980AE3801E}">
+        <File Id="fil_clrgc_dll_799d97c3" Source="!(bindpath.Publicado)\clrgc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_clrjit_dll_4e4679cb" Directory="INSTALLFOLDER" Guid="{4E4679CB-D266-58D4-86FB-763A315437C9}">
+        <File Id="fil_clrjit_dll_4e4679cb" Source="!(bindpath.Publicado)\clrjit.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coreclr_dll_cb63a3a9" Directory="INSTALLFOLDER" Guid="{CB63A3A9-FDE8-566B-8C7A-CCB30C5930D4}">
+        <File Id="fil_coreclr_dll_cb63a3a9" Source="!(bindpath.Publicado)\coreclr.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_createdump_exe_498fbea5" Directory="INSTALLFOLDER" Guid="{498FBEA5-96E1-559E-8C4E-0DB91060245D}">
+        <File Id="fil_createdump_exe_498fbea5" Source="!(bindpath.Publicado)\createdump.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_e_sqlcipher_dll_be0433e1" Directory="INSTALLFOLDER" Guid="{BE0433E1-6ABF-5795-9169-BEA34832102E}">
+        <File Id="fil_e_sqlcipher_dll_be0433e1" Source="!(bindpath.Publicado)\e_sqlcipher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_hostfxr_dll_14de7a55" Directory="INSTALLFOLDER" Guid="{14DE7A55-3E7A-50C0-AAEB-AE35ABE82890}">
+        <File Id="fil_hostfxr_dll_14de7a55" Source="!(bindpath.Publicado)\hostfxr.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_hostpolicy_dll_a4c403c4" Directory="INSTALLFOLDER" Guid="{A4C403C4-14F2-5035-9E39-7CBB8B499B85}">
+        <File Id="fil_hostpolicy_dll_a4c403c4" Source="!(bindpath.Publicado)\hostpolicy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_mscordaccore_dll_13479bfd" Directory="INSTALLFOLDER" Guid="{13479BFD-AFB5-57A1-B203-5121D3F69362}">
+        <File Id="fil_mscordaccore_dll_13479bfd" Source="!(bindpath.Publicado)\mscordaccore.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_mscordaccore_amd64_amd64_8_0_3026_36720_dll_bbcaddc9" Directory="INSTALLFOLDER" Guid="{BBCADDC9-7F65-5E55-A2E5-1CC29B9F1B45}">
+        <File Id="fil_mscordaccore_amd64_amd64_8_0_3026_36720_dll_bbcaddc9" Source="!(bindpath.Publicado)\mscordaccore_amd64_amd64_8.0.3026.36720.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_mscordbi_dll_176f6292" Directory="INSTALLFOLDER" Guid="{176F6292-E5F6-56F3-8D87-0581A42C121B}">
+        <File Id="fil_mscordbi_dll_176f6292" Source="!(bindpath.Publicado)\mscordbi.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_mscorlib_dll_0c914eaa" Directory="INSTALLFOLDER" Guid="{0C914EAA-7CED-5CBA-9FF4-AB82FFCB0C6F}">
+        <File Id="fil_mscorlib_dll_0c914eaa" Source="!(bindpath.Publicado)\mscorlib.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_mscorrc_dll_91a641bf" Directory="INSTALLFOLDER" Guid="{91A641BF-79A2-58EA-BBBB-6013E3742BC0}">
+        <File Id="fil_mscorrc_dll_91a641bf" Source="!(bindpath.Publicado)\mscorrc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_msquic_dll_0fca4ad6" Directory="INSTALLFOLDER" Guid="{0FCA4AD6-D24D-52C4-8365-A0EA5A7C7170}">
+        <File Id="fil_msquic_dll_0fca4ad6" Source="!(bindpath.Publicado)\msquic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_netstandard_dll_af77246f" Directory="INSTALLFOLDER" Guid="{AF77246F-5257-5AC1-8845-E47234DD3692}">
+        <File Id="fil_netstandard_dll_af77246f" Source="!(bindpath.Publicado)\netstandard.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Accessibility_dll_76eacb7c" Directory="DIR_coletor" Guid="{76EACB7C-A6B6-50A2-977A-688C8F952A0D}">
+        <File Id="fil_coletor_Accessibility_dll_76eacb7c" Source="!(bindpath.Publicado)\coletor\Accessibility.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_D3DCompiler_47_cor3_dll_36f27ec1" Directory="DIR_coletor" Guid="{36F27EC1-AB9D-5520-9433-11D1D6599AAF}">
+        <File Id="fil_coletor_D3DCompiler_47_cor3_dll_36f27ec1" Source="!(bindpath.Publicado)\coletor\D3DCompiler_47_cor3.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_DirectWriteForwarder_dll_74f35445" Directory="DIR_coletor" Guid="{74F35445-9052-51D9-87F4-772C7A0BB001}">
+        <File Id="fil_coletor_DirectWriteForwarder_dll_74f35445" Source="!(bindpath.Publicado)\coletor\DirectWriteForwarder.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_CSharp_dll_6dfee744" Directory="DIR_coletor" Guid="{6DFEE744-6113-5DFA-8F1A-22FA96242F60}">
+        <File Id="fil_coletor_Microsoft_CSharp_dll_6dfee744" Source="!(bindpath.Publicado)\coletor\Microsoft.CSharp.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Data_Sqlite_dll_20673bbf" Directory="DIR_coletor" Guid="{20673BBF-4046-5493-A97D-C4CC0A06E207}">
+        <File Id="fil_coletor_Microsoft_Data_Sqlite_dll_20673bbf" Source="!(bindpath.Publicado)\coletor\Microsoft.Data.Sqlite.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_DiaSymReader_Native_amd64_dll_8371d40a" Directory="DIR_coletor" Guid="{8371D40A-1800-5A35-8C12-4A9C7B538567}">
+        <File Id="fil_coletor_Microsoft_DiaSymReader_Native_amd64_dll_8371d40a" Source="!(bindpath.Publicado)\coletor\Microsoft.DiaSymReader.Native.amd64.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_rosoft_Extensions_Configuration_Abstractions_dll_812e7104" Directory="DIR_coletor" Guid="{812E7104-4331-5A2A-BA27-6F38A34B5EA7}">
+        <File Id="fil_rosoft_Extensions_Configuration_Abstractions_dll_812e7104" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_or_Microsoft_Extensions_Configuration_Binder_dll_4ba5651b" Directory="DIR_coletor" Guid="{4BA5651B-1048-5341-8BE7-69211122B921}">
+        <File Id="fil_or_Microsoft_Extensions_Configuration_Binder_dll_4ba5651b" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.Binder.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_crosoft_Extensions_Configuration_CommandLine_dll_494ab864" Directory="DIR_coletor" Guid="{494AB864-B246-5FA0-B634-929FC7EBE9FA}">
+        <File Id="fil_crosoft_Extensions_Configuration_CommandLine_dll_494ab864" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.CommandLine.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_xtensions_Configuration_EnvironmentVariables_dll_4cdfc6cf" Directory="DIR_coletor" Guid="{4CDFC6CF-0462-5CC9-92A1-2F705E07273A}">
+        <File Id="fil_xtensions_Configuration_EnvironmentVariables_dll_4cdfc6cf" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_soft_Extensions_Configuration_FileExtensions_dll_2302aec3" Directory="DIR_coletor" Guid="{2302AEC3-2677-5528-9ADC-DC0D9957EB87}">
+        <File Id="fil_soft_Extensions_Configuration_FileExtensions_dll_2302aec3" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.FileExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_Microsoft_Extensions_Configuration_Json_dll_8c72ae21" Directory="DIR_coletor" Guid="{8C72AE21-61D7-5CFA-B521-30F7E31D4C6E}">
+        <File Id="fil_etor_Microsoft_Extensions_Configuration_Json_dll_8c72ae21" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_crosoft_Extensions_Configuration_UserSecrets_dll_186807b1" Directory="DIR_coletor" Guid="{186807B1-E194-590C-BD0D-249F2C223C3C}">
+        <File Id="fil_crosoft_Extensions_Configuration_UserSecrets_dll_186807b1" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.UserSecrets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Configuration_dll_4136a955" Directory="DIR_coletor" Guid="{4136A955-CB2C-55F3-8746-D26F5EF8F3D5}">
+        <File Id="fil_coletor_Microsoft_Extensions_Configuration_dll_4136a955" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__Extensions_DependencyInjection_Abstractions_dll_1723dd49" Directory="DIR_coletor" Guid="{1723DD49-04AB-5172-81B7-66360AB4BDA5}">
+        <File Id="fil__Extensions_DependencyInjection_Abstractions_dll_1723dd49" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_tor_Microsoft_Extensions_DependencyInjection_dll_5417f840" Directory="DIR_coletor" Guid="{5417F840-2164-5003-93B3-0A8935328901}">
+        <File Id="fil_tor_Microsoft_Extensions_DependencyInjection_dll_5417f840" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_icrosoft_Extensions_Diagnostics_Abstractions_dll_566232ca" Directory="DIR_coletor" Guid="{566232CA-A15D-5049-81FE-E7C6A63A3735}">
+        <File Id="fil_icrosoft_Extensions_Diagnostics_Abstractions_dll_566232ca" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Diagnostics.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Diagnostics_dll_11883512" Directory="DIR_coletor" Guid="{11883512-8664-539C-B2BD-EF09DB1DA7BD}">
+        <File Id="fil_coletor_Microsoft_Extensions_Diagnostics_dll_11883512" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Diagnostics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_rosoft_Extensions_FileProviders_Abstractions_dll_1dec0f06" Directory="DIR_coletor" Guid="{1DEC0F06-2A44-547B-B7BF-10A334DEB98A}">
+        <File Id="fil_rosoft_Extensions_FileProviders_Abstractions_dll_1dec0f06" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.FileProviders.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__Microsoft_Extensions_FileProviders_Physical_dll_4bdbf49d" Directory="DIR_coletor" Guid="{4BDBF49D-4A6D-5364-99FC-FBA6DABBA3A2}">
+        <File Id="fil__Microsoft_Extensions_FileProviders_Physical_dll_4bdbf49d" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.FileProviders.Physical.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_Microsoft_Extensions_FileSystemGlobbing_dll_50dd55f4" Directory="DIR_coletor" Guid="{50DD55F4-16FC-5820-A62D-5CB8F55D7F0C}">
+        <File Id="fil_etor_Microsoft_Extensions_FileSystemGlobbing_dll_50dd55f4" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.FileSystemGlobbing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_or_Microsoft_Extensions_Hosting_Abstractions_dll_26c05097" Directory="DIR_coletor" Guid="{26C05097-15B4-533F-8508-4E7A0BC69A09}">
+        <File Id="fil_or_Microsoft_Extensions_Hosting_Abstractions_dll_26c05097" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Hosting.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Hosting_dll_af078d0f" Directory="DIR_coletor" Guid="{AF078D0F-E271-5863-B5E3-F9FB4003FF63}">
+        <File Id="fil_coletor_Microsoft_Extensions_Hosting_dll_af078d0f" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Hosting.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_or_Microsoft_Extensions_Logging_Abstractions_dll_025a5eaf" Directory="DIR_coletor" Guid="{025A5EAF-FAEC-5D86-9DB4-CAB18713D3C7}">
+        <File Id="fil_or_Microsoft_Extensions_Logging_Abstractions_dll_025a5eaf" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_r_Microsoft_Extensions_Logging_Configuration_dll_b4951e14" Directory="DIR_coletor" Guid="{B4951E14-294F-58AE-8029-066C9522BE97}">
+        <File Id="fil_r_Microsoft_Extensions_Logging_Configuration_dll_b4951e14" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Logging_Console_dll_67863441" Directory="DIR_coletor" Guid="{67863441-157D-5E91-A176-49B022FF41F5}">
+        <File Id="fil_coletor_Microsoft_Extensions_Logging_Console_dll_67863441" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.Console.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Logging_Debug_dll_f3de419a" Directory="DIR_coletor" Guid="{F3DE419A-EF66-58B7-BF60-B4020B2A10A4}">
+        <File Id="fil_coletor_Microsoft_Extensions_Logging_Debug_dll_f3de419a" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.Debug.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_Microsoft_Extensions_Logging_EventLog_dll_ad00862e" Directory="DIR_coletor" Guid="{AD00862E-5C6B-5B7B-A2C2-08CCAEF15F99}">
+        <File Id="fil_oletor_Microsoft_Extensions_Logging_EventLog_dll_ad00862e" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.EventLog.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_tor_Microsoft_Extensions_Logging_EventSource_dll_44a4adf7" Directory="DIR_coletor" Guid="{44A4ADF7-8E22-5025-81A0-82F1747CB5D8}">
+        <File Id="fil_tor_Microsoft_Extensions_Logging_EventSource_dll_44a4adf7" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.EventSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Logging_dll_084437fb" Directory="DIR_coletor" Guid="{084437FB-C113-5B95-AAD4-6B932DECDC6E}">
+        <File Id="fil_coletor_Microsoft_Extensions_Logging_dll_084437fb" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Logging.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_t_Extensions_Options_ConfigurationExtensions_dll_df583512" Directory="DIR_coletor" Guid="{DF583512-FDCE-5244-85DC-55F354E376E7}">
+        <File Id="fil_t_Extensions_Options_ConfigurationExtensions_dll_df583512" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Options.ConfigurationExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Options_dll_0a3afbd2" Directory="DIR_coletor" Guid="{0A3AFBD2-3A39-5123-BDB3-3E7C91629A09}">
+        <File Id="fil_coletor_Microsoft_Extensions_Options_dll_0a3afbd2" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Options.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Extensions_Primitives_dll_4affdda0" Directory="DIR_coletor" Guid="{4AFFDDA0-A91A-5E5F-873A-F3FA69689C0B}">
+        <File Id="fil_coletor_Microsoft_Extensions_Primitives_dll_4affdda0" Source="!(bindpath.Publicado)\coletor\Microsoft.Extensions.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_VisualBasic_Core_dll_5ffe9f63" Directory="DIR_coletor" Guid="{5FFE9F63-47F5-5DF0-86D8-7CDC775B04C6}">
+        <File Id="fil_coletor_Microsoft_VisualBasic_Core_dll_5ffe9f63" Source="!(bindpath.Publicado)\coletor\Microsoft.VisualBasic.Core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_VisualBasic_Forms_dll_6d3bfd0b" Directory="DIR_coletor" Guid="{6D3BFD0B-FDD6-5345-A79C-0D0D5EAD40F9}">
+        <File Id="fil_coletor_Microsoft_VisualBasic_Forms_dll_6d3bfd0b" Source="!(bindpath.Publicado)\coletor\Microsoft.VisualBasic.Forms.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_VisualBasic_dll_231c22c1" Directory="DIR_coletor" Guid="{231C22C1-A595-5457-8192-6444E0FA67FD}">
+        <File Id="fil_coletor_Microsoft_VisualBasic_dll_231c22c1" Source="!(bindpath.Publicado)\coletor\Microsoft.VisualBasic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Win32_Primitives_dll_f512b7a1" Directory="DIR_coletor" Guid="{F512B7A1-6125-5BBA-9592-61765E9D4AC0}">
+        <File Id="fil_coletor_Microsoft_Win32_Primitives_dll_f512b7a1" Source="!(bindpath.Publicado)\coletor\Microsoft.Win32.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_letor_Microsoft_Win32_Registry_AccessControl_dll_21e5968c" Directory="DIR_coletor" Guid="{21E5968C-DFC7-5D91-B5CD-995131DA52DF}">
+        <File Id="fil_letor_Microsoft_Win32_Registry_AccessControl_dll_21e5968c" Source="!(bindpath.Publicado)\coletor\Microsoft.Win32.Registry.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Win32_Registry_dll_30d3cec6" Directory="DIR_coletor" Guid="{30D3CEC6-072A-5963-9FFC-4F457908A34D}">
+        <File Id="fil_coletor_Microsoft_Win32_Registry_dll_30d3cec6" Source="!(bindpath.Publicado)\coletor\Microsoft.Win32.Registry.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Microsoft_Win32_SystemEvents_dll_558e7662" Directory="DIR_coletor" Guid="{558E7662-7FFE-57B1-B8F5-B9C3568D5E38}">
+        <File Id="fil_coletor_Microsoft_Win32_SystemEvents_dll_558e7662" Source="!(bindpath.Publicado)\coletor\Microsoft.Win32.SystemEvents.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PenImc_cor3_dll_3f071e15" Directory="DIR_coletor" Guid="{3F071E15-0BA8-58F5-AE09-51C5817885E3}">
+        <File Id="fil_coletor_PenImc_cor3_dll_3f071e15" Source="!(bindpath.Publicado)\coletor\PenImc_cor3.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationCore_dll_17e8510d" Directory="DIR_coletor" Guid="{17E8510D-CFCB-539E-8ECA-74A79F136F2F}">
+        <File Id="fil_coletor_PresentationCore_dll_17e8510d" Source="!(bindpath.Publicado)\coletor\PresentationCore.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_SystemCore_dll_09a0152f" Directory="DIR_coletor" Guid="{09A0152F-5AE0-5DBF-8140-B94367E31B36}">
+        <File Id="fil_coletor_PresentationFramework_SystemCore_dll_09a0152f" Source="!(bindpath.Publicado)\coletor\PresentationFramework-SystemCore.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_SystemData_dll_77fb47ce" Directory="DIR_coletor" Guid="{77FB47CE-C8F5-599C-A5BF-50FB6BAF86FB}">
+        <File Id="fil_coletor_PresentationFramework_SystemData_dll_77fb47ce" Source="!(bindpath.Publicado)\coletor\PresentationFramework-SystemData.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_SystemDrawing_dll_10d56bb6" Directory="DIR_coletor" Guid="{10D56BB6-88F1-598B-8BDC-49895B200982}">
+        <File Id="fil_coletor_PresentationFramework_SystemDrawing_dll_10d56bb6" Source="!(bindpath.Publicado)\coletor\PresentationFramework-SystemDrawing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_SystemXml_dll_146e0d91" Directory="DIR_coletor" Guid="{146E0D91-0B4E-5C5D-AE9E-20FACBD95255}">
+        <File Id="fil_coletor_PresentationFramework_SystemXml_dll_146e0d91" Source="!(bindpath.Publicado)\coletor\PresentationFramework-SystemXml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_SystemXmlLinq_dll_71758acc" Directory="DIR_coletor" Guid="{71758ACC-9115-5508-BFEE-FDD31124E106}">
+        <File Id="fil_coletor_PresentationFramework_SystemXmlLinq_dll_71758acc" Source="!(bindpath.Publicado)\coletor\PresentationFramework-SystemXmlLinq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_Aero_dll_7104fd23" Directory="DIR_coletor" Guid="{7104FD23-1590-5EA8-AAA0-3C6427E9DE69}">
+        <File Id="fil_coletor_PresentationFramework_Aero_dll_7104fd23" Source="!(bindpath.Publicado)\coletor\PresentationFramework.Aero.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_Aero2_dll_1f506ad8" Directory="DIR_coletor" Guid="{1F506AD8-14E0-557B-AB09-A35E17A4F4F0}">
+        <File Id="fil_coletor_PresentationFramework_Aero2_dll_1f506ad8" Source="!(bindpath.Publicado)\coletor\PresentationFramework.Aero2.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_AeroLite_dll_111af599" Directory="DIR_coletor" Guid="{111AF599-5CA9-5C9C-A98C-702313C657BD}">
+        <File Id="fil_coletor_PresentationFramework_AeroLite_dll_111af599" Source="!(bindpath.Publicado)\coletor\PresentationFramework.AeroLite.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_Classic_dll_851b0999" Directory="DIR_coletor" Guid="{851B0999-0C2F-5812-A77B-75C5DF7D092A}">
+        <File Id="fil_coletor_PresentationFramework_Classic_dll_851b0999" Source="!(bindpath.Publicado)\coletor\PresentationFramework.Classic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_Luna_dll_9f91753a" Directory="DIR_coletor" Guid="{9F91753A-E782-582C-A9A6-228DAF24704F}">
+        <File Id="fil_coletor_PresentationFramework_Luna_dll_9f91753a" Source="!(bindpath.Publicado)\coletor\PresentationFramework.Luna.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_Royale_dll_00d5e278" Directory="DIR_coletor" Guid="{00D5E278-98C9-59B8-BA0B-AFDB6F43E3ED}">
+        <File Id="fil_coletor_PresentationFramework_Royale_dll_00d5e278" Source="!(bindpath.Publicado)\coletor\PresentationFramework.Royale.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationFramework_dll_9aabedcb" Directory="DIR_coletor" Guid="{9AABEDCB-8E80-56A6-A473-7AA0F45D5431}">
+        <File Id="fil_coletor_PresentationFramework_dll_9aabedcb" Source="!(bindpath.Publicado)\coletor\PresentationFramework.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationNative_cor3_dll_0d95c897" Directory="DIR_coletor" Guid="{0D95C897-EA22-50BA-AB89-82F2082692B7}">
+        <File Id="fil_coletor_PresentationNative_cor3_dll_0d95c897" Source="!(bindpath.Publicado)\coletor\PresentationNative_cor3.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_PresentationUI_dll_3e0f666d" Directory="DIR_coletor" Guid="{3E0F666D-7FF6-5845-B793-6F9CF615178B}">
+        <File Id="fil_coletor_PresentationUI_dll_3e0f666d" Source="!(bindpath.Publicado)\coletor\PresentationUI.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_ReachFramework_dll_ea4cc1d9" Directory="DIR_coletor" Guid="{EA4CC1D9-EA85-5C33-B990-A55E27C0DD30}">
+        <File Id="fil_coletor_ReachFramework_dll_ea4cc1d9" Source="!(bindpath.Publicado)\coletor\ReachFramework.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_SQLitePCLRaw_batteries_v2_dll_176914c5" Directory="DIR_coletor" Guid="{176914C5-42B0-59E5-8F4E-40E76881ABC3}">
+        <File Id="fil_coletor_SQLitePCLRaw_batteries_v2_dll_176914c5" Source="!(bindpath.Publicado)\coletor\SQLitePCLRaw.batteries_v2.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_SQLitePCLRaw_core_dll_f0933954" Directory="DIR_coletor" Guid="{F0933954-1D3F-50E1-A0C6-ED412E6106E9}">
+        <File Id="fil_coletor_SQLitePCLRaw_core_dll_f0933954" Source="!(bindpath.Publicado)\coletor\SQLitePCLRaw.core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_SQLitePCLRaw_provider_e_sqlcipher_dll_62d91b0f" Directory="DIR_coletor" Guid="{62D91B0F-74CF-5EAC-A291-2E1350D472B9}">
+        <File Id="fil_coletor_SQLitePCLRaw_provider_e_sqlcipher_dll_62d91b0f" Source="!(bindpath.Publicado)\coletor\SQLitePCLRaw.provider.e_sqlcipher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_AppContext_dll_b2d883e0" Directory="DIR_coletor" Guid="{B2D883E0-4719-538F-95C3-57073AE862E5}">
+        <File Id="fil_coletor_System_AppContext_dll_b2d883e0" Source="!(bindpath.Publicado)\coletor\System.AppContext.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Buffers_dll_5120b047" Directory="DIR_coletor" Guid="{5120B047-4E10-585D-B692-E83A4E020666}">
+        <File Id="fil_coletor_System_Buffers_dll_5120b047" Source="!(bindpath.Publicado)\coletor\System.Buffers.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_CodeDom_dll_067f0734" Directory="DIR_coletor" Guid="{067F0734-2A89-5A51-8F33-BF007A3A60BC}">
+        <File Id="fil_coletor_System_CodeDom_dll_067f0734" Source="!(bindpath.Publicado)\coletor\System.CodeDom.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Collections_Concurrent_dll_eaaebaac" Directory="DIR_coletor" Guid="{EAAEBAAC-C250-5ACA-B1B2-6697E6E2E702}">
+        <File Id="fil_coletor_System_Collections_Concurrent_dll_eaaebaac" Source="!(bindpath.Publicado)\coletor\System.Collections.Concurrent.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Collections_Immutable_dll_3d4fd1a3" Directory="DIR_coletor" Guid="{3D4FD1A3-B555-5DE5-9319-C46675B3D312}">
+        <File Id="fil_coletor_System_Collections_Immutable_dll_3d4fd1a3" Source="!(bindpath.Publicado)\coletor\System.Collections.Immutable.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Collections_NonGeneric_dll_458100c4" Directory="DIR_coletor" Guid="{458100C4-2E16-535C-A445-CE9D09966BC8}">
+        <File Id="fil_coletor_System_Collections_NonGeneric_dll_458100c4" Source="!(bindpath.Publicado)\coletor\System.Collections.NonGeneric.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Collections_Specialized_dll_5a0f7bbb" Directory="DIR_coletor" Guid="{5A0F7BBB-034C-5FD2-9DC1-C1615DD77945}">
+        <File Id="fil_coletor_System_Collections_Specialized_dll_5a0f7bbb" Source="!(bindpath.Publicado)\coletor\System.Collections.Specialized.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Collections_dll_ae4090d1" Directory="DIR_coletor" Guid="{AE4090D1-3B58-5B19-8746-E48AB1BD6E01}">
+        <File Id="fil_coletor_System_Collections_dll_ae4090d1" Source="!(bindpath.Publicado)\coletor\System.Collections.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ComponentModel_Annotations_dll_bae38abd" Directory="DIR_coletor" Guid="{BAE38ABD-1A2F-50FE-A439-A7BFD25189B2}">
+        <File Id="fil_coletor_System_ComponentModel_Annotations_dll_bae38abd" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.Annotations.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_System_ComponentModel_DataAnnotations_dll_482fe941" Directory="DIR_coletor" Guid="{482FE941-EACE-5A42-9C55-80BAE5CB7D5A}">
+        <File Id="fil_oletor_System_ComponentModel_DataAnnotations_dll_482fe941" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.DataAnnotations.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_System_ComponentModel_EventBasedAsync_dll_cef7d4ab" Directory="DIR_coletor" Guid="{CEF7D4AB-AE15-501F-B819-04C79D150355}">
+        <File Id="fil_oletor_System_ComponentModel_EventBasedAsync_dll_cef7d4ab" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.EventBasedAsync.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ComponentModel_Primitives_dll_96e65836" Directory="DIR_coletor" Guid="{96E65836-7965-5F0A-BAE9-F4A3B3C78696}">
+        <File Id="fil_coletor_System_ComponentModel_Primitives_dll_96e65836" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ComponentModel_TypeConverter_dll_e4e3f1ee" Directory="DIR_coletor" Guid="{E4E3F1EE-910D-50F4-B777-31873191566E}">
+        <File Id="fil_coletor_System_ComponentModel_TypeConverter_dll_e4e3f1ee" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.TypeConverter.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ComponentModel_dll_c396a90f" Directory="DIR_coletor" Guid="{C396A90F-9C1C-5855-A941-64831EF58AB3}">
+        <File Id="fil_coletor_System_ComponentModel_dll_c396a90f" Source="!(bindpath.Publicado)\coletor\System.ComponentModel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_or_System_Configuration_ConfigurationManager_dll_7f3de295" Directory="DIR_coletor" Guid="{7F3DE295-F5F4-5BF6-B31B-C31EBAFE910A}">
+        <File Id="fil_or_System_Configuration_ConfigurationManager_dll_7f3de295" Source="!(bindpath.Publicado)\coletor\System.Configuration.ConfigurationManager.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Configuration_dll_2083aa79" Directory="DIR_coletor" Guid="{2083AA79-2B80-5E42-806F-A645F42C995A}">
+        <File Id="fil_coletor_System_Configuration_dll_2083aa79" Source="!(bindpath.Publicado)\coletor\System.Configuration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Console_dll_11452fbf" Directory="DIR_coletor" Guid="{11452FBF-AEB6-5416-B92B-6B3384D199F2}">
+        <File Id="fil_coletor_System_Console_dll_11452fbf" Source="!(bindpath.Publicado)\coletor\System.Console.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Core_dll_883d4cd3" Directory="DIR_coletor" Guid="{883D4CD3-E6E2-51BA-8A7D-FE8AFD752DB3}">
+        <File Id="fil_coletor_System_Core_dll_883d4cd3" Source="!(bindpath.Publicado)\coletor\System.Core.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Data_Common_dll_81888cbe" Directory="DIR_coletor" Guid="{81888CBE-D0CC-5213-99BF-BE929C632043}">
+        <File Id="fil_coletor_System_Data_Common_dll_81888cbe" Source="!(bindpath.Publicado)\coletor\System.Data.Common.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Data_DataSetExtensions_dll_87658fe6" Directory="DIR_coletor" Guid="{87658FE6-F904-5A0D-856D-6AD69225D224}">
+        <File Id="fil_coletor_System_Data_DataSetExtensions_dll_87658fe6" Source="!(bindpath.Publicado)\coletor\System.Data.DataSetExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Data_dll_2480f4e0" Directory="DIR_coletor" Guid="{2480F4E0-8CA8-5381-88D2-2E29567CDD71}">
+        <File Id="fil_coletor_System_Data_dll_2480f4e0" Source="!(bindpath.Publicado)\coletor\System.Data.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Design_dll_a538158a" Directory="DIR_coletor" Guid="{A538158A-D6FB-5D9C-89E9-49037B0E8BF9}">
+        <File Id="fil_coletor_System_Design_dll_a538158a" Source="!(bindpath.Publicado)\coletor\System.Design.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_Contracts_dll_65c9e8dd" Directory="DIR_coletor" Guid="{65C9E8DD-6A16-509D-8FAE-EBAE89D8B6BA}">
+        <File Id="fil_coletor_System_Diagnostics_Contracts_dll_65c9e8dd" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.Contracts.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_Debug_dll_f6900198" Directory="DIR_coletor" Guid="{F6900198-415A-5E16-A903-4FFD511CC442}">
+        <File Id="fil_coletor_System_Diagnostics_Debug_dll_f6900198" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.Debug.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_DiagnosticSource_dll_0cf39f57" Directory="DIR_coletor" Guid="{0CF39F57-0ABF-5169-97F2-CC908A6C3B27}">
+        <File Id="fil_coletor_System_Diagnostics_DiagnosticSource_dll_0cf39f57" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.DiagnosticSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_EventLog_Messages_dll_1490a3d7" Directory="DIR_coletor" Guid="{1490A3D7-1307-51C8-92C1-5915C0E188FC}">
+        <File Id="fil_coletor_System_Diagnostics_EventLog_Messages_dll_1490a3d7" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.EventLog.Messages.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_EventLog_dll_e09e4815" Directory="DIR_coletor" Guid="{E09E4815-C506-562C-AA31-25791BFE1065}">
+        <File Id="fil_coletor_System_Diagnostics_EventLog_dll_e09e4815" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.EventLog.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_FileVersionInfo_dll_cc34e8b1" Directory="DIR_coletor" Guid="{CC34E8B1-7982-507C-BB4B-089FBAEFE1DE}">
+        <File Id="fil_coletor_System_Diagnostics_FileVersionInfo_dll_cc34e8b1" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.FileVersionInfo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_System_Diagnostics_PerformanceCounter_dll_978dcc80" Directory="DIR_coletor" Guid="{978DCC80-414E-594B-8A39-287A76402A7B}">
+        <File Id="fil_oletor_System_Diagnostics_PerformanceCounter_dll_978dcc80" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.PerformanceCounter.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_Process_dll_0aeaea5c" Directory="DIR_coletor" Guid="{0AEAEA5C-9B62-5E90-95EE-C70C3EF1D5A0}">
+        <File Id="fil_coletor_System_Diagnostics_Process_dll_0aeaea5c" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.Process.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_StackTrace_dll_b8dbab03" Directory="DIR_coletor" Guid="{B8DBAB03-30BF-56CA-9C21-00952ED6C28E}">
+        <File Id="fil_coletor_System_Diagnostics_StackTrace_dll_b8dbab03" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.StackTrace.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_r_System_Diagnostics_TextWriterTraceListener_dll_01d4bb6a" Directory="DIR_coletor" Guid="{01D4BB6A-5DE2-5644-A120-97C5FF6B857F}">
+        <File Id="fil_r_System_Diagnostics_TextWriterTraceListener_dll_01d4bb6a" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.TextWriterTraceListener.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_Tools_dll_a499ebe1" Directory="DIR_coletor" Guid="{A499EBE1-F27B-5C62-B6C0-48FF3672948A}">
+        <File Id="fil_coletor_System_Diagnostics_Tools_dll_a499ebe1" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.Tools.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_TraceSource_dll_4e56a606" Directory="DIR_coletor" Guid="{4E56A606-DCC6-5778-AB37-E2CF06E9F238}">
+        <File Id="fil_coletor_System_Diagnostics_TraceSource_dll_4e56a606" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.TraceSource.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Diagnostics_Tracing_dll_d1c20ac6" Directory="DIR_coletor" Guid="{D1C20AC6-B7FD-5F37-B062-7B3F1B9E8612}">
+        <File Id="fil_coletor_System_Diagnostics_Tracing_dll_d1c20ac6" Source="!(bindpath.Publicado)\coletor\System.Diagnostics.Tracing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_DirectoryServices_dll_27778f8d" Directory="DIR_coletor" Guid="{27778F8D-7520-563B-8F9C-686B51EDADDA}">
+        <File Id="fil_coletor_System_DirectoryServices_dll_27778f8d" Source="!(bindpath.Publicado)\coletor\System.DirectoryServices.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Drawing_Common_dll_785869e6" Directory="DIR_coletor" Guid="{785869E6-2853-59C0-9CAF-5FAEE51C7A1E}">
+        <File Id="fil_coletor_System_Drawing_Common_dll_785869e6" Source="!(bindpath.Publicado)\coletor\System.Drawing.Common.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Drawing_Design_dll_23164de9" Directory="DIR_coletor" Guid="{23164DE9-85F3-541F-B4DB-B69B141E1866}">
+        <File Id="fil_coletor_System_Drawing_Design_dll_23164de9" Source="!(bindpath.Publicado)\coletor\System.Drawing.Design.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Drawing_Primitives_dll_4c363722" Directory="DIR_coletor" Guid="{4C363722-3D54-58DA-9644-8DD2749D37C9}">
+        <File Id="fil_coletor_System_Drawing_Primitives_dll_4c363722" Source="!(bindpath.Publicado)\coletor\System.Drawing.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Drawing_dll_5e34c06e" Directory="DIR_coletor" Guid="{5E34C06E-E1D7-5AB3-8746-426BF720D5DB}">
+        <File Id="fil_coletor_System_Drawing_dll_5e34c06e" Source="!(bindpath.Publicado)\coletor\System.Drawing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Dynamic_Runtime_dll_494a73ee" Directory="DIR_coletor" Guid="{494A73EE-986B-55A7-A79C-2CD3766CF078}">
+        <File Id="fil_coletor_System_Dynamic_Runtime_dll_494a73ee" Source="!(bindpath.Publicado)\coletor\System.Dynamic.Runtime.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Formats_Asn1_dll_6e6cc95f" Directory="DIR_coletor" Guid="{6E6CC95F-9CD2-58BF-9BCD-F5547DE73444}">
+        <File Id="fil_coletor_System_Formats_Asn1_dll_6e6cc95f" Source="!(bindpath.Publicado)\coletor\System.Formats.Asn1.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Formats_Tar_dll_667a9787" Directory="DIR_coletor" Guid="{667A9787-8BAD-544F-8631-B3774786DE46}">
+        <File Id="fil_coletor_System_Formats_Tar_dll_667a9787" Source="!(bindpath.Publicado)\coletor\System.Formats.Tar.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Globalization_Calendars_dll_4dd9a3ab" Directory="DIR_coletor" Guid="{4DD9A3AB-DC68-51B6-873D-A5388D9F923A}">
+        <File Id="fil_coletor_System_Globalization_Calendars_dll_4dd9a3ab" Source="!(bindpath.Publicado)\coletor\System.Globalization.Calendars.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Globalization_Extensions_dll_168add90" Directory="DIR_coletor" Guid="{168ADD90-6C40-5D6E-81B9-576D65DEF49D}">
+        <File Id="fil_coletor_System_Globalization_Extensions_dll_168add90" Source="!(bindpath.Publicado)\coletor\System.Globalization.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Globalization_dll_cca3fab3" Directory="DIR_coletor" Guid="{CCA3FAB3-C0FC-5393-9A8C-B20790D454BB}">
+        <File Id="fil_coletor_System_Globalization_dll_cca3fab3" Source="!(bindpath.Publicado)\coletor\System.Globalization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Compression_Brotli_dll_9cea3fa8" Directory="DIR_coletor" Guid="{9CEA3FA8-61D6-5083-A7F8-47E44D22CD05}">
+        <File Id="fil_coletor_System_IO_Compression_Brotli_dll_9cea3fa8" Source="!(bindpath.Publicado)\coletor\System.IO.Compression.Brotli.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Compression_FileSystem_dll_b6cf5869" Directory="DIR_coletor" Guid="{B6CF5869-1081-516E-93DD-33DD9227E1BB}">
+        <File Id="fil_coletor_System_IO_Compression_FileSystem_dll_b6cf5869" Source="!(bindpath.Publicado)\coletor\System.IO.Compression.FileSystem.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Compression_Native_dll_f030b7f5" Directory="DIR_coletor" Guid="{F030B7F5-0DEF-5507-A436-F8D5C0CD79C7}">
+        <File Id="fil_coletor_System_IO_Compression_Native_dll_f030b7f5" Source="!(bindpath.Publicado)\coletor\System.IO.Compression.Native.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Compression_ZipFile_dll_0e0ed6bb" Directory="DIR_coletor" Guid="{0E0ED6BB-E96B-5C66-8785-03F1E5D75288}">
+        <File Id="fil_coletor_System_IO_Compression_ZipFile_dll_0e0ed6bb" Source="!(bindpath.Publicado)\coletor\System.IO.Compression.ZipFile.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Compression_dll_a8a4a16e" Directory="DIR_coletor" Guid="{A8A4A16E-6087-5DCB-B878-C417DEF2101E}">
+        <File Id="fil_coletor_System_IO_Compression_dll_a8a4a16e" Source="!(bindpath.Publicado)\coletor\System.IO.Compression.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_FileSystem_AccessControl_dll_af9e43a7" Directory="DIR_coletor" Guid="{AF9E43A7-078F-5E38-829E-728CF4B925D2}">
+        <File Id="fil_coletor_System_IO_FileSystem_AccessControl_dll_af9e43a7" Source="!(bindpath.Publicado)\coletor\System.IO.FileSystem.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_FileSystem_DriveInfo_dll_d73c224b" Directory="DIR_coletor" Guid="{D73C224B-6943-5538-9374-E6FC777AAC35}">
+        <File Id="fil_coletor_System_IO_FileSystem_DriveInfo_dll_d73c224b" Source="!(bindpath.Publicado)\coletor\System.IO.FileSystem.DriveInfo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_FileSystem_Primitives_dll_f7bc8d66" Directory="DIR_coletor" Guid="{F7BC8D66-6AF0-5695-881C-C9A6163F0C12}">
+        <File Id="fil_coletor_System_IO_FileSystem_Primitives_dll_f7bc8d66" Source="!(bindpath.Publicado)\coletor\System.IO.FileSystem.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_FileSystem_Watcher_dll_94619184" Directory="DIR_coletor" Guid="{94619184-4237-51AD-A708-69296CB07C39}">
+        <File Id="fil_coletor_System_IO_FileSystem_Watcher_dll_94619184" Source="!(bindpath.Publicado)\coletor\System.IO.FileSystem.Watcher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_FileSystem_dll_a804d296" Directory="DIR_coletor" Guid="{A804D296-F370-567F-9A24-8F67E5074933}">
+        <File Id="fil_coletor_System_IO_FileSystem_dll_a804d296" Source="!(bindpath.Publicado)\coletor\System.IO.FileSystem.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_IsolatedStorage_dll_89048aa6" Directory="DIR_coletor" Guid="{89048AA6-F31D-5F58-8F3E-7097173BBE59}">
+        <File Id="fil_coletor_System_IO_IsolatedStorage_dll_89048aa6" Source="!(bindpath.Publicado)\coletor\System.IO.IsolatedStorage.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_MemoryMappedFiles_dll_88d281e4" Directory="DIR_coletor" Guid="{88D281E4-419C-5D1D-B537-10357A4D2E04}">
+        <File Id="fil_coletor_System_IO_MemoryMappedFiles_dll_88d281e4" Source="!(bindpath.Publicado)\coletor\System.IO.MemoryMappedFiles.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Packaging_dll_cea1dde2" Directory="DIR_coletor" Guid="{CEA1DDE2-2AC3-5151-BAD7-1DA406F13814}">
+        <File Id="fil_coletor_System_IO_Packaging_dll_cea1dde2" Source="!(bindpath.Publicado)\coletor\System.IO.Packaging.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Pipes_AccessControl_dll_cf9acf08" Directory="DIR_coletor" Guid="{CF9ACF08-E9A9-5FD4-8877-3C2B5EB0303E}">
+        <File Id="fil_coletor_System_IO_Pipes_AccessControl_dll_cf9acf08" Source="!(bindpath.Publicado)\coletor\System.IO.Pipes.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_Pipes_dll_0aebe623" Directory="DIR_coletor" Guid="{0AEBE623-B923-56E1-B754-E1C6B076015B}">
+        <File Id="fil_coletor_System_IO_Pipes_dll_0aebe623" Source="!(bindpath.Publicado)\coletor\System.IO.Pipes.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_UnmanagedMemoryStream_dll_f2335097" Directory="DIR_coletor" Guid="{F2335097-7381-5AB7-AFB5-720548AE7AAE}">
+        <File Id="fil_coletor_System_IO_UnmanagedMemoryStream_dll_f2335097" Source="!(bindpath.Publicado)\coletor\System.IO.UnmanagedMemoryStream.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_IO_dll_c4eb26e2" Directory="DIR_coletor" Guid="{C4EB26E2-81EC-57AE-A5F6-3600B24A26F8}">
+        <File Id="fil_coletor_System_IO_dll_c4eb26e2" Source="!(bindpath.Publicado)\coletor\System.IO.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Linq_Expressions_dll_c766a262" Directory="DIR_coletor" Guid="{C766A262-37BE-5FDD-A740-30267AF87506}">
+        <File Id="fil_coletor_System_Linq_Expressions_dll_c766a262" Source="!(bindpath.Publicado)\coletor\System.Linq.Expressions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Linq_Parallel_dll_06b46501" Directory="DIR_coletor" Guid="{06B46501-1A76-56FC-99F3-7870086FA7D8}">
+        <File Id="fil_coletor_System_Linq_Parallel_dll_06b46501" Source="!(bindpath.Publicado)\coletor\System.Linq.Parallel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Linq_Queryable_dll_7e671075" Directory="DIR_coletor" Guid="{7E671075-FF49-5276-989F-CD32D0872A4D}">
+        <File Id="fil_coletor_System_Linq_Queryable_dll_7e671075" Source="!(bindpath.Publicado)\coletor\System.Linq.Queryable.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Linq_dll_919b0bda" Directory="DIR_coletor" Guid="{919B0BDA-BB9A-5A4B-B0CA-40A0C0E4E092}">
+        <File Id="fil_coletor_System_Linq_dll_919b0bda" Source="!(bindpath.Publicado)\coletor\System.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Memory_dll_5fd25a10" Directory="DIR_coletor" Guid="{5FD25A10-73BC-57E8-8C2D-7A3EDD665FD6}">
+        <File Id="fil_coletor_System_Memory_dll_5fd25a10" Source="!(bindpath.Publicado)\coletor\System.Memory.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Http_Json_dll_ab73724d" Directory="DIR_coletor" Guid="{AB73724D-CE8D-5967-AD86-282412EC587C}">
+        <File Id="fil_coletor_System_Net_Http_Json_dll_ab73724d" Source="!(bindpath.Publicado)\coletor\System.Net.Http.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Http_dll_6ff8e836" Directory="DIR_coletor" Guid="{6FF8E836-7C2B-5250-AE34-669ED505B980}">
+        <File Id="fil_coletor_System_Net_Http_dll_6ff8e836" Source="!(bindpath.Publicado)\coletor\System.Net.Http.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_HttpListener_dll_a991d354" Directory="DIR_coletor" Guid="{A991D354-AD7F-5910-96B7-06DDF93237EA}">
+        <File Id="fil_coletor_System_Net_HttpListener_dll_a991d354" Source="!(bindpath.Publicado)\coletor\System.Net.HttpListener.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Mail_dll_c9d85686" Directory="DIR_coletor" Guid="{C9D85686-6E98-5F29-8C05-90022FB3B9EE}">
+        <File Id="fil_coletor_System_Net_Mail_dll_c9d85686" Source="!(bindpath.Publicado)\coletor\System.Net.Mail.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_NameResolution_dll_352c5dd0" Directory="DIR_coletor" Guid="{352C5DD0-B703-5C25-8440-35BEDBD98C8C}">
+        <File Id="fil_coletor_System_Net_NameResolution_dll_352c5dd0" Source="!(bindpath.Publicado)\coletor\System.Net.NameResolution.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_NetworkInformation_dll_080cc26d" Directory="DIR_coletor" Guid="{080CC26D-1631-5A4C-A4E9-519EC55797EB}">
+        <File Id="fil_coletor_System_Net_NetworkInformation_dll_080cc26d" Source="!(bindpath.Publicado)\coletor\System.Net.NetworkInformation.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Ping_dll_887d1add" Directory="DIR_coletor" Guid="{887D1ADD-E86C-59F0-B578-6D9CEB75A12B}">
+        <File Id="fil_coletor_System_Net_Ping_dll_887d1add" Source="!(bindpath.Publicado)\coletor\System.Net.Ping.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Primitives_dll_665f37df" Directory="DIR_coletor" Guid="{665F37DF-AAAA-5714-9180-258F1D749D14}">
+        <File Id="fil_coletor_System_Net_Primitives_dll_665f37df" Source="!(bindpath.Publicado)\coletor\System.Net.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Quic_dll_67b1be66" Directory="DIR_coletor" Guid="{67B1BE66-093E-51CE-A4B8-3BFDCD50CBB7}">
+        <File Id="fil_coletor_System_Net_Quic_dll_67b1be66" Source="!(bindpath.Publicado)\coletor\System.Net.Quic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Requests_dll_6a6031f2" Directory="DIR_coletor" Guid="{6A6031F2-9B64-5F41-89BA-96053B4A6E1F}">
+        <File Id="fil_coletor_System_Net_Requests_dll_6a6031f2" Source="!(bindpath.Publicado)\coletor\System.Net.Requests.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Security_dll_39f63d62" Directory="DIR_coletor" Guid="{39F63D62-17E9-5D06-AF11-500645404F12}">
+        <File Id="fil_coletor_System_Net_Security_dll_39f63d62" Source="!(bindpath.Publicado)\coletor\System.Net.Security.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_ServicePoint_dll_29f1f46f" Directory="DIR_coletor" Guid="{29F1F46F-A59F-55DB-91E6-C406CE25C3F9}">
+        <File Id="fil_coletor_System_Net_ServicePoint_dll_29f1f46f" Source="!(bindpath.Publicado)\coletor\System.Net.ServicePoint.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_Sockets_dll_0eb33fd6" Directory="DIR_coletor" Guid="{0EB33FD6-7054-5769-B11E-71FBF9120C5A}">
+        <File Id="fil_coletor_System_Net_Sockets_dll_0eb33fd6" Source="!(bindpath.Publicado)\coletor\System.Net.Sockets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_WebClient_dll_66cd7ae0" Directory="DIR_coletor" Guid="{66CD7AE0-4B22-50FA-90D6-B2D33B1E32CD}">
+        <File Id="fil_coletor_System_Net_WebClient_dll_66cd7ae0" Source="!(bindpath.Publicado)\coletor\System.Net.WebClient.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_WebHeaderCollection_dll_8f208dcc" Directory="DIR_coletor" Guid="{8F208DCC-4F58-571A-8EF6-741906E3C19B}">
+        <File Id="fil_coletor_System_Net_WebHeaderCollection_dll_8f208dcc" Source="!(bindpath.Publicado)\coletor\System.Net.WebHeaderCollection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_WebProxy_dll_f8b6fa83" Directory="DIR_coletor" Guid="{F8B6FA83-F9AA-5033-954D-F78EFD9B5DE7}">
+        <File Id="fil_coletor_System_Net_WebProxy_dll_f8b6fa83" Source="!(bindpath.Publicado)\coletor\System.Net.WebProxy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_WebSockets_Client_dll_88af525d" Directory="DIR_coletor" Guid="{88AF525D-563E-5CC3-8DD6-EFBA4495549B}">
+        <File Id="fil_coletor_System_Net_WebSockets_Client_dll_88af525d" Source="!(bindpath.Publicado)\coletor\System.Net.WebSockets.Client.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_WebSockets_dll_016a8fc0" Directory="DIR_coletor" Guid="{016A8FC0-1B84-5075-A380-7A4EFF1A73CE}">
+        <File Id="fil_coletor_System_Net_WebSockets_dll_016a8fc0" Source="!(bindpath.Publicado)\coletor\System.Net.WebSockets.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Net_dll_56f667ee" Directory="DIR_coletor" Guid="{56F667EE-7B49-53DC-8377-FF726FAA772E}">
+        <File Id="fil_coletor_System_Net_dll_56f667ee" Source="!(bindpath.Publicado)\coletor\System.Net.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Numerics_Vectors_dll_8da66781" Directory="DIR_coletor" Guid="{8DA66781-D5EF-5271-8115-BB6E7448B165}">
+        <File Id="fil_coletor_System_Numerics_Vectors_dll_8da66781" Source="!(bindpath.Publicado)\coletor\System.Numerics.Vectors.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Numerics_dll_f2d6cba5" Directory="DIR_coletor" Guid="{F2D6CBA5-98C1-5E85-84D7-FF2E66AB804D}">
+        <File Id="fil_coletor_System_Numerics_dll_f2d6cba5" Source="!(bindpath.Publicado)\coletor\System.Numerics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ObjectModel_dll_cdfdec40" Directory="DIR_coletor" Guid="{CDFDEC40-AEC6-5C2C-A201-B6F51FDAF23B}">
+        <File Id="fil_coletor_System_ObjectModel_dll_cdfdec40" Source="!(bindpath.Publicado)\coletor\System.ObjectModel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Printing_dll_d5acd45a" Directory="DIR_coletor" Guid="{D5ACD45A-6EFE-5C9B-AFC8-1D711E8E2B38}">
+        <File Id="fil_coletor_System_Printing_dll_d5acd45a" Source="!(bindpath.Publicado)\coletor\System.Printing.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Private_CoreLib_dll_42ae7ef8" Directory="DIR_coletor" Guid="{42AE7EF8-2AC7-5F1D-8189-E8FF657A1890}">
+        <File Id="fil_coletor_System_Private_CoreLib_dll_42ae7ef8" Source="!(bindpath.Publicado)\coletor\System.Private.CoreLib.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_tor_System_Private_DataContractSerialization_dll_6750ffa4" Directory="DIR_coletor" Guid="{6750FFA4-2CC8-5C72-9CC7-AB0E5E8890D3}">
+        <File Id="fil_tor_System_Private_DataContractSerialization_dll_6750ffa4" Source="!(bindpath.Publicado)\coletor\System.Private.DataContractSerialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Private_Uri_dll_799264bf" Directory="DIR_coletor" Guid="{799264BF-61D0-54E2-B77F-4C1936C25A42}">
+        <File Id="fil_coletor_System_Private_Uri_dll_799264bf" Source="!(bindpath.Publicado)\coletor\System.Private.Uri.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Private_Xml_Linq_dll_27405b09" Directory="DIR_coletor" Guid="{27405B09-9B6F-5177-B1EB-F25CD640271D}">
+        <File Id="fil_coletor_System_Private_Xml_Linq_dll_27405b09" Source="!(bindpath.Publicado)\coletor\System.Private.Xml.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Private_Xml_dll_9e7a6fbb" Directory="DIR_coletor" Guid="{9E7A6FBB-87AE-56CF-B5C5-16FDC60BFAD2}">
+        <File Id="fil_coletor_System_Private_Xml_dll_9e7a6fbb" Source="!(bindpath.Publicado)\coletor\System.Private.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_DispatchProxy_dll_d8df522d" Directory="DIR_coletor" Guid="{D8DF522D-82BE-51C9-BB24-EB27D5BD04D2}">
+        <File Id="fil_coletor_System_Reflection_DispatchProxy_dll_d8df522d" Source="!(bindpath.Publicado)\coletor\System.Reflection.DispatchProxy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Emit_ILGeneration_dll_083235c3" Directory="DIR_coletor" Guid="{083235C3-5790-5A58-ADDA-A1A562E6F33D}">
+        <File Id="fil_coletor_System_Reflection_Emit_ILGeneration_dll_083235c3" Source="!(bindpath.Publicado)\coletor\System.Reflection.Emit.ILGeneration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Emit_Lightweight_dll_48e5787e" Directory="DIR_coletor" Guid="{48E5787E-9B08-5390-BB43-BA8A1AF24E49}">
+        <File Id="fil_coletor_System_Reflection_Emit_Lightweight_dll_48e5787e" Source="!(bindpath.Publicado)\coletor\System.Reflection.Emit.Lightweight.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Emit_dll_a7a80b12" Directory="DIR_coletor" Guid="{A7A80B12-BDF4-519F-AD08-C6EBDBBAEB9E}">
+        <File Id="fil_coletor_System_Reflection_Emit_dll_a7a80b12" Source="!(bindpath.Publicado)\coletor\System.Reflection.Emit.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Extensions_dll_03525b3f" Directory="DIR_coletor" Guid="{03525B3F-4360-57D9-9036-996C99204D76}">
+        <File Id="fil_coletor_System_Reflection_Extensions_dll_03525b3f" Source="!(bindpath.Publicado)\coletor\System.Reflection.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Metadata_dll_140758e6" Directory="DIR_coletor" Guid="{140758E6-B3E7-5973-A62A-A9A6B328D328}">
+        <File Id="fil_coletor_System_Reflection_Metadata_dll_140758e6" Source="!(bindpath.Publicado)\coletor\System.Reflection.Metadata.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_Primitives_dll_5166e58e" Directory="DIR_coletor" Guid="{5166E58E-F313-594D-B45F-4E4B21EB70E4}">
+        <File Id="fil_coletor_System_Reflection_Primitives_dll_5166e58e" Source="!(bindpath.Publicado)\coletor\System.Reflection.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_TypeExtensions_dll_5b5808fc" Directory="DIR_coletor" Guid="{5B5808FC-A1AD-595E-8B64-D0E9B1C5048E}">
+        <File Id="fil_coletor_System_Reflection_TypeExtensions_dll_5b5808fc" Source="!(bindpath.Publicado)\coletor\System.Reflection.TypeExtensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Reflection_dll_c8fb4653" Directory="DIR_coletor" Guid="{C8FB4653-37E9-5FE2-8050-057391E6F9F0}">
+        <File Id="fil_coletor_System_Reflection_dll_c8fb4653" Source="!(bindpath.Publicado)\coletor\System.Reflection.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Resources_Extensions_dll_cef93e27" Directory="DIR_coletor" Guid="{CEF93E27-EF03-5B90-979C-33C4F06F3300}">
+        <File Id="fil_coletor_System_Resources_Extensions_dll_cef93e27" Source="!(bindpath.Publicado)\coletor\System.Resources.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Resources_Reader_dll_6af1cc9a" Directory="DIR_coletor" Guid="{6AF1CC9A-D9B4-5F2A-B389-15F0D139511E}">
+        <File Id="fil_coletor_System_Resources_Reader_dll_6af1cc9a" Source="!(bindpath.Publicado)\coletor\System.Resources.Reader.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Resources_ResourceManager_dll_1f324898" Directory="DIR_coletor" Guid="{1F324898-5187-58C8-8787-F99478AC7299}">
+        <File Id="fil_coletor_System_Resources_ResourceManager_dll_1f324898" Source="!(bindpath.Publicado)\coletor\System.Resources.ResourceManager.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Resources_Writer_dll_efebdac3" Directory="DIR_coletor" Guid="{EFEBDAC3-AB71-5A96-9A60-CBA2B05CA3BC}">
+        <File Id="fil_coletor_System_Resources_Writer_dll_efebdac3" Source="!(bindpath.Publicado)\coletor\System.Resources.Writer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_letor_System_Runtime_CompilerServices_Unsafe_dll_e26ce658" Directory="DIR_coletor" Guid="{E26CE658-A454-5AEC-BB4E-46757877B41F}">
+        <File Id="fil_letor_System_Runtime_CompilerServices_Unsafe_dll_e26ce658" Source="!(bindpath.Publicado)\coletor\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_System_Runtime_CompilerServices_VisualC_dll_89b36e60" Directory="DIR_coletor" Guid="{89B36E60-E01C-53EE-9D60-5CF10DEFFD22}">
+        <File Id="fil_etor_System_Runtime_CompilerServices_VisualC_dll_89b36e60" Source="!(bindpath.Publicado)\coletor\System.Runtime.CompilerServices.VisualC.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Extensions_dll_fee3dd50" Directory="DIR_coletor" Guid="{FEE3DD50-DE11-5C9B-BAA2-3E626F9CBB28}">
+        <File Id="fil_coletor_System_Runtime_Extensions_dll_fee3dd50" Source="!(bindpath.Publicado)\coletor\System.Runtime.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Handles_dll_e23452c9" Directory="DIR_coletor" Guid="{E23452C9-E6A9-500D-818A-BD32842016E8}">
+        <File Id="fil_coletor_System_Runtime_Handles_dll_e23452c9" Source="!(bindpath.Publicado)\coletor\System.Runtime.Handles.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_or_System_Runtime_InteropServices_JavaScript_dll_14bb2621" Directory="DIR_coletor" Guid="{14BB2621-E9B5-5F7B-9E07-EA7F7354E7A6}">
+        <File Id="fil_or_System_Runtime_InteropServices_JavaScript_dll_14bb2621" Source="!(bindpath.Publicado)\coletor\System.Runtime.InteropServices.JavaScript.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_m_Runtime_InteropServices_RuntimeInformation_dll_9ac9c735" Directory="DIR_coletor" Guid="{9AC9C735-35A9-587F-91D7-91B0E0B352ED}">
+        <File Id="fil_m_Runtime_InteropServices_RuntimeInformation_dll_9ac9c735" Source="!(bindpath.Publicado)\coletor\System.Runtime.InteropServices.RuntimeInformation.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_InteropServices_dll_f3d0ef07" Directory="DIR_coletor" Guid="{F3D0EF07-31A7-56FE-9102-3F86B4FF2D15}">
+        <File Id="fil_coletor_System_Runtime_InteropServices_dll_f3d0ef07" Source="!(bindpath.Publicado)\coletor\System.Runtime.InteropServices.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Intrinsics_dll_a2fb1e18" Directory="DIR_coletor" Guid="{A2FB1E18-F9D1-5E8A-B1A1-54D910790EB5}">
+        <File Id="fil_coletor_System_Runtime_Intrinsics_dll_a2fb1e18" Source="!(bindpath.Publicado)\coletor\System.Runtime.Intrinsics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Loader_dll_601b4e58" Directory="DIR_coletor" Guid="{601B4E58-FBC5-5AD7-8781-0CDC1CB555EB}">
+        <File Id="fil_coletor_System_Runtime_Loader_dll_601b4e58" Source="!(bindpath.Publicado)\coletor\System.Runtime.Loader.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Numerics_dll_0dd07cb1" Directory="DIR_coletor" Guid="{0DD07CB1-C89D-5A1B-81DA-C106A98CFBB6}">
+        <File Id="fil_coletor_System_Runtime_Numerics_dll_0dd07cb1" Source="!(bindpath.Publicado)\coletor\System.Runtime.Numerics.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_System_Runtime_Serialization_Formatters_dll_9abeaf65" Directory="DIR_coletor" Guid="{9ABEAF65-79DC-55D1-B1DC-BCF8D0E0005C}">
+        <File Id="fil_etor_System_Runtime_Serialization_Formatters_dll_9abeaf65" Source="!(bindpath.Publicado)\coletor\System.Runtime.Serialization.Formatters.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Serialization_Json_dll_3990706f" Directory="DIR_coletor" Guid="{3990706F-A8B0-5A0F-AB0B-E183A7177A4B}">
+        <File Id="fil_coletor_System_Runtime_Serialization_Json_dll_3990706f" Source="!(bindpath.Publicado)\coletor\System.Runtime.Serialization.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_System_Runtime_Serialization_Primitives_dll_c65e7221" Directory="DIR_coletor" Guid="{C65E7221-3F4A-535C-8269-0035B387B078}">
+        <File Id="fil_etor_System_Runtime_Serialization_Primitives_dll_c65e7221" Source="!(bindpath.Publicado)\coletor\System.Runtime.Serialization.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Serialization_Xml_dll_5e11916a" Directory="DIR_coletor" Guid="{5E11916A-08FF-5214-8CAD-53715CD4EF52}">
+        <File Id="fil_coletor_System_Runtime_Serialization_Xml_dll_5e11916a" Source="!(bindpath.Publicado)\coletor\System.Runtime.Serialization.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_Serialization_dll_05aee836" Directory="DIR_coletor" Guid="{05AEE836-0241-5EB0-8535-336C61C3E762}">
+        <File Id="fil_coletor_System_Runtime_Serialization_dll_05aee836" Source="!(bindpath.Publicado)\coletor\System.Runtime.Serialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Runtime_dll_de88233c" Directory="DIR_coletor" Guid="{DE88233C-082D-535E-A32F-70DE4A128395}">
+        <File Id="fil_coletor_System_Runtime_dll_de88233c" Source="!(bindpath.Publicado)\coletor\System.Runtime.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_AccessControl_dll_f5b131c3" Directory="DIR_coletor" Guid="{F5B131C3-09CF-5457-99EE-E343E53F4B4F}">
+        <File Id="fil_coletor_System_Security_AccessControl_dll_f5b131c3" Source="!(bindpath.Publicado)\coletor\System.Security.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Claims_dll_3ab08e00" Directory="DIR_coletor" Guid="{3AB08E00-FCE0-5EDF-8A54-637AC42E6C4E}">
+        <File Id="fil_coletor_System_Security_Claims_dll_3ab08e00" Source="!(bindpath.Publicado)\coletor\System.Security.Claims.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_System_Security_Cryptography_Algorithms_dll_f45e86e6" Directory="DIR_coletor" Guid="{F45E86E6-BABC-5804-917B-BA8962E368EF}">
+        <File Id="fil_etor_System_Security_Cryptography_Algorithms_dll_f45e86e6" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Algorithms.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_Cng_dll_5ee4b57b" Directory="DIR_coletor" Guid="{5EE4B57B-3AEF-56C8-BFC5-76C07BA9931E}">
+        <File Id="fil_coletor_System_Security_Cryptography_Cng_dll_5ee4b57b" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Cng.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_Csp_dll_dca759cc" Directory="DIR_coletor" Guid="{DCA759CC-52DB-50AC-9741-5D8F7F13FDF8}">
+        <File Id="fil_coletor_System_Security_Cryptography_Csp_dll_dca759cc" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Csp.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_System_Security_Cryptography_Encoding_dll_ebf745ec" Directory="DIR_coletor" Guid="{EBF745EC-4C9A-5574-BE7B-BDF558355EEB}">
+        <File Id="fil_oletor_System_Security_Cryptography_Encoding_dll_ebf745ec" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Encoding.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_OpenSsl_dll_a2634c41" Directory="DIR_coletor" Guid="{A2634C41-B4C2-57AC-9103-61CB51422634}">
+        <File Id="fil_coletor_System_Security_Cryptography_OpenSsl_dll_a2634c41" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.OpenSsl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_Pkcs_dll_ca3627f1" Directory="DIR_coletor" Guid="{CA3627F1-EF8D-5B5D-866E-EBA7E4C6C653}">
+        <File Id="fil_coletor_System_Security_Cryptography_Pkcs_dll_ca3627f1" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Pkcs.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_System_Security_Cryptography_Primitives_dll_5c95e9cd" Directory="DIR_coletor" Guid="{5C95E9CD-47BA-562C-84F9-E07168327298}">
+        <File Id="fil_etor_System_Security_Cryptography_Primitives_dll_5c95e9cd" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_r_System_Security_Cryptography_ProtectedData_dll_7754624a" Directory="DIR_coletor" Guid="{7754624A-3A0D-5AD6-A3ED-9692B5D3CE36}">
+        <File Id="fil_r_System_Security_Cryptography_ProtectedData_dll_7754624a" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.ProtectedData.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_ystem_Security_Cryptography_X509Certificates_dll_408737fe" Directory="DIR_coletor" Guid="{408737FE-2DA6-5FF0-88CC-645EE057B99A}">
+        <File Id="fil_ystem_Security_Cryptography_X509Certificates_dll_408737fe" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.X509Certificates.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_Xml_dll_e30a9816" Directory="DIR_coletor" Guid="{E30A9816-78A9-5FC0-AC1E-754C74D78F5B}">
+        <File Id="fil_coletor_System_Security_Cryptography_Xml_dll_e30a9816" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Cryptography_dll_f02e774d" Directory="DIR_coletor" Guid="{F02E774D-F75E-5166-AE6E-449B7FF2E7E7}">
+        <File Id="fil_coletor_System_Security_Cryptography_dll_f02e774d" Source="!(bindpath.Publicado)\coletor\System.Security.Cryptography.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Permissions_dll_1e112d82" Directory="DIR_coletor" Guid="{1E112D82-91E2-5B74-9F38-ACA3E394BF67}">
+        <File Id="fil_coletor_System_Security_Permissions_dll_1e112d82" Source="!(bindpath.Publicado)\coletor\System.Security.Permissions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Principal_Windows_dll_e6af3262" Directory="DIR_coletor" Guid="{E6AF3262-055A-569B-A13C-272CA637E68D}">
+        <File Id="fil_coletor_System_Security_Principal_Windows_dll_e6af3262" Source="!(bindpath.Publicado)\coletor\System.Security.Principal.Windows.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_Principal_dll_0485461e" Directory="DIR_coletor" Guid="{0485461E-2701-556B-AA37-01F5AF1ACC9A}">
+        <File Id="fil_coletor_System_Security_Principal_dll_0485461e" Source="!(bindpath.Publicado)\coletor\System.Security.Principal.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_SecureString_dll_2a53d9bc" Directory="DIR_coletor" Guid="{2A53D9BC-43DA-5A31-8FDE-92C6C557DC2F}">
+        <File Id="fil_coletor_System_Security_SecureString_dll_2a53d9bc" Source="!(bindpath.Publicado)\coletor\System.Security.SecureString.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Security_dll_1df8386a" Directory="DIR_coletor" Guid="{1DF8386A-4159-5FCF-8DA8-FAC4D0103CA9}">
+        <File Id="fil_coletor_System_Security_dll_1df8386a" Source="!(bindpath.Publicado)\coletor\System.Security.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ServiceModel_Web_dll_968ea872" Directory="DIR_coletor" Guid="{968EA872-F3FD-5FAF-9471-3F015733B958}">
+        <File Id="fil_coletor_System_ServiceModel_Web_dll_968ea872" Source="!(bindpath.Publicado)\coletor\System.ServiceModel.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ServiceProcess_dll_f9f0cc4e" Directory="DIR_coletor" Guid="{F9F0CC4E-E2CA-5E80-9A42-752128319433}">
+        <File Id="fil_coletor_System_ServiceProcess_dll_f9f0cc4e" Source="!(bindpath.Publicado)\coletor\System.ServiceProcess.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_Encoding_CodePages_dll_e1fdd11b" Directory="DIR_coletor" Guid="{E1FDD11B-E6CD-5F03-B130-A974F855C336}">
+        <File Id="fil_coletor_System_Text_Encoding_CodePages_dll_e1fdd11b" Source="!(bindpath.Publicado)\coletor\System.Text.Encoding.CodePages.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_Encoding_Extensions_dll_4efda44f" Directory="DIR_coletor" Guid="{4EFDA44F-288B-5F43-9EC8-E8D5778B7D2F}">
+        <File Id="fil_coletor_System_Text_Encoding_Extensions_dll_4efda44f" Source="!(bindpath.Publicado)\coletor\System.Text.Encoding.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_Encoding_dll_e786c44a" Directory="DIR_coletor" Guid="{E786C44A-62B5-5F8F-82BC-BC3E8CBCF1FE}">
+        <File Id="fil_coletor_System_Text_Encoding_dll_e786c44a" Source="!(bindpath.Publicado)\coletor\System.Text.Encoding.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_Encodings_Web_dll_cd88ff54" Directory="DIR_coletor" Guid="{CD88FF54-A43D-5EB6-9A4E-FA68F509573B}">
+        <File Id="fil_coletor_System_Text_Encodings_Web_dll_cd88ff54" Source="!(bindpath.Publicado)\coletor\System.Text.Encodings.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_Json_dll_375d7c4c" Directory="DIR_coletor" Guid="{375D7C4C-116A-5E12-B4F7-16D70A5FE6E3}">
+        <File Id="fil_coletor_System_Text_Json_dll_375d7c4c" Source="!(bindpath.Publicado)\coletor\System.Text.Json.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Text_RegularExpressions_dll_8b821db7" Directory="DIR_coletor" Guid="{8B821DB7-54FD-56F7-9353-9FCFC2FC3587}">
+        <File Id="fil_coletor_System_Text_RegularExpressions_dll_8b821db7" Source="!(bindpath.Publicado)\coletor\System.Text.RegularExpressions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_AccessControl_dll_bfd72281" Directory="DIR_coletor" Guid="{BFD72281-556F-53AF-A140-0EE7E4DBE52E}">
+        <File Id="fil_coletor_System_Threading_AccessControl_dll_bfd72281" Source="!(bindpath.Publicado)\coletor\System.Threading.AccessControl.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Channels_dll_2fdd666e" Directory="DIR_coletor" Guid="{2FDD666E-DA93-57ED-97EE-F72E30EAB4E5}">
+        <File Id="fil_coletor_System_Threading_Channels_dll_2fdd666e" Source="!(bindpath.Publicado)\coletor\System.Threading.Channels.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Overlapped_dll_8b8dd35f" Directory="DIR_coletor" Guid="{8B8DD35F-9C43-5E8A-81CA-EA477FEB8920}">
+        <File Id="fil_coletor_System_Threading_Overlapped_dll_8b8dd35f" Source="!(bindpath.Publicado)\coletor\System.Threading.Overlapped.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Tasks_Dataflow_dll_e9f5d0db" Directory="DIR_coletor" Guid="{E9F5D0DB-C118-5EB6-B382-ADE1E8BAD106}">
+        <File Id="fil_coletor_System_Threading_Tasks_Dataflow_dll_e9f5d0db" Source="!(bindpath.Publicado)\coletor\System.Threading.Tasks.Dataflow.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Tasks_Extensions_dll_632a4945" Directory="DIR_coletor" Guid="{632A4945-945D-57A2-9E76-54457F746344}">
+        <File Id="fil_coletor_System_Threading_Tasks_Extensions_dll_632a4945" Source="!(bindpath.Publicado)\coletor\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Tasks_Parallel_dll_f46dcb71" Directory="DIR_coletor" Guid="{F46DCB71-9152-56EA-903C-BCD57EDF2962}">
+        <File Id="fil_coletor_System_Threading_Tasks_Parallel_dll_f46dcb71" Source="!(bindpath.Publicado)\coletor\System.Threading.Tasks.Parallel.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Tasks_dll_e7f8a655" Directory="DIR_coletor" Guid="{E7F8A655-6863-5EE8-A70F-0EB08FFDB73E}">
+        <File Id="fil_coletor_System_Threading_Tasks_dll_e7f8a655" Source="!(bindpath.Publicado)\coletor\System.Threading.Tasks.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Thread_dll_f8d051b3" Directory="DIR_coletor" Guid="{F8D051B3-CD1B-5B3D-B302-412B5BE03816}">
+        <File Id="fil_coletor_System_Threading_Thread_dll_f8d051b3" Source="!(bindpath.Publicado)\coletor\System.Threading.Thread.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_ThreadPool_dll_25a92b0f" Directory="DIR_coletor" Guid="{25A92B0F-8A01-550A-B9D3-985883A5B82E}">
+        <File Id="fil_coletor_System_Threading_ThreadPool_dll_25a92b0f" Source="!(bindpath.Publicado)\coletor\System.Threading.ThreadPool.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_Timer_dll_0b6db48c" Directory="DIR_coletor" Guid="{0B6DB48C-7495-53C3-9370-3C537A6B0AD4}">
+        <File Id="fil_coletor_System_Threading_Timer_dll_0b6db48c" Source="!(bindpath.Publicado)\coletor\System.Threading.Timer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Threading_dll_2705ec24" Directory="DIR_coletor" Guid="{2705EC24-A9A8-5AE9-84AB-F9711C66EE5C}">
+        <File Id="fil_coletor_System_Threading_dll_2705ec24" Source="!(bindpath.Publicado)\coletor\System.Threading.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Transactions_Local_dll_800f53c6" Directory="DIR_coletor" Guid="{800F53C6-D4FD-5F1E-9B68-A4DA8AC3FFEB}">
+        <File Id="fil_coletor_System_Transactions_Local_dll_800f53c6" Source="!(bindpath.Publicado)\coletor\System.Transactions.Local.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Transactions_dll_291b2353" Directory="DIR_coletor" Guid="{291B2353-09DE-50BA-BFBE-30695238D4D4}">
+        <File Id="fil_coletor_System_Transactions_dll_291b2353" Source="!(bindpath.Publicado)\coletor\System.Transactions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_ValueTuple_dll_4be88de4" Directory="DIR_coletor" Guid="{4BE88DE4-F68C-5C4F-B277-2DAFD7778861}">
+        <File Id="fil_coletor_System_ValueTuple_dll_4be88de4" Source="!(bindpath.Publicado)\coletor\System.ValueTuple.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Web_HttpUtility_dll_c16ed496" Directory="DIR_coletor" Guid="{C16ED496-CC37-5345-8D53-74F266742C18}">
+        <File Id="fil_coletor_System_Web_HttpUtility_dll_c16ed496" Source="!(bindpath.Publicado)\coletor\System.Web.HttpUtility.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Web_dll_dfa34a33" Directory="DIR_coletor" Guid="{DFA34A33-8D6B-5D1F-A0FB-6B4F4916EBD7}">
+        <File Id="fil_coletor_System_Web_dll_dfa34a33" Source="!(bindpath.Publicado)\coletor\System.Web.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Controls_Ribbon_dll_1b9f7c29" Directory="DIR_coletor" Guid="{1B9F7C29-8F30-5E6E-BB07-9ACD5BA7750E}">
+        <File Id="fil_coletor_System_Windows_Controls_Ribbon_dll_1b9f7c29" Source="!(bindpath.Publicado)\coletor\System.Windows.Controls.Ribbon.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Extensions_dll_8ee15442" Directory="DIR_coletor" Guid="{8EE15442-8184-5F97-8B88-AF2E87176CDF}">
+        <File Id="fil_coletor_System_Windows_Extensions_dll_8ee15442" Source="!(bindpath.Publicado)\coletor\System.Windows.Extensions.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Forms_Design_Editors_dll_b2e7f6fc" Directory="DIR_coletor" Guid="{B2E7F6FC-17D7-52EC-B0F5-CF144FFE5B4F}">
+        <File Id="fil_coletor_System_Windows_Forms_Design_Editors_dll_b2e7f6fc" Source="!(bindpath.Publicado)\coletor\System.Windows.Forms.Design.Editors.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Forms_Design_dll_1e877413" Directory="DIR_coletor" Guid="{1E877413-495E-5037-8408-A1AACE3CD125}">
+        <File Id="fil_coletor_System_Windows_Forms_Design_dll_1e877413" Source="!(bindpath.Publicado)\coletor\System.Windows.Forms.Design.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Forms_Primitives_dll_6f585e45" Directory="DIR_coletor" Guid="{6F585E45-E517-5CDB-834F-9407816D43C6}">
+        <File Id="fil_coletor_System_Windows_Forms_Primitives_dll_6f585e45" Source="!(bindpath.Publicado)\coletor\System.Windows.Forms.Primitives.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Forms_dll_b7f7f31c" Directory="DIR_coletor" Guid="{B7F7F31C-AB9E-5760-A2C4-3697B83541FA}">
+        <File Id="fil_coletor_System_Windows_Forms_dll_b7f7f31c" Source="!(bindpath.Publicado)\coletor\System.Windows.Forms.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Input_Manipulations_dll_8ad71e68" Directory="DIR_coletor" Guid="{8AD71E68-94F4-55EB-8B02-7FF67795FA6E}">
+        <File Id="fil_coletor_System_Windows_Input_Manipulations_dll_8ad71e68" Source="!(bindpath.Publicado)\coletor\System.Windows.Input.Manipulations.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_Presentation_dll_8f14a243" Directory="DIR_coletor" Guid="{8F14A243-A400-5636-9C6D-7016D3B83494}">
+        <File Id="fil_coletor_System_Windows_Presentation_dll_8f14a243" Source="!(bindpath.Publicado)\coletor\System.Windows.Presentation.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Windows_dll_35adef19" Directory="DIR_coletor" Guid="{35ADEF19-19C9-524D-B37D-7C3BC4046508}">
+        <File Id="fil_coletor_System_Windows_dll_35adef19" Source="!(bindpath.Publicado)\coletor\System.Windows.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xaml_dll_3f5462f3" Directory="DIR_coletor" Guid="{3F5462F3-4D66-57A5-9EDB-F49F4AC9B43D}">
+        <File Id="fil_coletor_System_Xaml_dll_3f5462f3" Source="!(bindpath.Publicado)\coletor\System.Xaml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_Linq_dll_c3e25c29" Directory="DIR_coletor" Guid="{C3E25C29-7D3C-50DC-9DC1-04285F3CADFE}">
+        <File Id="fil_coletor_System_Xml_Linq_dll_c3e25c29" Source="!(bindpath.Publicado)\coletor\System.Xml.Linq.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_ReaderWriter_dll_73e4b904" Directory="DIR_coletor" Guid="{73E4B904-2896-588F-8259-435C78C771CE}">
+        <File Id="fil_coletor_System_Xml_ReaderWriter_dll_73e4b904" Source="!(bindpath.Publicado)\coletor\System.Xml.ReaderWriter.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_Serialization_dll_3d4ab39a" Directory="DIR_coletor" Guid="{3D4AB39A-FF3A-567D-BC05-64FD01AB11FF}">
+        <File Id="fil_coletor_System_Xml_Serialization_dll_3d4ab39a" Source="!(bindpath.Publicado)\coletor\System.Xml.Serialization.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_XDocument_dll_3048e999" Directory="DIR_coletor" Guid="{3048E999-2211-5D6A-8199-3F5BC75C111A}">
+        <File Id="fil_coletor_System_Xml_XDocument_dll_3048e999" Source="!(bindpath.Publicado)\coletor\System.Xml.XDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_XPath_XDocument_dll_f98845d8" Directory="DIR_coletor" Guid="{F98845D8-E909-5EA0-BE0A-81E579709688}">
+        <File Id="fil_coletor_System_Xml_XPath_XDocument_dll_f98845d8" Source="!(bindpath.Publicado)\coletor\System.Xml.XPath.XDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_XPath_dll_e51c1514" Directory="DIR_coletor" Guid="{E51C1514-47AB-5986-A68A-E93990879B4C}">
+        <File Id="fil_coletor_System_Xml_XPath_dll_e51c1514" Source="!(bindpath.Publicado)\coletor\System.Xml.XPath.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_XmlDocument_dll_211df20a" Directory="DIR_coletor" Guid="{211DF20A-EBF3-52A8-AE2E-38491A8194EE}">
+        <File Id="fil_coletor_System_Xml_XmlDocument_dll_211df20a" Source="!(bindpath.Publicado)\coletor\System.Xml.XmlDocument.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_XmlSerializer_dll_d6c29c50" Directory="DIR_coletor" Guid="{D6C29C50-E4FA-5044-B0D2-732D9A1B9AEB}">
+        <File Id="fil_coletor_System_Xml_XmlSerializer_dll_d6c29c50" Source="!(bindpath.Publicado)\coletor\System.Xml.XmlSerializer.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_Xml_dll_cbff6b47" Directory="DIR_coletor" Guid="{CBFF6B47-8DBE-5A71-A379-A1B46B55BC8E}">
+        <File Id="fil_coletor_System_Xml_dll_cbff6b47" Source="!(bindpath.Publicado)\coletor\System.Xml.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_System_dll_f41d80b0" Directory="DIR_coletor" Guid="{F41D80B0-2078-5F37-A70D-FE7593640800}">
+        <File Id="fil_coletor_System_dll_f41d80b0" Source="!(bindpath.Publicado)\coletor\System.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Coletor_deps_json_7d98151f" Directory="DIR_coletor" Guid="{7D98151F-49B8-5992-984E-2C7842754FF6}">
+        <File Id="fil_coletor_Telemetria_Coletor_deps_json_7d98151f" Source="!(bindpath.Publicado)\coletor\Telemetria.Coletor.deps.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Coletor_dll_74e01cdf" Directory="DIR_coletor" Guid="{74E01CDF-9F80-5DF9-AE71-4295CC5E3D4A}">
+        <File Id="fil_coletor_Telemetria_Coletor_dll_74e01cdf" Source="!(bindpath.Publicado)\coletor\Telemetria.Coletor.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Coletor_exe_324f240a" Directory="DIR_coletor" Guid="{324F240A-9E85-54A0-AF5D-2B1A75B098E7}">
+        <File Id="fil_coletor_Telemetria_Coletor_exe_324f240a" Source="!(bindpath.Publicado)\coletor\Telemetria.Coletor.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Coletor_pdb_6d52fe63" Directory="DIR_coletor" Guid="{6D52FE63-6376-5148-A5BD-E392CF284B9B}">
+        <File Id="fil_coletor_Telemetria_Coletor_pdb_6d52fe63" Source="!(bindpath.Publicado)\coletor\Telemetria.Coletor.pdb" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Coletor_runtimeconfig_json_45555c79" Directory="DIR_coletor" Guid="{45555C79-5C96-5D95-9CBA-C7892B6D6051}">
+        <File Id="fil_coletor_Telemetria_Coletor_runtimeconfig_json_45555c79" Source="!(bindpath.Publicado)\coletor\Telemetria.Coletor.runtimeconfig.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Nucleo_dll_b379fb68" Directory="DIR_coletor" Guid="{B379FB68-32A8-535E-BCA5-287C6A3E6076}">
+        <File Id="fil_coletor_Telemetria_Nucleo_dll_b379fb68" Source="!(bindpath.Publicado)\coletor\Telemetria.Nucleo.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_Telemetria_Nucleo_pdb_63778b9f" Directory="DIR_coletor" Guid="{63778B9F-5A93-59C7-8377-533F8BC27AF1}">
+        <File Id="fil_coletor_Telemetria_Nucleo_pdb_63778b9f" Source="!(bindpath.Publicado)\coletor\Telemetria.Nucleo.pdb" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_UIAutomationClient_dll_b0ff7fd4" Directory="DIR_coletor" Guid="{B0FF7FD4-F82D-57C1-9A04-B23A20FDB996}">
+        <File Id="fil_coletor_UIAutomationClient_dll_b0ff7fd4" Source="!(bindpath.Publicado)\coletor\UIAutomationClient.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_UIAutomationClientSideProviders_dll_ae404474" Directory="DIR_coletor" Guid="{AE404474-14AC-5A8B-9451-2CA880308842}">
+        <File Id="fil_coletor_UIAutomationClientSideProviders_dll_ae404474" Source="!(bindpath.Publicado)\coletor\UIAutomationClientSideProviders.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_UIAutomationProvider_dll_0cfce2cb" Directory="DIR_coletor" Guid="{0CFCE2CB-9720-5758-B75F-26AB82A8EF8D}">
+        <File Id="fil_coletor_UIAutomationProvider_dll_0cfce2cb" Source="!(bindpath.Publicado)\coletor\UIAutomationProvider.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_UIAutomationTypes_dll_a1847b63" Directory="DIR_coletor" Guid="{A1847B63-7837-501A-A813-08BEB1EBD830}">
+        <File Id="fil_coletor_UIAutomationTypes_dll_a1847b63" Source="!(bindpath.Publicado)\coletor\UIAutomationTypes.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_WindowsBase_dll_b39f18d0" Directory="DIR_coletor" Guid="{B39F18D0-2814-5520-98B9-D6D034E09F69}">
+        <File Id="fil_coletor_WindowsBase_dll_b39f18d0" Source="!(bindpath.Publicado)\coletor\WindowsBase.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_WindowsFormsIntegration_dll_701de82a" Directory="DIR_coletor" Guid="{701DE82A-93E7-5B10-A775-C55CF209DD56}">
+        <File Id="fil_coletor_WindowsFormsIntegration_dll_701de82a" Source="!(bindpath.Publicado)\coletor\WindowsFormsIntegration.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_appsettings_json_27129f9e" Directory="DIR_coletor" Guid="{27129F9E-3637-52C4-88ED-ADA4C110B9EF}">
+        <File Id="fil_coletor_appsettings_json_27129f9e" Source="!(bindpath.Publicado)\coletor\appsettings.json" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_clretwrc_dll_dfde65cd" Directory="DIR_coletor" Guid="{DFDE65CD-6CC7-54AB-BB05-D41220F98D82}">
+        <File Id="fil_coletor_clretwrc_dll_dfde65cd" Source="!(bindpath.Publicado)\coletor\clretwrc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_clrgc_dll_fe25810f" Directory="DIR_coletor" Guid="{FE25810F-AB02-59A8-B113-6E7EEAA5B386}">
+        <File Id="fil_coletor_clrgc_dll_fe25810f" Source="!(bindpath.Publicado)\coletor\clrgc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_clrjit_dll_e7450726" Directory="DIR_coletor" Guid="{E7450726-FD3E-59DC-BC9B-62A5C6E33069}">
+        <File Id="fil_coletor_clrjit_dll_e7450726" Source="!(bindpath.Publicado)\coletor\clrjit.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_coreclr_dll_9b62ea15" Directory="DIR_coletor" Guid="{9B62EA15-C477-509D-9F05-D8AAD2B09DBE}">
+        <File Id="fil_coletor_coreclr_dll_9b62ea15" Source="!(bindpath.Publicado)\coletor\coreclr.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_createdump_exe_acfcde3c" Directory="DIR_coletor" Guid="{ACFCDE3C-42C7-5E17-A35E-58AC47DB4462}">
+        <File Id="fil_coletor_createdump_exe_acfcde3c" Source="!(bindpath.Publicado)\coletor\createdump.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_e_sqlcipher_dll_d592ef4c" Directory="DIR_coletor" Guid="{D592EF4C-D06D-5442-8DD9-6F4DD621216B}">
+        <File Id="fil_coletor_e_sqlcipher_dll_d592ef4c" Source="!(bindpath.Publicado)\coletor\e_sqlcipher.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_hostfxr_dll_4e955e52" Directory="DIR_coletor" Guid="{4E955E52-7F20-5AA0-A3BB-FB33AA0163D0}">
+        <File Id="fil_coletor_hostfxr_dll_4e955e52" Source="!(bindpath.Publicado)\coletor\hostfxr.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_hostpolicy_dll_2149b666" Directory="DIR_coletor" Guid="{2149B666-A1AD-59CA-A22B-BDB38EA7CFE4}">
+        <File Id="fil_coletor_hostpolicy_dll_2149b666" Source="!(bindpath.Publicado)\coletor\hostpolicy.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_mscordaccore_dll_124cd513" Directory="DIR_coletor" Guid="{124CD513-BF2E-5809-955E-386BD39F4398}">
+        <File Id="fil_coletor_mscordaccore_dll_124cd513" Source="!(bindpath.Publicado)\coletor\mscordaccore.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_mscordaccore_amd64_amd64_8_0_3026_36720_dll_1c98aab3" Directory="DIR_coletor" Guid="{1C98AAB3-1530-5116-AB3F-7A311811F36D}">
+        <File Id="fil_etor_mscordaccore_amd64_amd64_8_0_3026_36720_dll_1c98aab3" Source="!(bindpath.Publicado)\coletor\mscordaccore_amd64_amd64_8.0.3026.36720.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_mscordbi_dll_e932841a" Directory="DIR_coletor" Guid="{E932841A-78DB-5C3D-960F-0FB8326E59BF}">
+        <File Id="fil_coletor_mscordbi_dll_e932841a" Source="!(bindpath.Publicado)\coletor\mscordbi.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_mscorlib_dll_e0cfa615" Directory="DIR_coletor" Guid="{E0CFA615-C154-5CC2-83FD-D34BB0F53A75}">
+        <File Id="fil_coletor_mscorlib_dll_e0cfa615" Source="!(bindpath.Publicado)\coletor\mscorlib.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_mscorrc_dll_31982151" Directory="DIR_coletor" Guid="{31982151-13A7-58A6-8984-AA9A7D6AF789}">
+        <File Id="fil_coletor_mscorrc_dll_31982151" Source="!(bindpath.Publicado)\coletor\mscorrc.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_msquic_dll_435cb402" Directory="DIR_coletor" Guid="{435CB402-B9F2-5003-9EA7-F216D7A325A0}">
+        <File Id="fil_coletor_msquic_dll_435cb402" Source="!(bindpath.Publicado)\coletor\msquic.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_netstandard_dll_58ff80a0" Directory="DIR_coletor" Guid="{58FF80A0-F2C8-5AEE-9E1E-968400EFD10F}">
+        <File Id="fil_coletor_netstandard_dll_58ff80a0" Source="!(bindpath.Publicado)\coletor\netstandard.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_vcruntime140_cor3_dll_0568690a" Directory="DIR_coletor" Guid="{0568690A-4CDE-5317-8D1B-2EC79A61E46B}">
+        <File Id="fil_coletor_vcruntime140_cor3_dll_0568690a" Source="!(bindpath.Publicado)\coletor\vcruntime140_cor3.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_wpfgfx_cor3_dll_4030b786" Directory="DIR_coletor" Guid="{4030B786-F90F-5C61-9487-9D4CEB4C6C3C}">
+        <File Id="fil_coletor_wpfgfx_cor3_dll_4030b786" Source="!(bindpath.Publicado)\coletor\wpfgfx_cor3.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__pt_BR_Microsoft_VisualBasic_Forms_resources_dll_412b09db" Directory="DIR_coletor_pt_BR" Guid="{412B09DB-2D5C-5ABD-ACE2-E0D11E97A058}">
+        <File Id="fil__pt_BR_Microsoft_VisualBasic_Forms_resources_dll_412b09db" Source="!(bindpath.Publicado)\coletor\pt-BR\Microsoft.VisualBasic.Forms.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_PresentationCore_resources_dll_ccd6b8dd" Directory="DIR_coletor_pt_BR" Guid="{CCD6B8DD-022C-5FA3-BF06-8E52AFAC6E42}">
+        <File Id="fil_coletor_pt_BR_PresentationCore_resources_dll_ccd6b8dd" Source="!(bindpath.Publicado)\coletor\pt-BR\PresentationCore.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_oletor_pt_BR_PresentationFramework_resources_dll_9ed5e7a1" Directory="DIR_coletor_pt_BR" Guid="{9ED5E7A1-68B4-5839-BD41-31F14DFDDC29}">
+        <File Id="fil_oletor_pt_BR_PresentationFramework_resources_dll_9ed5e7a1" Source="!(bindpath.Publicado)\coletor\pt-BR\PresentationFramework.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_PresentationUI_resources_dll_1f581d57" Directory="DIR_coletor_pt_BR" Guid="{1F581D57-59CF-527D-89DD-1F0017F9E6A0}">
+        <File Id="fil_coletor_pt_BR_PresentationUI_resources_dll_1f581d57" Source="!(bindpath.Publicado)\coletor\pt-BR\PresentationUI.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_ReachFramework_resources_dll_60ed83fd" Directory="DIR_coletor_pt_BR" Guid="{60ED83FD-0B8E-5B8A-855F-A84188197B29}">
+        <File Id="fil_coletor_pt_BR_ReachFramework_resources_dll_60ed83fd" Source="!(bindpath.Publicado)\coletor\pt-BR\ReachFramework.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__BR_System_Windows_Controls_Ribbon_resources_dll_947ef81b" Directory="DIR_coletor_pt_BR" Guid="{947EF81B-A6B1-5257-A8C0-D2D790907CE0}">
+        <File Id="fil__BR_System_Windows_Controls_Ribbon_resources_dll_947ef81b" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Windows.Controls.Ribbon.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp__pt_BR_System_Windows_Forms_Design_resources_dll_9017ef52" Directory="DIR_coletor_pt_BR" Guid="{9017EF52-4CC1-5089-8BA4-117A4F0EF2E8}">
+        <File Id="fil__pt_BR_System_Windows_Forms_Design_resources_dll_9017ef52" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Windows.Forms.Design.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_BR_System_Windows_Forms_Primitives_resources_dll_38ea9d08" Directory="DIR_coletor_pt_BR" Guid="{38EA9D08-8050-5DE6-B83A-37E5D25753B3}">
+        <File Id="fil_BR_System_Windows_Forms_Primitives_resources_dll_38ea9d08" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Windows.Forms.Primitives.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_System_Windows_Forms_resources_dll_ea98c5c9" Directory="DIR_coletor_pt_BR" Guid="{EA98C5C9-BAA3-59A0-8A69-B740BE1C478A}">
+        <File Id="fil_coletor_pt_BR_System_Windows_Forms_resources_dll_ea98c5c9" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Windows.Forms.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_System_Windows_Input_Manipulations_resources_dll_93b16582" Directory="DIR_coletor_pt_BR" Guid="{93B16582-7F36-57E2-A930-DC232F7154B7}">
+        <File Id="fil_System_Windows_Input_Manipulations_resources_dll_93b16582" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Windows.Input.Manipulations.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_System_Xaml_resources_dll_1a26fbd5" Directory="DIR_coletor_pt_BR" Guid="{1A26FBD5-04C7-5858-A0C3-81FFAE8CE96C}">
+        <File Id="fil_coletor_pt_BR_System_Xaml_resources_dll_1a26fbd5" Source="!(bindpath.Publicado)\coletor\pt-BR\System.Xaml.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_UIAutomationClient_resources_dll_f81a89ff" Directory="DIR_coletor_pt_BR" Guid="{F81A89FF-4527-55EC-90F1-E91C4DBBF1F5}">
+        <File Id="fil_coletor_pt_BR_UIAutomationClient_resources_dll_f81a89ff" Source="!(bindpath.Publicado)\coletor\pt-BR\UIAutomationClient.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_BR_UIAutomationClientSideProviders_resources_dll_8f7c0a44" Directory="DIR_coletor_pt_BR" Guid="{8F7C0A44-6353-553B-8006-131C2904998D}">
+        <File Id="fil_BR_UIAutomationClientSideProviders_resources_dll_8f7c0a44" Source="!(bindpath.Publicado)\coletor\pt-BR\UIAutomationClientSideProviders.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_UIAutomationProvider_resources_dll_f56fb71e" Directory="DIR_coletor_pt_BR" Guid="{F56FB71E-5769-5313-97B0-E3E07F4E0AB3}">
+        <File Id="fil_coletor_pt_BR_UIAutomationProvider_resources_dll_f56fb71e" Source="!(bindpath.Publicado)\coletor\pt-BR\UIAutomationProvider.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_UIAutomationTypes_resources_dll_f45f15de" Directory="DIR_coletor_pt_BR" Guid="{F45F15DE-71BD-53E5-9982-42FCD2BDE729}">
+        <File Id="fil_coletor_pt_BR_UIAutomationTypes_resources_dll_f45f15de" Source="!(bindpath.Publicado)\coletor\pt-BR\UIAutomationTypes.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_coletor_pt_BR_WindowsBase_resources_dll_f5620382" Directory="DIR_coletor_pt_BR" Guid="{F5620382-D19A-5028-BF3E-C787247D419B}">
+        <File Id="fil_coletor_pt_BR_WindowsBase_resources_dll_f5620382" Source="!(bindpath.Publicado)\coletor\pt-BR\WindowsBase.resources.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="cmp_etor_pt_BR_WindowsFormsIntegration_resources_dll_4e2b3f56" Directory="DIR_coletor_pt_BR" Guid="{4E2B3F56-5841-5245-80F0-18EF897CEAE7}">
+        <File Id="fil_etor_pt_BR_WindowsFormsIntegration_resources_dll_4e2b3f56" Source="!(bindpath.Publicado)\coletor\pt-BR\WindowsFormsIntegration.resources.dll" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
