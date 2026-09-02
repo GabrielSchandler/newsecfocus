@@ -16,7 +16,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Telemetria de Produtividade",
+  // O nome é sempre o composto: "Focus" sozinho não é distintivo em busca.
+  title: "NewSec Focus",
   description:
     "Painel empresarial de produtividade — coleta de metadados em conformidade com a LGPD.",
 };

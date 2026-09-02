@@ -1,4 +1,4 @@
-# Guia de Instalação — ponta a ponta
+# NewSec Focus — guia de instalação ponta a ponta
 
 Ordem: **banco → painel → operação da plataforma → empresa cliente → agente**.
 

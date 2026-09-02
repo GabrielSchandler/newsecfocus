@@ -1,4 +1,4 @@
-# Supabase — banco, RLS e Edge Functions
+# NewSec Focus — banco, RLS e Edge Functions
 
 ## Conteúdo
 

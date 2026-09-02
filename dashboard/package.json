@@ -1,8 +1,8 @@
 {
-  "name": "telemetria-dashboard",
+  "name": "newsec-focus-painel",
   "version": "2.0.0",
   "private": true,
-  "description": "Painel de produtividade — Next.js 15 + Supabase",
+  "description": "NewSec Focus — painel de produtividade (Next.js 15 + Supabase)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

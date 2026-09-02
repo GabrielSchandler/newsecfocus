@@ -1,4 +1,4 @@
-# Painel — Next.js 15 + Supabase
+# NewSec Focus — painel (Next.js 15 + Supabase)
 
 Painel de produtividade multiempresa, com hierarquia **empresa → equipe → pessoa**,
 período fechado (dia, semana, mês, ano, geral e intervalo livre) e exportação em XLSX/CSV.

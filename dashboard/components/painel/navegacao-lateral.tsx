@@ -71,8 +71,8 @@ function Marca() {
         <Activity className="h-5 w-5 text-slate-950" />
       </div>
       <div className="leading-tight">
-        <p className="text-sm font-semibold text-slate-100">Telemetria</p>
-        <p className="text-xs text-slate-500">Produtividade</p>
+        <p className="text-sm font-semibold text-slate-100">NewSec</p>
+        <p className="text-xs text-slate-500">Focus</p>
       </div>
     </div>
   );

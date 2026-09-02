@@ -1,11 +1,11 @@
-# Sistema de Telemetria e Produtividade
+# NewSec Focus
 
 SaaS de telemetria de produtividade para estações Windows, vendido a empresas clientes.
 Agente nativo de baixo consumo, backend multiempresa e painel web com hierarquia
 **empresa → equipe → pessoa**.
 
 ```
-telemetria-produtividade/
+newsecfocus/
 ├── agente/        Agente Windows em C# (.NET 8): serviço supervisor + coletor de sessão
 ├── supabase/      Schema SQL, RLS, migrations, agregados e Edge Functions
 ├── dashboard/     Painel Next.js 15 (App Router, Tailwind, Supabase) — pronto para a Vercel
@@ -114,18 +114,24 @@ Guia unificado em [documentos/GUIA-INSTALACAO.md](documentos/GUIA-INSTALACAO.md)
 
 | Componente | Situação |
 |------------|----------|
-| `dashboard/` | **compila** (`next build`), `tsc --noEmit` e `next lint` limpos |
-| `agente/` | **compila e publica** (`dotnet build -c Release`, `publicar.bat`) — 0 erros, 0 avisos |
-| `supabase/` | escrito e revisado; **ainda não aplicado num projeto real** |
+| `supabase/` | **aplicado** num projeto real (PostgreSQL 17.6, região São Paulo): 7 migrations, 12 tabelas, 3 jobs de pg_cron ativos |
+| `dashboard/` | **compila e roda** contra o banco real; `tsc --noEmit` e `next lint` limpos |
+| `agente/` | **compila, publica e coleta** — o coletor gravou atividade real numa estação Windows |
 
-O agente gera binários, mas **nunca rodou numa estação**: hooks de baixo nível,
-`CreateProcessAsUser` entre sessões e SQLCipher só se provam em execução. É o próximo
-teste.
+Validado com 23.300 minutos de atividade sintética (5 pessoas, 3 equipes, 14 dias):
 
-Pendências conhecidas antes de vender:
+- os KPIs do painel batem **exatamente** com a contagem no dado cru (minutos ativos,
+  minutos parados, teclas e número de pessoas);
+- a consolidação comprimiu 23.300 linhas brutas em 393 baldes de hora e 50 de dia,
+  em 4,3 segundos;
+- o **isolamento por RLS funciona**: um líder de equipe enxergou 2 das 5 pessoas e
+  7.001 dos 17.869 minutos, sem que nenhuma consulta precisasse saber disso.
 
-1. Aplicar as migrations num projeto Supabase e rodar o fluxo ponta a ponta.
-2. Instalar o agente numa máquina de teste e validar coleta, matrícula e sincronização.
+Falta para o ciclo completo:
+
+1. Publicar as Edge Functions (`supabase functions deploy`) — sem elas o agente não
+   consegue se matricular nem sincronizar; exige um access token da conta Supabase.
+2. Instalar o agente como serviço numa estação e validar matrícula e envio de lote.
 3. Gerar instalador MSI **com assinatura de código** — binário não assinado que instala
    hooks de teclado é bloqueado por antivírus e SmartScreen.
 4. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
