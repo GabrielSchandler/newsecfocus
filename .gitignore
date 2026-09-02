@@ -1,0 +1,42 @@
+# ---------------------------------------------------------------------------
+#  Telemetria de Produtividade — arquivos que nao vao para o repositorio
+# ---------------------------------------------------------------------------
+
+# .NET / Visual Studio (agente)
+bin/
+obj/
+.vs/
+*.user
+*.suo
+publicado/
+*.msi
+
+# Node / Next.js (dashboard)
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+
+# Variaveis de ambiente — NUNCA versionar chave de projeto
+.env
+.env.local
+.env*.local
+
+# Supabase CLI
+supabase/.branches/
+supabase/.temp/
+
+# Sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs e banco local do agente
+*.log
+*.db
+*.db-shm
+*.db-wal

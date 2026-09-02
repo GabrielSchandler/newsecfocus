@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Propriedade custom animável usada pela borda em gradiente giratório (Glow Card). */
+@property --angulo {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  --fonte-sans: "Inter", system-ui, sans-serif;
+  --fonte-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #090d16;
+  color: #e2e8f0;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Malha de brilho radial ao fundo — clima "futuristic enterprise". */
+.fundo-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fundo-aurora::before,
+.fundo-aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.35;
+}
+.fundo-aurora::before {
+  width: 520px;
+  height: 520px;
+  top: -140px;
+  left: -80px;
+  background: radial-gradient(circle, #22d3ee, transparent 70%);
+}
+.fundo-aurora::after {
+  width: 620px;
+  height: 620px;
+  bottom: -220px;
+  right: -120px;
+  background: radial-gradient(circle, #a78bfa, transparent 70%);
+}
+
+/* Vidro fosco (glassmorphism) reutilizável. */
+.vidro {
+  background: linear-gradient(180deg, rgba(15, 21, 36, 0.75), rgba(9, 13, 22, 0.65));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+/* Barra de rolagem discreta. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 8px;
+}

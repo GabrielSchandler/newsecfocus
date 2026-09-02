@@ -1,0 +1,32 @@
+# Configuração do projeto Supabase (CLI). Ajuste project_id ao linkar.
+project_id = "telemetria-produtividade"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+# As Edge Functions de ingestão não exigem JWT de usuário: a autenticação é o
+# token de dispositivo, validado dentro da própria função com a service_role.
+[functions.ingestao-lote]
+verify_jwt = false
+
+[functions.registrar-dispositivo]
+verify_jwt = false
