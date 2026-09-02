@@ -1,57 +1,210 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, MonitorSmartphone, AppWindow, Activity } from "lucide-react";
+import {
+  Activity,
+  AppWindow,
+  Building2,
+  FileSpreadsheet,
+  LayoutDashboard,
+  Menu,
+  MonitorSmartphone,
+  Settings,
+  Users,
+  UserSquare2,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ITENS = [
-  { href: "/painel", rotulo: "Visão Geral", icone: LayoutDashboard },
-  { href: "/painel/dispositivos", rotulo: "Dispositivos", icone: MonitorSmartphone },
-  { href: "/painel/aplicativos", rotulo: "Aplicativos", icone: AppWindow },
-];
+export interface ItemNavegacao {
+  href: string;
+  rotulo: string;
+  icone: keyof typeof ICONES;
+}
 
-export function NavegacaoLateral() {
+const ICONES = {
+  visao: LayoutDashboard,
+  equipes: Users,
+  pessoas: UserSquare2,
+  aplicativos: AppWindow,
+  dispositivos: MonitorSmartphone,
+  relatorios: FileSpreadsheet,
+  administracao: Settings,
+  plataforma: Building2,
+} as const;
+
+/** Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece. */
+export function itensDoMenu(opcoes: {
+  podeAdministrar: boolean;
+  adminPlataforma: boolean;
+}): ItemNavegacao[] {
+  const itens: ItemNavegacao[] = [
+    { href: "/painel", rotulo: "Visão geral", icone: "visao" },
+    { href: "/painel/equipes", rotulo: "Equipes", icone: "equipes" },
+    { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas" },
+    { href: "/painel/aplicativos", rotulo: "Aplicativos", icone: "aplicativos" },
+    { href: "/painel/dispositivos", rotulo: "Dispositivos", icone: "dispositivos" },
+    { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios" },
+  ];
+
+  if (opcoes.podeAdministrar) {
+    itens.push({ href: "/painel/administracao", rotulo: "Administração", icone: "administracao" });
+  }
+  if (opcoes.adminPlataforma) {
+    itens.push({ href: "/plataforma", rotulo: "Plataforma", icone: "plataforma" });
+  }
+
+  return itens;
+}
+
+function estaAtivo(caminho: string, href: string): boolean {
+  if (href === "/painel") return caminho === "/painel";
+  return caminho === href || caminho.startsWith(`${href}/`);
+}
+
+function Marca() {
+  return (
+    <div className="flex items-center gap-2.5 px-6 py-5">
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 shadow-glow">
+        <Activity className="h-5 w-5 text-slate-950" />
+      </div>
+      <div className="leading-tight">
+        <p className="text-sm font-semibold text-slate-100">Telemetria</p>
+        <p className="text-xs text-slate-500">Produtividade</p>
+      </div>
+    </div>
+  );
+}
+
+function ListaLinks({
+  itens,
+  caminho,
+  aoNavegar,
+}: {
+  itens: ItemNavegacao[];
+  caminho: string;
+  aoNavegar?: () => void;
+}) {
+  return (
+    <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
+      {itens.map(({ href, rotulo, icone }) => {
+        const Icone = ICONES[icone];
+        const ativo = estaAtivo(caminho, href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            onClick={aoNavegar}
+            aria-current={ativo ? "page" : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+              ativo
+                ? "bg-cyan-500/10 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.2)]"
+                : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200",
+            )}
+          >
+            <Icone className="h-4 w-4 shrink-0" />
+            {rotulo}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function Rodape() {
+  return (
+    <div className="border-t border-borda px-6 py-4">
+      <p className="text-xs leading-relaxed text-slate-600">
+        Coleta em conformidade com a LGPD. Sem conteúdo digitado, telas ou mensagens.
+      </p>
+    </div>
+  );
+}
+
+/** Barra lateral fixa — desktop. */
+export function NavegacaoLateral({ itens }: { itens: ItemNavegacao[] }) {
   const caminho = usePathname();
 
   return (
     <aside className="hidden w-60 shrink-0 border-r border-borda bg-fundo-suave/60 lg:flex lg:flex-col">
-      <div className="flex items-center gap-2.5 px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 shadow-glow">
-          <Activity className="h-5 w-5 text-slate-950" />
-        </div>
-        <div className="leading-tight">
-          <p className="text-sm font-semibold text-slate-100">Telemetria</p>
-          <p className="text-xs text-slate-500">Produtividade</p>
-        </div>
-      </div>
-
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-        {ITENS.map(({ href, rotulo, icone: Icone }) => {
-          const ativo = caminho === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                ativo
-                  ? "bg-cyan-500/10 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.2)]"
-                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200",
-              )}
-            >
-              <Icone className="h-4 w-4" />
-              {rotulo}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="border-t border-borda px-6 py-4">
-        <p className="text-xs leading-relaxed text-slate-600">
-          Coleta em conformidade com a LGPD. Sem conteúdo digitado, telas ou mensagens.
-        </p>
-      </div>
+      <Marca />
+      <ListaLinks itens={itens} caminho={caminho} />
+      <Rodape />
     </aside>
+  );
+}
+
+/**
+ * Menu do celular. Sem isso a navegação simplesmente sumia abaixo de 1024px —
+ * a lateral era `hidden lg:flex` e não havia alternativa.
+ */
+export function MenuMobile({ itens }: { itens: ItemNavegacao[] }) {
+  const [aberto, setAberto] = useState(false);
+  const caminho = usePathname();
+
+  // Fecha ao trocar de rota e trava a rolagem do fundo enquanto está aberto.
+  useEffect(() => setAberto(false), [caminho]);
+
+  useEffect(() => {
+    if (!aberto) return;
+    const anterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function aoTeclar(e: KeyboardEvent) {
+      if (e.key === "Escape") setAberto(false);
+    }
+    document.addEventListener("keydown", aoTeclar);
+
+    return () => {
+      document.body.style.overflow = anterior;
+      document.removeEventListener("keydown", aoTeclar);
+    };
+  }, [aberto]);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        aria-label="Abrir menu"
+        aria-expanded={aberto}
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-borda text-slate-300 transition-colors hover:bg-slate-800/60 lg:hidden"
+      >
+        <Menu className="h-4 w-4" />
+      </button>
+
+      {aberto && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+            onClick={() => setAberto(false)}
+            aria-hidden
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navegação"
+            className="absolute inset-y-0 left-0 flex w-64 animate-entrada-suave flex-col border-r border-borda bg-fundo"
+          >
+            <div className="flex items-center justify-between pr-3">
+              <Marca />
+              <button
+                type="button"
+                onClick={() => setAberto(false)}
+                aria-label="Fechar menu"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800/60"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ListaLinks itens={itens} caminho={caminho} aoNavegar={() => setAberto(false)} />
+            <Rodape />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -21,6 +21,20 @@ export function clienteAdministrativo(): SupabaseClient {
   });
 }
 
+/**
+ * Cliente com o JWT de quem chamou. Serve para PERGUNTAR AO BANCO quem é a
+ * pessoa e o que ela pode: o RLS e as funções de papel continuam valendo, então
+ * a Edge Function não precisa (nem deve) reimplementar a regra de permissão.
+ */
+export function clienteDoUsuario(req: Request): SupabaseClient {
+  const url = Deno.env.get("SUPABASE_URL")!;
+  const chaveAnonima = Deno.env.get("SUPABASE_ANON_KEY")!;
+  return createClient(url, chaveAnonima, {
+    global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 /** SHA-256 do token, em hex. Guardamos só o hash no banco; o texto vive na máquina. */
 export async function hashToken(token: string): Promise<string> {
   const dados = new TextEncoder().encode(token);

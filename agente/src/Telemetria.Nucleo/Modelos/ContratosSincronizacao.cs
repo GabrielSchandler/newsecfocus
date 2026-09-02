@@ -60,4 +60,12 @@ public sealed class RespostaIngestao
     /// <summary>Intervalo de sincronização imposto pelo servidor (remote config).</summary>
     [JsonPropertyName("next_sync_minutes")]
     public int? ProximaSincronizacaoEmMinutos { get; set; }
+
+    /// <summary>
+    /// Falso quando a conta da empresa está suspensa ou cancelada no SaaS. O
+    /// servidor já devolve o campo; ainda falta o serviço propagar a pausa ao
+    /// coletor da sessão. Ausente na resposta = null = seguir coletando.
+    /// </summary>
+    [JsonPropertyName("collection_enabled")]
+    public bool? ColetaHabilitada { get; set; }
 }

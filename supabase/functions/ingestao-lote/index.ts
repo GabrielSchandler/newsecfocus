@@ -4,6 +4,10 @@
 //  dispositivo (Authorization: Bearer). Insere em activity_logs com deduplicação
 //  por (device_id, timestamp, process_name) — reenvios após queda de rede não
 //  duplicam dado. Responde com a contagem aceita e o intervalo de sync do servidor.
+//
+//  Além de gravar, esta função RESOLVE A PESSOA: cada registro traz o usuário do
+//  Windows, e aqui ele vira um colaborador (employees) da empresa. É o que liga
+//  a atividade à hierarquia empresa → equipe → pessoa, em vez de parar na máquina.
 // ============================================================================
 import {
   clienteAdministrativo,
@@ -75,11 +79,29 @@ Deno.serve(async (req) => {
   if (erroDisp) return erro("Falha ao autenticar o dispositivo.", 500);
   if (!dispositivo) return erro("Token de dispositivo inválido.", 401);
 
-  // 2. Normaliza os registros, carimbando org_id e device_id no servidor
-  //    (o agente nunca decide em qual org grava).
+  // 2. Resolve o colaborador de cada usuário do SO presente no lote.
+  //    Um lote costuma ter 1 usuário; no máximo alguns numa estação
+  //    compartilhada. Por isso resolvemos por usuário distinto, não por registro.
+  const usuarios = [...new Set(lote.logs.map((r) => (r.os_user ?? "").trim()))];
+  const porUsuario = new Map<string, string>();
+
+  for (const usuario of usuarios) {
+    const { data: colaboradorId, error: erroColab } = await supabase.rpc(
+      "resolver_colaborador",
+      { p_org: dispositivo.org_id, p_os_user: usuario },
+    );
+    if (erroColab) {
+      return erro(`Falha ao resolver o colaborador: ${erroColab.message}`, 500);
+    }
+    porUsuario.set(usuario, colaboradorId as string);
+  }
+
+  // 3. Normaliza os registros, carimbando org_id, device_id e employee_id no
+  //    servidor (o agente nunca decide em qual empresa nem em quem grava).
   const linhas = lote.logs.map((r) => ({
     device_id: dispositivo.id,
     org_id: dispositivo.org_id,
+    employee_id: porUsuario.get((r.os_user ?? "").trim()) ?? null,
     timestamp: r.timestamp,
     process_name: (r.process_name ?? "desconhecido").slice(0, 260),
     window_title: (r.window_title ?? "").slice(0, 260),
@@ -94,7 +116,7 @@ Deno.serve(async (req) => {
     os_user: r.os_user ?? null,
   }));
 
-  // 3. Upsert com ignore de duplicados. O count total nos diz quantos já existiam.
+  // 4. Upsert com ignore de duplicados. O count total nos diz quantos já existiam.
   const { data: inseridos, error: erroInsert } = await supabase
     .from("activity_logs")
     .upsert(linhas, {
@@ -110,7 +132,7 @@ Deno.serve(async (req) => {
   const aceitos = inseridos?.length ?? 0;
   const duplicados = linhas.length - aceitos;
 
-  // 4. Marca o dispositivo online e busca o intervalo de sync da organização.
+  // 5. Marca o dispositivo online e busca a configuração remota da empresa.
   await supabase
     .from("devices")
     .update({
@@ -122,14 +144,18 @@ Deno.serve(async (req) => {
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("sync_interval_minutes")
+    .select("sync_interval_minutes, status")
     .eq("id", dispositivo.org_id)
     .maybeSingle();
+
+  // Conta suspensa ou cancelada: o agente para de coletar até a regularização.
+  const contaAtiva = org?.status !== "SUSPENSA" && org?.status !== "CANCELADA";
 
   return json({
     accepted: aceitos,
     duplicates: duplicados,
     next_sync_minutes: org?.sync_interval_minutes ?? null,
+    collection_enabled: contaAtiva,
   });
 });
 

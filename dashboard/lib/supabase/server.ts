@@ -1,5 +1,8 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+/** Formato dos cookies que o Supabase pede para gravar na resposta. */
+type CookieParaDefinir = { name: string; value: string; options?: CookieOptions };
 
 /**
  * Cliente Supabase para Server Components e Route Handlers. No Next 15, cookies()
@@ -17,7 +20,7 @@ export async function criarClienteServidor() {
         getAll() {
           return armazenamento.getAll();
         },
-        setAll(cookiesParaDefinir) {
+        setAll(cookiesParaDefinir: CookieParaDefinir[]) {
           try {
             cookiesParaDefinir.forEach(({ name, value, options }) =>
               armazenamento.set(name, value, options),

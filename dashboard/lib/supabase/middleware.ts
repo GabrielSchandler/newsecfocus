@@ -1,10 +1,16 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Formato dos cookies que o Supabase pede para gravar na resposta. */
+type CookieParaDefinir = { name: string; value: string; options?: CookieOptions };
+
+/** Rotas que exigem sessão. */
+const ROTAS_PROTEGIDAS = ["/painel", "/plataforma"];
+
 /**
- * Renova a sessão do Supabase a cada request e protege as rotas do painel.
- * Sem sessão em /painel -> redireciona para /entrar. Com sessão em /entrar ->
- * manda para /painel.
+ * Renova a sessão do Supabase a cada request e protege as rotas autenticadas.
+ * Sem sessão em rota protegida -> redireciona para /entrar. Com sessão em
+ * /entrar -> manda para /painel.
  */
 export async function atualizarSessao(request: NextRequest) {
   let resposta = NextResponse.next({ request });
@@ -17,7 +23,7 @@ export async function atualizarSessao(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesParaDefinir) {
+        setAll(cookiesParaDefinir: CookieParaDefinir[]) {
           cookiesParaDefinir.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
@@ -35,7 +41,9 @@ export async function atualizarSessao(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const caminho = request.nextUrl.pathname;
-  const rotaProtegida = caminho.startsWith("/painel");
+  const rotaProtegida = ROTAS_PROTEGIDAS.some(
+    (rota) => caminho === rota || caminho.startsWith(`${rota}/`),
+  );
   const rotaEntrada = caminho.startsWith("/entrar");
 
   if (rotaProtegida && !user) {

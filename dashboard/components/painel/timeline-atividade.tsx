@@ -1,164 +1,135 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Radio, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { IndicadorLed } from "./indicador-led";
 import { criarClienteNavegador } from "@/lib/supabase/client";
-import { buscarTimeline } from "@/lib/consultas";
+import { buscarTempoReal } from "@/lib/consultas";
 import { tempoRelativo } from "@/lib/formato";
-import type { LinhaTimeline } from "@/lib/tipos";
+import type { LinhaTempoReal } from "@/lib/tipos";
 
-interface Props {
-  inicial: LinhaTimeline[];
-  busca: string;
-}
+const INTERVALO_ATUALIZACAO = 45_000;
 
 /**
- * Tabela de atividade "ao vivo" por funcionário/estação. Assina o Realtime do
- * Supabase para novos inserts em activity_logs e re-consulta a última linha por
- * dispositivo, mantendo os LEDs e o nível de interatividade atualizados.
+ * Quem está fazendo o quê agora, por pessoa.
+ *
+ * Atualiza por consulta periódica em vez de Realtime de propósito: o Realtime
+ * exige habilitar replicação da tabela no painel do Supabase — um passo manual
+ * que, se esquecido na implantação de um cliente, deixaria a tela congelada sem
+ * nenhum erro visível.
  */
-export function TimelineAtividade({ inicial, busca }: Props) {
-  const [linhas, setLinhas] = useState<LinhaTimeline[]>(inicial);
-  const [aoVivo, setAoVivo] = useState(false);
+export function TimelineAtividade({ inicial }: { inicial: LinhaTempoReal[] }) {
   const supabase = useMemo(() => criarClienteNavegador(), []);
+  const [linhas, setLinhas] = useState(inicial);
+  const [busca, setBusca] = useState("");
+  const [atualizadoEm, setAtualizadoEm] = useState(() => new Date().toISOString());
 
   useEffect(() => setLinhas(inicial), [inicial]);
 
   useEffect(() => {
     let ativo = true;
 
-    async function recarregar() {
+    const temporizador = setInterval(async () => {
       try {
-        const dados = await buscarTimeline(supabase);
-        if (ativo) setLinhas(dados);
+        const novas = await buscarTempoReal(supabase);
+        if (!ativo) return;
+        setLinhas(novas);
+        setAtualizadoEm(new Date().toISOString());
       } catch {
-        /* silencioso: mantém o último estado bom */
+        // Falha pontual de rede: mantém o último estado e tenta de novo depois.
       }
-    }
-
-    const canal = supabase
-      .channel("timeline-atividade")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "activity_logs" },
-        () => recarregar(),
-      )
-      .subscribe((status) => {
-        if (ativo) setAoVivo(status === "SUBSCRIBED");
-      });
-
-    // Fallback: atualiza a cada 30s mesmo sem eventos (rede/realtime instável).
-    const intervalo = setInterval(recarregar, 30_000);
+    }, INTERVALO_ATUALIZACAO);
 
     return () => {
       ativo = false;
-      clearInterval(intervalo);
-      supabase.removeChannel(canal);
+      clearInterval(temporizador);
     };
   }, [supabase]);
 
   const filtradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     if (!termo) return linhas;
-    return linhas.filter(
-      (l) =>
-        l.machine_name.toLowerCase().includes(termo) ||
-        (l.os_user ?? "").toLowerCase().includes(termo) ||
-        l.process_name.toLowerCase().includes(termo) ||
-        (l.domain ?? "").toLowerCase().includes(termo),
+    return linhas.filter((l) =>
+      [l.colaborador, l.equipe, l.maquina, l.processo, l.dominio]
+        .filter(Boolean)
+        .some((campo) => String(campo).toLowerCase().includes(termo)),
     );
   }, [linhas, busca]);
 
+  const online = linhas.filter((l) => l.status !== "offline").length;
+
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-borda p-5">
+      <div className="flex flex-col gap-3 border-b border-borda p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-medium text-slate-200">Timeline de atividade</h3>
-          <p className="text-xs text-slate-500">status por estação, em tempo real</p>
+          <h3 className="text-sm font-medium text-slate-200">Atividade agora</h3>
+          <p className="text-xs text-slate-500">
+            {online} de {linhas.length} com sinal · atualizado {tempoRelativo(atualizadoEm)}
+          </p>
         </div>
-        <Badge variante={aoVivo ? "ativo" : "neutro"}>
-          <Radio className="h-3 w-3" />
-          {aoVivo ? "ao vivo" : "conectando…"}
-        </Badge>
+
+        <div className="relative sm:w-64">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar pessoa, equipe, app…"
+            aria-label="Buscar na atividade"
+            className="pl-9"
+          />
+        </div>
       </div>
 
-      <div className="max-h-[420px] overflow-x-auto overflow-y-auto">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead className="sticky top-0 z-10 bg-fundo-cartao/95 backdrop-blur">
-            <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-5 py-3 font-medium">Estação / Usuário</th>
-              <th className="px-5 py-3 font-medium">Aplicativo em foco</th>
-              <th className="px-5 py-3 font-medium">Interatividade</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-              <th className="px-5 py-3 text-right font-medium">Última sync</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800/70">
-            {filtradas.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
-                  <Search className="mx-auto mb-2 h-5 w-5 opacity-50" />
-                  Nenhuma estação corresponde ao filtro.
-                </td>
-              </tr>
-            ) : (
-              filtradas.map((l) => <LinhaEstacao key={l.device_id} linha={l} />)
-            )}
-          </tbody>
-        </table>
-      </div>
+      {filtradas.length === 0 ? (
+        <p className="p-10 text-center text-sm text-slate-500">
+          {linhas.length === 0
+            ? "Nenhum colaborador com atividade registrada ainda."
+            : "Nenhum resultado para essa busca."}
+        </p>
+      ) : (
+        <ul className="divide-y divide-slate-800/70">
+          {filtradas.map((l) => (
+            <li key={l.colaboradorId} className="flex items-start gap-3 p-4 transition-colors hover:bg-slate-800/20">
+              <span className="mt-1.5">
+                <IndicadorLed estado={l.status} />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="truncate text-sm font-medium text-slate-100">
+                    {l.colaborador}
+                  </span>
+                  <Badge variante="neutro">{l.equipe}</Badge>
+                  {l.maquina && (
+                    <span className="hidden text-xs text-slate-600 sm:inline">{l.maquina}</span>
+                  )}
+                </div>
+
+                <p className="mt-1 truncate text-xs text-slate-400">
+                  {l.dominio ?? l.processo}
+                  {l.tituloJanela && (
+                    <span className="text-slate-600"> · {l.tituloJanela}</span>
+                  )}
+                </p>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <Badge
+                  variante={
+                    l.status === "ativo" ? "ativo" : l.status === "ocioso" ? "ocioso" : "offline"
+                  }
+                >
+                  {l.status}
+                </Badge>
+                <p className="mt-1 text-xs text-slate-600">{tempoRelativo(l.momento)}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
-  );
-}
-
-function LinhaEstacao({ linha }: { linha: LinhaTimeline }) {
-  const rotuloProcesso = linha.domain ?? linha.process_name;
-  const estadoBadge =
-    linha.status === "ativo" ? "ativo" : linha.status === "ocioso" ? "ocioso" : "offline";
-  const textoBadge =
-    linha.status === "ativo" ? "Ativo" : linha.status === "ocioso" ? "Ocioso" : "Offline";
-
-  return (
-    <tr className="animate-entrada-suave transition-colors hover:bg-slate-800/30">
-      <td className="px-5 py-3">
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-200">{linha.machine_name}</span>
-          <span className="text-xs text-slate-500">{linha.os_user ?? "—"}</span>
-        </div>
-      </td>
-      <td className="px-5 py-3">
-        <div className="flex flex-col">
-          <span className="text-slate-300">{rotuloProcesso}</span>
-          {linha.window_title && (
-            <span className="max-w-[220px] truncate text-xs text-slate-600">
-              {linha.window_title}
-            </span>
-          )}
-        </div>
-      </td>
-      <td className="px-5 py-3">
-        <div className="flex items-center gap-2">
-          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-800">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
-              style={{ width: `${linha.interatividade}%` }}
-            />
-          </div>
-          <span className="w-8 text-xs text-slate-500">{linha.interatividade}</span>
-        </div>
-      </td>
-      <td className="px-5 py-3">
-        <span className="inline-flex items-center gap-2">
-          <IndicadorLed estado={linha.status} />
-          <Badge variante={estadoBadge}>{textoBadge}</Badge>
-        </span>
-      </td>
-      <td className="px-5 py-3 text-right text-xs text-slate-500">
-        {tempoRelativo(linha.timestamp)}
-      </td>
-    </tr>
   );
 }
