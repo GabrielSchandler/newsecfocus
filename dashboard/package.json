@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "verificar": "tsc --noEmit"
+    "verificar": "tsc --noEmit",
+    "fumaca": "node scripts/fumaca.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
