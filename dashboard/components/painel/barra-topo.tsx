@@ -5,7 +5,8 @@ import { LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteNavegador } from "@/lib/supabase/client";
-import { MenuMobile, type ItemNavegacao } from "./navegacao-lateral";
+import { MenuMobile } from "./navegacao-lateral";
+import type { ItemNavegacao } from "@/lib/menu";
 import { ROTULO_PAPEL } from "@/lib/sessao";
 import type { ContextoSessao } from "@/lib/tipos";
 

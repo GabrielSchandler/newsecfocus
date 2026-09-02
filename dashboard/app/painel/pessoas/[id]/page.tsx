@@ -6,7 +6,7 @@ import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
-import { Tabela, type ColunaTabela } from "@/components/painel/tabela";
+import { TabelaDias, type LinhaDia } from "@/components/painel/tabela-dias";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
@@ -19,27 +19,10 @@ import {
   buscarRelatorioDiario,
   buscarSerie,
 } from "@/lib/consultas";
-import {
-  dataCurta,
-  faixaIndice,
-  formatarHorasCurto,
-  formatarPorcentagem,
-  horaCurta,
-} from "@/lib/formato";
+import { formatarHorasCurto } from "@/lib/formato";
 import type { Escopo } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
-
-interface LinhaDia {
-  dia: string;
-  minutos_ativos: number;
-  minutos_ociosos: number;
-  minutos_produtivos: number;
-  minutos_improdutivos: number;
-  indice: number | null;
-  primeiro_sinal: string | null;
-  ultimo_sinal: string | null;
-}
 
 export default async function PaginaDetalhePessoa({
   params,
@@ -90,65 +73,6 @@ export default async function PaginaDetalhePessoa({
 
   const erro = primeiroErro(kpis, serie, distribuicao, diario);
 
-  const colunasDia: ColunaTabela<LinhaDia>[] = [
-    {
-      chave: "dia",
-      rotulo: "Data",
-      principal: true,
-      valorOrdenacao: (l) => l.dia,
-      render: (l) => (
-        <span className="font-medium text-slate-100">{dataCurta(`${l.dia}T12:00:00Z`, "UTC")}</span>
-      ),
-    },
-    {
-      chave: "expediente",
-      rotulo: "Expediente",
-      valorOrdenacao: (l) => l.primeiro_sinal ?? "",
-      render: (l) => (
-        <span className="tabular-nums text-slate-400">
-          {horaCurta(l.primeiro_sinal, fuso)} — {horaCurta(l.ultimo_sinal, fuso)}
-        </span>
-      ),
-    },
-    {
-      chave: "ativo",
-      rotulo: "Ativo",
-      alinhar: "direita",
-      valorOrdenacao: (l) => Number(l.minutos_ativos),
-      render: (l) => (
-        <span className="tabular-nums text-slate-200">
-          {formatarHorasCurto(Number(l.minutos_ativos))}
-        </span>
-      ),
-    },
-    {
-      chave: "ocioso",
-      rotulo: "Ocioso",
-      alinhar: "direita",
-      ocultarMobile: true,
-      valorOrdenacao: (l) => Number(l.minutos_ociosos),
-      render: (l) => (
-        <span className="tabular-nums text-slate-400">
-          {formatarHorasCurto(Number(l.minutos_ociosos))}
-        </span>
-      ),
-    },
-    {
-      chave: "indice",
-      rotulo: "Índice",
-      alinhar: "direita",
-      valorOrdenacao: (l) => l.indice ?? -1,
-      render: (l) => {
-        const faixa = faixaIndice(l.indice === null ? null : Number(l.indice));
-        return (
-          <span className={`font-medium tabular-nums ${faixa.classe}`}>
-            {formatarPorcentagem(l.indice === null ? null : Number(l.indice), 1)}
-          </span>
-        );
-      },
-    },
-  ];
-
   return (
     <div className="space-y-5">
       <CabecalhoPagina
@@ -185,13 +109,7 @@ export default async function PaginaDetalhePessoa({
             jornada de {formatarHorasCurto(pessoa.jornada_minutos_dia)}/dia
           </Badge>
         </div>
-        <Tabela
-          colunas={colunasDia}
-          linhas={diario.dados}
-          chave={(l) => l.dia}
-          ordenacaoInicial={{ coluna: "dia", direcao: "desc" }}
-          vazio="Sem registros nesse período."
-        />
+        <TabelaDias linhas={diario.dados} fuso={fuso} />
       </section>
     </div>
   );

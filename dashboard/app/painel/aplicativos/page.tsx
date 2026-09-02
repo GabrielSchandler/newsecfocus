@@ -5,19 +5,13 @@ import { BarraFiltros } from "@/components/painel/barra-filtros";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina, EstadoVazio } from "@/components/painel/cabecalho";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
-import { Tabela, CelulaBarra, type ColunaTabela } from "@/components/painel/tabela";
-import { Badge } from "@/components/ui/badge";
+import { TabelaAplicativos } from "@/components/painel/tabela-aplicativos";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, type ParamsPagina } from "@/lib/filtros-url";
-import {
-  buscarColaboradores,
-  buscarDistribuicao,
-  buscarEquipes,
-} from "@/lib/consultas";
+import { buscarColaboradores, buscarDistribuicao, buscarEquipes } from "@/lib/consultas";
 import { ROTULOS_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
-import type { FatiaDistribuicao } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -44,75 +38,8 @@ export default async function PaginaAplicativos({
   const apps = distribuicao.dados;
 
   const total = apps.reduce((s, a) => s + a.minutos, 0);
-  const maior = Math.max(1, ...apps.map((a) => a.minutos));
   const semCategoria = apps.filter((a) => !a.tipo);
   const minutosSemCategoria = semCategoria.reduce((s, a) => s + a.minutos, 0);
-
-  const colunas: ColunaTabela<FatiaDistribuicao>[] = [
-    {
-      chave: "nome",
-      rotulo: "Aplicativo / site",
-      principal: true,
-      valorOrdenacao: (l) => l.nome,
-      render: (l) => (
-        <span className="flex min-w-0 items-center gap-2">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: l.cor }} />
-          <span className="truncate font-medium text-slate-100">{l.nome}</span>
-        </span>
-      ),
-    },
-    {
-      chave: "categoria",
-      rotulo: "Categoria",
-      valorOrdenacao: (l) => l.tipo ?? "ZZZ",
-      render: (l) =>
-        l.tipo ? (
-          <Badge
-            variante={
-              l.tipo === "PRODUCTIVE" ? "ativo" : l.tipo === "NEUTRAL" ? "roxo" : "offline"
-            }
-          >
-            {ROTULOS_TIPO[l.tipo]}
-          </Badge>
-        ) : (
-          <Badge variante="neutro">sem categoria</Badge>
-        ),
-    },
-    {
-      chave: "pessoas",
-      rotulo: "Pessoas",
-      alinhar: "direita",
-      ocultarMobile: true,
-      valorOrdenacao: (l) => l.pessoas,
-      render: (l) => <span className="tabular-nums text-slate-400">{l.pessoas}</span>,
-    },
-    {
-      chave: "participacao",
-      rotulo: "Participação",
-      alinhar: "direita",
-      ocultarMobile: true,
-      valorOrdenacao: (l) => l.minutos,
-      render: (l) => (
-        <span className="tabular-nums text-slate-400">
-          {formatarPorcentagem(total > 0 ? (l.minutos / total) * 100 : 0, 1)}
-        </span>
-      ),
-    },
-    {
-      chave: "tempo",
-      rotulo: "Tempo",
-      alinhar: "direita",
-      valorOrdenacao: (l) => l.minutos,
-      render: (l) => (
-        <CelulaBarra
-          valor={l.minutos}
-          maximo={maior}
-          rotulo={formatarHoras(l.minutos)}
-          cor={l.cor}
-        />
-      ),
-    },
-  ];
 
   return (
     <div className="space-y-5">
@@ -147,7 +74,10 @@ export default async function PaginaAplicativos({
               {semCategoria.length === 1 ? "ferramenta representa" : "ferramentas representam"}{" "}
               {formatarHoras(minutosSemCategoria)} sem categoria — esse tempo não entra no
               índice de produtividade.{" "}
-              <Link href="/painel/administracao" className="font-medium underline hover:text-amber-100">
+              <Link
+                href="/painel/administracao?aba=classificacao"
+                className="font-medium underline hover:text-amber-100"
+              >
                 Classificar agora
               </Link>
               .
@@ -200,12 +130,7 @@ export default async function PaginaAplicativos({
             </div>
           </div>
 
-          <Tabela
-            colunas={colunas}
-            linhas={apps}
-            chave={(l) => l.nome}
-            ordenacaoInicial={{ coluna: "tempo", direcao: "desc" }}
-          />
+          <TabelaAplicativos linhas={apps} />
         </>
       )}
     </div>

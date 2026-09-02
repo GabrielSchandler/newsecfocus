@@ -17,14 +17,12 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { IconeMenu, ItemNavegacao } from "@/lib/menu";
 
-export interface ItemNavegacao {
-  href: string;
-  rotulo: string;
-  icone: keyof typeof ICONES;
-}
-
-const ICONES = {
+// A lista de itens vive em lib/menu.ts, que não é "use client": quem a monta é
+// o layout, no servidor, e o servidor não pode chamar função de módulo cliente.
+// Aqui fica só o mapa de ícones, que é componente e não atravessa a fronteira.
+const ICONES: Record<IconeMenu, typeof LayoutDashboard> = {
   visao: LayoutDashboard,
   equipes: Users,
   pessoas: UserSquare2,
@@ -33,31 +31,7 @@ const ICONES = {
   relatorios: FileSpreadsheet,
   administracao: Settings,
   plataforma: Building2,
-} as const;
-
-/** Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece. */
-export function itensDoMenu(opcoes: {
-  podeAdministrar: boolean;
-  adminPlataforma: boolean;
-}): ItemNavegacao[] {
-  const itens: ItemNavegacao[] = [
-    { href: "/painel", rotulo: "Visão geral", icone: "visao" },
-    { href: "/painel/equipes", rotulo: "Equipes", icone: "equipes" },
-    { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas" },
-    { href: "/painel/aplicativos", rotulo: "Aplicativos", icone: "aplicativos" },
-    { href: "/painel/dispositivos", rotulo: "Dispositivos", icone: "dispositivos" },
-    { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios" },
-  ];
-
-  if (opcoes.podeAdministrar) {
-    itens.push({ href: "/painel/administracao", rotulo: "Administração", icone: "administracao" });
-  }
-  if (opcoes.adminPlataforma) {
-    itens.push({ href: "/plataforma", rotulo: "Plataforma", icone: "plataforma" });
-  }
-
-  return itens;
-}
+};
 
 function estaAtivo(caminho: string, href: string): boolean {
   if (href === "/painel") return caminho === "/painel";

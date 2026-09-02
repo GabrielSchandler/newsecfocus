@@ -1,6 +1,7 @@
 import * as React from "react";
 import { redirect } from "next/navigation";
-import { NavegacaoLateral, itensDoMenu } from "@/components/painel/navegacao-lateral";
+import { NavegacaoLateral } from "@/components/painel/navegacao-lateral";
+import { itensDoMenu } from "@/lib/menu";
 import { BarraTopo } from "@/components/painel/barra-topo";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
