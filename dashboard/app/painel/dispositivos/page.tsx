@@ -6,16 +6,26 @@ import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha } from "@/lib/carregar";
 import { buscarDispositivos } from "@/lib/consultas";
+import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
 
 export const dynamic = "force-dynamic";
 
-export default async function PaginaDispositivos() {
+export default async function PaginaDispositivos({
+  searchParams,
+}: {
+  searchParams: Promise<ParamsPagina>;
+}) {
+  const params = await searchParams;
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
 
   if (!contexto) redirect("/entrar");
 
-  const resultado = await comFalha(buscarDispositivos(supabase), []);
+  const { escopo } = lerFiltros(params, contexto);
+  const resultado = await comFalha(
+    buscarDispositivos(supabase, orgEfetiva(contexto, escopo)),
+    [],
+  );
   const dispositivos = resultado.dados;
   const online = dispositivos.filter((d) => d.status_online).length;
   const limite = contexto.empresa.maxDispositivos;

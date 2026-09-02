@@ -11,7 +11,7 @@ import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
   KPIS_VAZIOS,
   buscarColaboradores,
@@ -40,11 +40,12 @@ export default async function PaginaVisaoGeral({
 
   const { periodo, escopo } = lerFiltros(params, contexto);
   const fuso = contexto.empresa.fuso;
+  const org = orgEfetiva(contexto, escopo);
 
   const [equipes, colaboradores, dispositivos] = await Promise.all([
-    comFalha(buscarEquipes(supabase), []),
-    comFalha(buscarColaboradores(supabase), []),
-    comFalha(buscarDispositivos(supabase), []),
+    comFalha(buscarEquipes(supabase, org), []),
+    comFalha(buscarColaboradores(supabase, null, org), []),
+    comFalha(buscarDispositivos(supabase, org), []),
   ]);
 
   const [kpis, serie, distribuicao, rankingEquipes, tempoReal] = await Promise.all([
@@ -60,8 +61,8 @@ export default async function PaginaVisaoGeral({
     }),
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
-    comFalha(buscarRankingEquipes(supabase, periodo), []),
-    comFalha(buscarTempoReal(supabase), []),
+    comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []),
+    comFalha(buscarTempoReal(supabase, escopo.orgId), []),
   ]);
 
   const erro = primeiroErro(kpis, serie, distribuicao, rankingEquipes, tempoReal);

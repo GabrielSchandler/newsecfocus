@@ -25,6 +25,7 @@ import type {
   MapeamentoApp,
   Periodo,
   PontoSerie,
+  Registro,
 } from "./tipos";
 
 // ----------------------------------------------------------------------------
@@ -44,6 +45,7 @@ const numOuNulo = (v: unknown): number | null => {
 
 function paramsEscopo(escopo: Escopo) {
   return {
+    p_org: escopo.orgId,
     p_equipe: escopo.equipeId,
     p_colaborador: escopo.colaboradorId,
     p_dispositivo: escopo.dispositivoId,
@@ -80,12 +82,20 @@ export const KPIS_VAZIOS: Kpis = {
 //  Cadastros
 // ----------------------------------------------------------------------------
 
-export async function buscarEquipes(supabase: SupabaseClient): Promise<Equipe[]> {
-  const { data, error } = await supabase
+export async function buscarEquipes(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<Equipe[]> {
+  let consulta = supabase
     .from("teams")
     .select("id, nome, descricao, cor, ativa, employees(count)")
     .order("nome");
 
+  // O RLS já limita a empresa cliente à própria. Para o master, que enxerga
+  // todas, é este filtro que separa uma empresa da outra nos seletores.
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
   if (error) throw error;
 
   return (data ?? []).map((t: any) => ({
@@ -101,6 +111,7 @@ export async function buscarEquipes(supabase: SupabaseClient): Promise<Equipe[]>
 export async function buscarColaboradores(
   supabase: SupabaseClient,
   equipeId?: string | null,
+  orgId?: string | null,
 ): Promise<Colaborador[]> {
   let consulta = supabase
     .from("employees")
@@ -108,6 +119,7 @@ export async function buscarColaboradores(
     .order("nome", { nullsFirst: false });
 
   if (equipeId) consulta = consulta.eq("team_id", equipeId);
+  if (orgId) consulta = consulta.eq("org_id", orgId);
 
   const { data, error } = await consulta;
   if (error) throw error;
@@ -125,32 +137,50 @@ export async function buscarColaboradores(
   }));
 }
 
-export async function buscarDispositivos(supabase: SupabaseClient): Promise<Dispositivo[]> {
-  const { data, error } = await supabase
+export async function buscarDispositivos(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<Dispositivo[]> {
+  let consulta = supabase
     .from("devices")
     .select("id, machine_name, os_user, status_online, last_sync_at, agent_version")
     .order("machine_name");
 
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
   if (error) throw error;
   return (data ?? []) as Dispositivo[];
 }
 
-export async function buscarCategorias(supabase: SupabaseClient): Promise<Categoria[]> {
-  const { data, error } = await supabase
+export async function buscarCategorias(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<Categoria[]> {
+  let consulta = supabase
     .from("productivity_categories")
     .select("id, name, type, color")
     .order("name");
 
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
   if (error) throw error;
   return (data ?? []) as Categoria[];
 }
 
-export async function buscarMapeamentos(supabase: SupabaseClient): Promise<MapeamentoApp[]> {
-  const { data, error } = await supabase
+export async function buscarMapeamentos(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<MapeamentoApp[]> {
+  let consulta = supabase
     .from("app_mappings")
     .select("id, process_name, domain, category_id, productivity_categories(name, type)")
     .order("process_name", { nullsFirst: false });
 
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
   if (error) throw error;
 
   return (data ?? []).map((m: any) => {
@@ -289,6 +319,7 @@ export async function buscarDistribuicao(
   const { data, error } = await supabase.rpc("painel_distribuicao", {
     p_inicio: periodo.inicio,
     p_fim: periodo.fim,
+    p_org: escopo.orgId,
     p_equipe: escopo.equipeId,
     p_colaborador: escopo.colaboradorId,
     p_limite: limite,
@@ -312,10 +343,12 @@ export async function buscarDistribuicao(
 export async function buscarRankingEquipes(
   supabase: SupabaseClient,
   periodo: Periodo,
+  orgId: string | null = null,
 ): Promise<LinhaRankingEquipe[]> {
   const { data, error } = await supabase.rpc("painel_ranking_equipes", {
     p_inicio: periodo.inicio,
     p_fim: periodo.fim,
+    p_org: orgId,
   });
 
   if (error) throw error;
@@ -340,12 +373,14 @@ export async function buscarRankingColaboradores(
   periodo: Periodo,
   equipeId: string | null = null,
   limite = 100,
+  orgId: string | null = null,
 ): Promise<LinhaRankingColaborador[]> {
   const { data, error } = await supabase.rpc("painel_ranking_colaboradores", {
     p_inicio: periodo.inicio,
     p_fim: periodo.fim,
     p_equipe: equipeId,
     p_limite: limite,
+    p_org: orgId,
   });
 
   if (error) throw error;
@@ -373,8 +408,11 @@ export async function buscarRankingColaboradores(
 //  Tempo real
 // ----------------------------------------------------------------------------
 
-export async function buscarTempoReal(supabase: SupabaseClient): Promise<LinhaTempoReal[]> {
-  const { data, error } = await supabase.rpc("painel_tempo_real");
+export async function buscarTempoReal(
+  supabase: SupabaseClient,
+  orgId: string | null = null,
+): Promise<LinhaTempoReal[]> {
+  const { data, error } = await supabase.rpc("painel_tempo_real", { p_org: orgId });
   if (error) throw error;
 
   return (data ?? []).map((r: any) => {
@@ -399,6 +437,58 @@ export async function buscarTempoReal(supabase: SupabaseClient): Promise<LinhaTe
 }
 
 // ----------------------------------------------------------------------------
+//  Registros brutos — a atividade minuto a minuto por trás do consolidado
+// ----------------------------------------------------------------------------
+
+export interface PaginaRegistros {
+  linhas: Registro[];
+  total: number;
+}
+
+export async function buscarRegistros(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+  opcoes: { estado?: string | null; busca?: string | null; limite?: number; pagina?: number } = {},
+): Promise<PaginaRegistros> {
+  const limite = opcoes.limite ?? 100;
+  const pagina = Math.max(1, opcoes.pagina ?? 1);
+
+  const { data, error } = await supabase.rpc("painel_registros", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_colaborador: escopo.colaboradorId,
+    p_dispositivo: escopo.dispositivoId,
+    p_equipe: escopo.equipeId,
+    p_estado: opcoes.estado ?? null,
+    p_busca: opcoes.busca ?? null,
+    p_limite: limite,
+    p_deslocamento: (pagina - 1) * limite,
+  });
+
+  if (error) throw error;
+
+  const linhas = (data ?? []).map((r: any) => ({
+    momento: r.momento,
+    colaborador: r.colaborador,
+    equipe: r.equipe ?? "Sem equipe",
+    maquina: r.maquina,
+    processo: r.processo ?? "—",
+    dominio: r.dominio,
+    titulo: r.titulo ?? "",
+    estado: r.estado,
+    teclas: num(r.teclas),
+    cliques: num(r.cliques),
+    rolagens: num(r.rolagens),
+    segundosAtivos: num(r.segundos_ativos),
+  })) as Registro[];
+
+  // O total vem repetido em toda linha (count over) — uma consulta só.
+  return { linhas, total: num((data ?? [])[0]?.total) };
+}
+
+// ----------------------------------------------------------------------------
 //  Relatórios (linhas cruas — a formatação fica no exportador)
 // ----------------------------------------------------------------------------
 
@@ -410,6 +500,7 @@ export async function buscarRelatorioDiario(
   const { data, error } = await supabase.rpc("painel_relatorio_diario", {
     p_inicio: periodo.inicio,
     p_fim: periodo.fim,
+    p_org: escopo.orgId,
     p_equipe: escopo.equipeId,
     p_colaborador: escopo.colaboradorId,
   });
@@ -425,6 +516,7 @@ export async function buscarRelatorioAplicativos(
   const { data, error } = await supabase.rpc("painel_relatorio_aplicativos", {
     p_inicio: periodo.inicio,
     p_fim: periodo.fim,
+    p_org: escopo.orgId,
     p_equipe: escopo.equipeId,
     p_colaborador: escopo.colaboradorId,
   });

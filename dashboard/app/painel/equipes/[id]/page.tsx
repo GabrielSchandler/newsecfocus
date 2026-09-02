@@ -44,12 +44,17 @@ export default async function PaginaDetalheEquipe({
 
   if (!equipe) notFound();
 
-  const { periodo } = lerFiltros(busca, contexto);
+  const { periodo, escopo: recorteAtual } = lerFiltros(busca, contexto);
   const fuso = contexto.empresa.fuso;
   const recorte = paramsDoRecorte(busca);
 
   // O escopo desta tela é a equipe da URL, não o que estiver na query string.
-  const escopo: Escopo = { equipeId: id, colaboradorId: null, dispositivoId: null };
+  const escopo: Escopo = {
+    orgId: recorteAtual.orgId,
+    equipeId: id,
+    colaboradorId: null,
+    dispositivoId: null,
+  };
 
   const [kpis, serie, distribuicao, pessoas] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
@@ -64,7 +69,7 @@ export default async function PaginaDetalheEquipe({
     }),
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
-    comFalha(buscarRankingColaboradores(supabase, periodo, id), []),
+    comFalha(buscarRankingColaboradores(supabase, periodo, id, 100, escopo.orgId), []),
   ]);
 
   const erro = primeiroErro(kpis, serie, distribuicao, pessoas);

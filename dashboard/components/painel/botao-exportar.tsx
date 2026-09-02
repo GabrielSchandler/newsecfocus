@@ -58,6 +58,7 @@ export function BotaoExportar({
       params.set("de", p.de);
       params.set("ate", p.ate);
     }
+    if (escopo.orgId) params.set("empresa", escopo.orgId);
     if (escopo.equipeId) params.set("equipe", escopo.equipeId);
     if (escopo.colaboradorId) params.set("colaborador", escopo.colaboradorId);
     if (escopo.dispositivoId) params.set("dispositivo", escopo.dispositivoId);

@@ -31,6 +31,8 @@ export interface ContextoSessao {
     fuso: string;
     maxDispositivos: number;
     retencaoDias: number;
+    /** Jornada diária padrão da empresa, em minutos. Base da aderência. */
+    jornadaPadraoMinutos: number;
   };
   /** Operador da revenda: administra contas de clientes, não vê telemetria. */
   adminPlataforma: boolean;
@@ -48,6 +50,22 @@ export interface Equipe {
   total_pessoas?: number;
 }
 
+/** Uma linha de atividade crua — o detalhe por trás do consolidado. */
+export interface Registro {
+  momento: string;
+  colaborador: string;
+  equipe: string;
+  maquina: string | null;
+  processo: string;
+  dominio: string | null;
+  titulo: string;
+  estado: "ATIVO" | "OCIOSO" | "BLOQUEADO";
+  teclas: number;
+  cliques: number;
+  rolagens: number;
+  segundosAtivos: number;
+}
+
 export interface Colaborador {
   id: string;
   team_id: string | null;
@@ -57,7 +75,8 @@ export interface Colaborador {
   cargo: string | null;
   email: string | null;
   ativo: boolean;
-  jornada_minutos_dia: number;
+  /** NULL = herda a jornada padrão da empresa. */
+  jornada_minutos_dia: number | null;
 }
 
 export interface Dispositivo {
@@ -108,12 +127,15 @@ export interface Periodo {
 //  Escopo hierárquico dos filtros
 // ----------------------------------------------------------------------------
 export interface Escopo {
+  /** Empresa em foco. Só a operação da NewSec troca; empresa cliente fica na dela. */
+  orgId: string | null;
   equipeId: string | null;
   colaboradorId: string | null;
   dispositivoId: string | null;
 }
 
 export const ESCOPO_VAZIO: Escopo = {
+  orgId: null,
   equipeId: null,
   colaboradorId: null,
   dispositivoId: null,

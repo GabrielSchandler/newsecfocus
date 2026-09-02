@@ -107,7 +107,10 @@ export async function salvarColaborador(
       cargo: texto(dados, "cargo"),
       email: texto(dados, "email"),
       team_id: texto(dados, "team_id"),
-      jornada_minutos_dia: inteiro(dados, "jornada_minutos_dia", 480),
+      // Vazio = herda a jornada padrão da empresa.
+      jornada_minutos_dia: texto(dados, "jornada_minutos_dia")
+        ? inteiro(dados, "jornada_minutos_dia", 480)
+        : null,
       ativo: dados.get("ativo") === "on" || dados.get("ativo") === "true",
     })
     .eq("id", id);
@@ -244,6 +247,33 @@ export async function excluirMapeamento(
   return OK("Regra removida e histórico recalculado.");
 }
 
+/**
+ * Repõe o catálogo padrão de categorias e regras. Não sobrescreve o que a
+ * empresa já configurou — serve para quem apagou algo sem querer ou quer
+ * completar a lista depois de ver a tela de Aplicativos.
+ */
+export async function aplicarCatalogoPadrao(
+  _anterior: ResultadoAcao | null,
+  _dados: FormData,
+): Promise<ResultadoAcao> {
+  const supabase = await criarClienteServidor();
+  const contexto = await carregarContexto(supabase);
+  if (!contexto) return FALHA("Sessão expirada.");
+
+  const { data, error } = await supabase.rpc("aplicar_classificacao_padrao", {
+    p_org: contexto.empresa.id,
+  });
+  if (error) return FALHA(error.message);
+
+  const linha = Array.isArray(data) ? data[0] : data;
+  await reconsolidar(supabase, contexto.empresa.id);
+  atualizarTelas();
+
+  return OK(
+    `Catálogo aplicado: ${linha?.categorias_criadas ?? 0} categorias e ${linha?.regras_criadas ?? 0} regras no total.`,
+  );
+}
+
 // ----------------------------------------------------------------------------
 //  Empresa
 // ----------------------------------------------------------------------------
@@ -265,12 +295,18 @@ export async function salvarEmpresa(
     return FALHA("A retenção precisa ficar entre 7 e 3650 dias.");
   }
 
+  const jornada = inteiro(dados, "jornada_padrao_minutos", contexto.empresa.jornadaPadraoMinutos);
+  if (jornada < 60 || jornada > 1440) {
+    return FALHA("A jornada padrão precisa ficar entre 60 e 1440 minutos.");
+  }
+
   const { error } = await supabase
     .from("organizations")
     .update({
       name: texto(dados, "name") ?? contexto.empresa.nome,
       fuso: texto(dados, "fuso") ?? contexto.empresa.fuso,
       retencao_dias: retencao,
+      jornada_padrao_minutos: jornada,
       contato_email: texto(dados, "contato_email"),
       sync_interval_minutes: Number(dados.get("sync_interval_minutes")) || null,
     })

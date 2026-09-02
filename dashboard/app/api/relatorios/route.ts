@@ -49,6 +49,9 @@ export async function GET(request: NextRequest) {
   const periodo = periodoDeParams(params, contexto.empresa.fuso);
 
   const escopo: Escopo = {
+    // A empresa em foco só vale para a operação da NewSec; o banco recusa o
+    // parâmetro para qualquer outro usuário.
+    orgId: contexto.adminPlataforma ? params.get("empresa") || null : null,
     equipeId: params.get("equipe") || null,
     colaboradorId: params.get("colaborador") || null,
     dispositivoId: params.get("dispositivo") || null,

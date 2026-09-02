@@ -5,6 +5,8 @@ import { itensDoMenu } from "@/lib/menu";
 import { BarraTopo } from "@/components/painel/barra-topo";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
+import { buscarEmpresasClientes } from "@/lib/consultas";
+import type { EmpresaCliente } from "@/lib/tipos";
 
 export default async function LayoutPainel({ children }: { children: React.ReactNode }) {
   const supabase = await criarClienteServidor();
@@ -17,11 +19,21 @@ export default async function LayoutPainel({ children }: { children: React.React
     adminPlataforma: contexto.adminPlataforma,
   });
 
+  // Só a operação da NewSec troca de empresa; para os demais nem carregamos.
+  let empresas: EmpresaCliente[] = [];
+  if (contexto.adminPlataforma) {
+    try {
+      empresas = await buscarEmpresasClientes(supabase);
+    } catch {
+      // Sem a lista, o seletor some e o painel segue na empresa do perfil.
+    }
+  }
+
   return (
     <div className="flex min-h-screen">
       <NavegacaoLateral itens={itens} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <BarraTopo contexto={contexto} itens={itens} />
+        <BarraTopo contexto={contexto} itens={itens} empresas={empresas} />
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
     </div>

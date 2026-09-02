@@ -10,6 +10,7 @@ import { Campo, Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { ROTULOS_TIPO, formatarHorasCurto } from "@/lib/formato";
 import {
+  aplicarCatalogoPadrao,
   excluirCategoria,
   excluirEquipe,
   excluirMapeamento,
@@ -206,9 +207,11 @@ export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
 export function PainelColaboradores({
   colaboradores,
   equipes,
+  jornadaPadrao,
 }: {
   colaboradores: Colaborador[];
   equipes: Equipe[];
+  jornadaPadrao: number;
 }) {
   const [busca, setBusca] = useState("");
 
@@ -248,7 +251,12 @@ export function PainelColaboradores({
       ) : (
         <div className="space-y-3">
           {filtrados.map((c) => (
-            <FormularioColaborador key={c.id} colaborador={c} equipes={equipes} />
+            <FormularioColaborador
+              key={c.id}
+              colaborador={c}
+              equipes={equipes}
+              jornadaPadrao={jornadaPadrao}
+            />
           ))}
         </div>
       )}
@@ -259,9 +267,11 @@ export function PainelColaboradores({
 function FormularioColaborador({
   colaborador,
   equipes,
+  jornadaPadrao,
 }: {
   colaborador: Colaborador;
   equipes: Equipe[];
+  jornadaPadrao: number;
 }) {
   const [estado, enviar] = useFormState(salvarColaborador, null);
   const [equipeId, setEquipeId] = useState(colaborador.team_id ?? "");
@@ -301,7 +311,11 @@ function FormularioColaborador({
           </Campo>
           <Campo
             rotulo="Jornada (min/dia)"
-            dica={formatarHorasCurto(colaborador.jornada_minutos_dia)}
+            dica={
+              colaborador.jornada_minutos_dia === null
+                ? `vazio = padrão da empresa (${formatarHorasCurto(jornadaPadrao)})`
+                : formatarHorasCurto(colaborador.jornada_minutos_dia)
+            }
           >
             <Input
               type="number"
@@ -309,7 +323,8 @@ function FormularioColaborador({
               min={60}
               max={1440}
               step={30}
-              defaultValue={colaborador.jornada_minutos_dia}
+              placeholder={String(jornadaPadrao)}
+              defaultValue={colaborador.jornada_minutos_dia ?? ""}
             />
           </Campo>
         </div>
@@ -356,9 +371,29 @@ export function PainelClassificacao({
         </p>
       </Card>
 
+      <BotaoCatalogoPadrao />
       <FormularioCategoria categorias={categorias} />
       <FormularioMapeamento categorias={categorias} mapeamentos={mapeamentos} />
     </div>
+  );
+}
+
+function BotaoCatalogoPadrao() {
+  const [estado, enviar] = useFormState(aplicarCatalogoPadrao, null);
+
+  return (
+    <Card className="p-5">
+      <h3 className="text-sm font-medium text-slate-200">Catálogo padrão</h3>
+      <p className="mt-1 text-xs leading-relaxed text-slate-500">
+        Repõe as categorias e as regras que acompanham o sistema — pacote Office, ferramentas
+        de gestão, comunicação, redes sociais, streaming e compras. Nada do que você já
+        configurou é sobrescrito, então dá para rodar quantas vezes quiser.
+      </p>
+      <form action={enviar} className="mt-4 flex flex-wrap items-center gap-3">
+        <BotaoEnviar>Aplicar catálogo padrão</BotaoEnviar>
+        <Mensagem estado={estado} />
+      </form>
+    </Card>
   );
 }
 
@@ -564,6 +599,20 @@ export function PainelEmpresa({
               valor={fuso}
               aoMudar={setFuso}
               opcoes={FUSOS.map((f) => ({ valor: f, rotulo: f.replace("America/", "") }))}
+            />
+          </Campo>
+          <Campo
+            rotulo="Jornada padrão (min/dia)"
+            dica={`${formatarHorasCurto(contexto.empresa.jornadaPadraoMinutos)} — vale para quem não tem exceção`}
+          >
+            <Input
+              type="number"
+              name="jornada_padrao_minutos"
+              min={60}
+              max={1440}
+              step={30}
+              defaultValue={contexto.empresa.jornadaPadraoMinutos}
+              disabled={somenteLeitura}
             />
           </Campo>
           <Campo rotulo="Retenção (dias)" dica="entre 7 e 3650">

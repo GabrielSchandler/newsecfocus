@@ -47,11 +47,13 @@ export default async function PaginaAdministracao({
   const escolhida = (Array.isArray(abaBruta) ? abaBruta[0] : abaBruta) as Aba | undefined;
   const aba: Aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "equipes";
 
+  const org = contexto.empresa.id;
+
   const [equipes, colaboradores, categorias, mapeamentos, organizacao] = await Promise.all([
-    comFalha(buscarEquipes(supabase), []),
-    comFalha(buscarColaboradores(supabase), []),
-    comFalha(buscarCategorias(supabase), []),
-    comFalha(buscarMapeamentos(supabase), []),
+    comFalha(buscarEquipes(supabase, org), []),
+    comFalha(buscarColaboradores(supabase, null, org), []),
+    comFalha(buscarCategorias(supabase, org), []),
+    comFalha(buscarMapeamentos(supabase, org), []),
     comFalha(
       (async () => {
         const { data } = await supabase
@@ -108,7 +110,11 @@ export default async function PaginaAdministracao({
       {aba === "equipes" && <PainelEquipes equipes={equipes.dados} />}
 
       {aba === "pessoas" && (
-        <PainelColaboradores colaboradores={colaboradores.dados} equipes={equipes.dados} />
+        <PainelColaboradores
+          colaboradores={colaboradores.dados}
+          equipes={equipes.dados}
+          jornadaPadrao={contexto.empresa.jornadaPadraoMinutos}
+        />
       )}
 
       {aba === "classificacao" && (

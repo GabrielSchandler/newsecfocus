@@ -28,7 +28,7 @@ export default async function PaginaEquipes({
   const { periodo, escopo } = lerFiltros(params, contexto);
   const recorte = paramsDoRecorte(params);
 
-  const ranking = await comFalha(buscarRankingEquipes(supabase, periodo), []);
+  const ranking = await comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []);
   const equipes = ranking.dados;
 
   return (

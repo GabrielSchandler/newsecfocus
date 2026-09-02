@@ -9,7 +9,7 @@ import { TabelaAplicativos } from "@/components/painel/tabela-aplicativos";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
 import { buscarColaboradores, buscarDistribuicao, buscarEquipes } from "@/lib/consultas";
 import { ROTULOS_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
 
@@ -28,9 +28,11 @@ export default async function PaginaAplicativos({
 
   const { periodo, escopo } = lerFiltros(params, contexto);
 
+  const org = orgEfetiva(contexto, escopo);
+
   const [equipes, colaboradores, distribuicao] = await Promise.all([
-    comFalha(buscarEquipes(supabase), []),
-    comFalha(buscarColaboradores(supabase), []),
+    comFalha(buscarEquipes(supabase, org), []),
+    comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
   ]);
 

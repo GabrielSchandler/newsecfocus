@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
 import { buscarColaboradores, buscarEquipes } from "@/lib/consultas";
 import { RELATORIOS, type TipoRelatorio } from "@/lib/tipos";
 
@@ -29,9 +29,11 @@ export default async function PaginaRelatorios({
 
   const { periodo, escopo } = lerFiltros(params, contexto);
 
+  const org = orgEfetiva(contexto, escopo);
+
   const [equipes, colaboradores] = await Promise.all([
-    comFalha(buscarEquipes(supabase), []),
-    comFalha(buscarColaboradores(supabase), []),
+    comFalha(buscarEquipes(supabase, org), []),
+    comFalha(buscarColaboradores(supabase, null, org), []),
   ]);
 
   const erro = primeiroErro(equipes, colaboradores);

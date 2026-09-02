@@ -21,7 +21,7 @@ export async function carregarContexto(
     supabase
       .from("profiles")
       .select(
-        "full_name, role, team_id, org_id, organizations(id, name, slug, status, plano, fuso, max_dispositivos, retencao_dias)",
+        "full_name, role, team_id, org_id, organizations(id, name, slug, status, plano, fuso, max_dispositivos, retencao_dias, jornada_padrao_minutos)",
       )
       .eq("id", user.id)
       .maybeSingle(),
@@ -49,6 +49,7 @@ export async function carregarContexto(
       fuso: org?.fuso ?? FUSO_PADRAO,
       maxDispositivos: org?.max_dispositivos ?? 0,
       retencaoDias: org?.retencao_dias ?? 90,
+      jornadaPadraoMinutos: org?.jornada_padrao_minutos ?? 480,
     },
     adminPlataforma: !!admin,
   };

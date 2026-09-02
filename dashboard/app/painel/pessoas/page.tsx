@@ -8,7 +8,7 @@ import { TabelaColaboradores } from "@/components/painel/tabela-colaboradores";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
 import { buscarEquipes, buscarRankingColaboradores } from "@/lib/consultas";
 
 export const dynamic = "force-dynamic";
@@ -29,9 +29,14 @@ export default async function PaginaPessoas({
   const { periodo, escopo } = lerFiltros(params, contexto);
   const recorte = paramsDoRecorte(params);
 
+  const org = orgEfetiva(contexto, escopo);
+
   const [equipes, ranking] = await Promise.all([
-    comFalha(buscarEquipes(supabase), []),
-    comFalha(buscarRankingColaboradores(supabase, periodo, escopo.equipeId), []),
+    comFalha(buscarEquipes(supabase, org), []),
+    comFalha(
+      buscarRankingColaboradores(supabase, periodo, escopo.equipeId, 200, escopo.orgId),
+      [],
+    ),
   ]);
 
   const erro = primeiroErro(equipes, ranking);

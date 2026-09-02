@@ -49,11 +49,16 @@ export default async function PaginaDetalhePessoa({
   const equipeBruta = (pessoa as any).teams;
   const equipe = Array.isArray(equipeBruta) ? equipeBruta[0] : equipeBruta;
 
-  const { periodo } = lerFiltros(busca, contexto);
+  const { periodo, escopo: recorteAtual } = lerFiltros(busca, contexto);
   const fuso = contexto.empresa.fuso;
   const recorte = paramsDoRecorte(busca);
 
-  const escopo: Escopo = { equipeId: null, colaboradorId: id, dispositivoId: null };
+  const escopo: Escopo = {
+    orgId: recorteAtual.orgId,
+    equipeId: null,
+    colaboradorId: id,
+    dispositivoId: null,
+  };
 
   const [kpis, serie, distribuicao, diario] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
@@ -106,7 +111,12 @@ export default async function PaginaDetalhePessoa({
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-sm font-medium text-slate-200">Dia a dia</h3>
           <Badge variante="neutro">
-            jornada de {formatarHorasCurto(pessoa.jornada_minutos_dia)}/dia
+            jornada de{" "}
+            {formatarHorasCurto(
+              pessoa.jornada_minutos_dia ?? contexto.empresa.jornadaPadraoMinutos,
+            )}
+            /dia
+            {pessoa.jornada_minutos_dia === null && " (padrão da empresa)"}
           </Badge>
         </div>
         <TabelaDias linhas={diario.dados} fuso={fuso} />
