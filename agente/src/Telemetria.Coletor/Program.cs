@@ -1,3 +1,6 @@
+// System.IO explícito: este projeto liga UseWPF junto com UseWindowsForms, e essa
+// combinação deixa System.IO de fora dos implicit usings.
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.Extensions.Configuration;

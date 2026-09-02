@@ -114,15 +114,22 @@ Guia unificado em [documentos/GUIA-INSTALACAO.md](documentos/GUIA-INSTALACAO.md)
 
 | Componente | Situação |
 |------------|----------|
-| `dashboard/` | **compila** (`next build`) e passa no `tsc --noEmit` |
+| `dashboard/` | **compila** (`next build`), `tsc --noEmit` e `next lint` limpos |
+| `agente/` | **compila e publica** (`dotnet build -c Release`, `publicar.bat`) — 0 erros, 0 avisos |
 | `supabase/` | escrito e revisado; **ainda não aplicado num projeto real** |
-| `agente/` | **nunca compilado** — exige o .NET 8 SDK, ausente na máquina de desenvolvimento |
 
-Pendências conhecidas antes de vender: compilar e testar o agente numa estação real,
-gerar instalador MSI **com assinatura de código** (binário não assinado que instala hooks
-de teclado é bloqueado por antivírus e SmartScreen), e o serviço propagar ao coletor a
-pausa de coleta quando a conta está suspensa — o servidor já devolve `collection_enabled`
-na resposta de ingestão.
+O agente gera binários, mas **nunca rodou numa estação**: hooks de baixo nível,
+`CreateProcessAsUser` entre sessões e SQLCipher só se provam em execução. É o próximo
+teste.
+
+Pendências conhecidas antes de vender:
+
+1. Aplicar as migrations num projeto Supabase e rodar o fluxo ponta a ponta.
+2. Instalar o agente numa máquina de teste e validar coleta, matrícula e sincronização.
+3. Gerar instalador MSI **com assinatura de código** — binário não assinado que instala
+   hooks de teclado é bloqueado por antivírus e SmartScreen.
+4. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
+   servidor já devolve `collection_enabled` na resposta de ingestão.
 
 ---
 

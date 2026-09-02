@@ -13,6 +13,10 @@
     <RootNamespace>Telemetria.Coletor</RootNamespace>
     <AssemblyName>Telemetria.Coletor</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Ciência de DPI por monitor: coordenadas e estado corretos em telas com
+         escala. Declarada aqui, e não no manifesto, como o SDK do WinForms exige
+         (aviso WFAC010). -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <!-- Sem console, sem janela: processo silencioso na sessão do usuário. -->
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
   </PropertyGroup>
