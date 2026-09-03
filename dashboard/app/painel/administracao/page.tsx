@@ -14,6 +14,7 @@ import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import {
+  CATALOGO_VAZIO,
   buscarCatalogoApps,
   buscarCategorias,
   buscarColaboradores,
@@ -61,7 +62,7 @@ export default async function PaginaAdministracao({
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarCategorias(supabase, org), []),
     comFalha(buscarMapeamentos(supabase, org), []),
-    comFalha(buscarCatalogoApps(supabase, org), []),
+    comFalha(buscarCatalogoApps(supabase, org), CATALOGO_VAZIO),
     comFalha(
       (async () => {
         const { data } = await supabase

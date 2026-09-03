@@ -24,6 +24,7 @@ import {
   type ResultadoAcao,
 } from "./acoes";
 import type {
+  CatalogoApps as CatalogoAppsDados,
   Categoria,
   Colaborador,
   ContextoSessao,
@@ -384,7 +385,7 @@ export function PainelClassificacao({
 }: {
   categorias: Categoria[];
   mapeamentos: MapeamentoApp[];
-  catalogo: LinhaCatalogoApp[];
+  catalogo: CatalogoAppsDados;
 }) {
   return (
     <div className="space-y-4">
@@ -438,14 +439,32 @@ function formatarDataCurta(data: string): string {
  * fica destacado e sobe para o topo da lista (a RPC já ordena assim) — é o
  * "precisa classificar" que aparece assim que uma ferramenta nova sobe.
  */
+const POR_PAGINA = 40;
+
 function CatalogoApps({
   catalogo,
   categorias,
 }: {
-  catalogo: LinhaCatalogoApp[];
+  catalogo: CatalogoAppsDados;
   categorias: Categoria[];
 }) {
-  const pendentes = catalogo.filter((a) => !a.mapeamentoId).length;
+  const [busca, setBusca] = useState("");
+  const [soPendentes, setSoPendentes] = useState(false);
+  const [mostrando, setMostrando] = useState(POR_PAGINA);
+
+  const pendentes = catalogo.linhas.filter((a) => !a.mapeamentoId).length;
+
+  const termo = busca.trim().toLowerCase();
+  const filtrados = catalogo.linhas.filter((a) => {
+    if (soPendentes && a.mapeamentoId) return false;
+    if (!termo) return true;
+    return a.alvo.toLowerCase().includes(termo) || (a.categoriaNome ?? "").toLowerCase().includes(termo);
+  });
+
+  // Uma empresa com dezenas de máquinas junta centenas de domínios. Montar um
+  // formulário por linha para tudo de uma vez trava a tela — daí o corte, que
+  // não atrapalha porque o que falta classificar já vem ordenado na frente.
+  const visiveis = filtrados.slice(0, mostrando);
 
   return (
     <Card className="p-5">
@@ -462,17 +481,72 @@ function CatalogoApps({
         <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-200/90">
           Crie ao menos uma categoria (ou aplique o catálogo padrão acima) antes de classificar.
         </p>
-      ) : catalogo.length === 0 ? (
+      ) : catalogo.linhas.length === 0 ? (
         <p className="mt-4 text-center text-sm text-slate-500">
           Nada detectado ainda. Assim que uma estação sincronizar, os aplicativos e sites usados
           aparecem aqui.
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
-          {catalogo.map((app) => (
-            <LinhaCatalogo key={`${app.ehProcesso}:${app.alvo}`} app={app} categorias={categorias} />
-          ))}
-        </ul>
+        <>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Input
+              value={busca}
+              onChange={(e) => {
+                setBusca(e.target.value);
+                setMostrando(POR_PAGINA);
+              }}
+              placeholder="Buscar aplicativo, site ou categoria…"
+              aria-label="Buscar no catálogo"
+              className="min-w-[220px] flex-1"
+            />
+            <label className="flex items-center gap-2 text-xs text-slate-400">
+              <input
+                type="checkbox"
+                checked={soPendentes}
+                onChange={(e) => {
+                  setSoPendentes(e.target.checked);
+                  setMostrando(POR_PAGINA);
+                }}
+                className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
+              />
+              Só o que falta classificar
+            </label>
+          </div>
+
+          {filtrados.length === 0 ? (
+            <p className="mt-4 text-center text-sm text-slate-500">
+              Nenhum resultado para esse filtro.
+            </p>
+          ) : (
+            <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
+              {visiveis.map((app) => (
+                <LinhaCatalogo
+                  key={`${app.ehProcesso}:${app.alvo}`}
+                  app={app}
+                  categorias={categorias}
+                />
+              ))}
+            </ul>
+          )}
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+            <span>
+              {visiveis.length} de {filtrados.length}
+              {catalogo.total > catalogo.linhas.length &&
+                ` · ${catalogo.total} detectados no total, mostrando os ${catalogo.linhas.length} mais relevantes`}
+            </span>
+            {visiveis.length < filtrados.length && (
+              <Button
+                type="button"
+                variante="contorno"
+                tamanho="sm"
+                onClick={() => setMostrando((n) => n + POR_PAGINA)}
+              >
+                Mostrar mais
+              </Button>
+            )}
+          </div>
+        </>
       )}
     </Card>
   );
@@ -489,6 +563,10 @@ function LinhaCatalogo({ app, categorias }: { app: LinhaCatalogoApp; categorias:
         <input type="hidden" name="alvo" value={app.alvo} />
         <input type="hidden" name="eh_processo" value={String(app.ehProcesso)} />
         {app.mapeamentoId && <input type="hidden" name="mapeamento_id" value={app.mapeamentoId} />}
+        {/* O Select é controlado e não tem name: sem este campo, a categoria
+            escolhida não ia junto no envio e a ação recusava com "Escolha a
+            categoria" mesmo com uma selecionada na tela. */}
+        <input type="hidden" name="category_id" value={categoriaId} />
 
         <div className="min-w-0 flex-1">
           <span className="block truncate font-mono text-sm text-slate-200">{app.alvo}</span>

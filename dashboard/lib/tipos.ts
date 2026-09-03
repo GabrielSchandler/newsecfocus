@@ -143,6 +143,12 @@ export interface LinhaCatalogoApp {
   minutosTotais: number;
 }
 
+export interface CatalogoApps {
+  linhas: LinhaCatalogoApp[];
+  /** Quantos existem no total — a lista pode vir cortada pelo limite. */
+  total: number;
+}
+
 export interface MapeamentoApp {
   id: string;
   process_name: string | null;

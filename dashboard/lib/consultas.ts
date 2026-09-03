@@ -10,6 +10,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { CORES_TIPO, PALETA_SERIES, rotuloDoBalde } from "./formato";
 import { periodoAnterior } from "./periodos";
 import type {
+  CatalogoApps,
   Categoria,
   Colaborador,
   Dispositivo,
@@ -239,11 +240,15 @@ export async function buscarMapeamentos(
 export async function buscarCatalogoApps(
   supabase: SupabaseClient,
   orgId?: string | null,
-): Promise<LinhaCatalogoApp[]> {
-  const { data, error } = await supabase.rpc("painel_catalogo_apps", { p_org: orgId ?? null });
+  limite = 300,
+): Promise<CatalogoApps> {
+  const { data, error } = await supabase.rpc("painel_catalogo_apps", {
+    p_org: orgId ?? null,
+    p_limite: limite,
+  });
   if (error) throw error;
 
-  return (data ?? []).map((r: any) => ({
+  const linhas = (data ?? []).map((r: any) => ({
     alvo: r.alvo,
     ehProcesso: !!r.eh_processo,
     mapeamentoId: r.mapeamento_id,
@@ -253,8 +258,13 @@ export async function buscarCatalogoApps(
     primeiroVisto: r.primeiro_visto,
     ultimoVisto: r.ultimo_visto,
     minutosTotais: num(r.minutos_totais),
-  }));
+  })) as LinhaCatalogoApp[];
+
+  // O total vem repetido em toda linha (count over) — uma consulta só.
+  return { linhas, total: num((data ?? [])[0]?.total) };
 }
+
+export const CATALOGO_VAZIO: CatalogoApps = { linhas: [], total: 0 };
 
 // ----------------------------------------------------------------------------
 //  KPIs
