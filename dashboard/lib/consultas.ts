@@ -26,6 +26,7 @@ import type {
   Periodo,
   PontoSerie,
   Registro,
+  UsuarioAcesso,
 } from "./tipos";
 
 // ----------------------------------------------------------------------------
@@ -151,6 +152,35 @@ export async function buscarDispositivos(
   const { data, error } = await consulta;
   if (error) throw error;
   return (data ?? []) as Dispositivo[];
+}
+
+export async function buscarUsuariosAcesso(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<UsuarioAcesso[]> {
+  let consulta = supabase
+    .from("profiles")
+    .select("id, full_name, role, team_id, ativo, teams(nome)")
+    .order("full_name", { nullsFirst: false });
+
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
+  if (error) throw error;
+
+  return (data ?? []).map((p: any) => {
+    const equipe = Array.isArray(p.teams) ? p.teams[0] : p.teams;
+    return {
+      id: p.id,
+      nome: p.full_name,
+      // O e-mail vive em auth.users, que o painel não lê: mostramos o que há.
+      email: null,
+      papel: p.role,
+      equipeId: p.team_id,
+      equipeNome: equipe?.nome ?? null,
+      ativo: p.ativo ?? true,
+    };
+  });
 }
 
 export async function buscarCategorias(

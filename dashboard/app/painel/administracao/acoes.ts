@@ -318,6 +318,28 @@ export async function salvarEmpresa(
   return OK("Dados da empresa atualizados.");
 }
 
+/**
+ * Gera um código de instalação novo. As máquinas já matriculadas não são
+ * afetadas: elas usam um token próprio desde o primeiro contato, e não o
+ * código. Serve para quando o código vaza ou circula fora da empresa.
+ */
+export async function girarCodigoInstalacao(
+  _anterior: ResultadoAcao | null,
+  _dados: FormData,
+): Promise<ResultadoAcao> {
+  const supabase = await criarClienteServidor();
+  const contexto = await carregarContexto(supabase);
+  if (!contexto) return FALHA("Sessão expirada.");
+
+  const { data, error } = await supabase.rpc("girar_codigo_instalacao", {
+    p_org: contexto.empresa.id,
+  });
+  if (error) return FALHA(error.message);
+
+  atualizarTelas();
+  return OK(`Código novo gerado: ${String(data).replace(/(\d{4})(?=\d)/g, "$1-")}`);
+}
+
 // ----------------------------------------------------------------------------
 //  Configuração do agente (aplicada remotamente na frota)
 // ----------------------------------------------------------------------------

@@ -133,6 +133,17 @@ export function faixaIndice(indice: number | null): {
   return { rotulo: "baixo", cor: "#fb7185", classe: "text-rose-400" };
 }
 
+/**
+ * Código de instalação em blocos de quatro: 1234-5678-9012.
+ * Quem digita isso é o TI do cliente, muitas vezes lendo de um papel — os
+ * blocos reduzem erro e facilitam ditar por telefone.
+ */
+export function formatarCodigoInstalacao(codigo: string | null): string {
+  if (!codigo) return "—";
+  const digitos = codigo.replace(/\D/g, "");
+  return digitos.replace(/(\d{4})(?=\d)/g, "$1-");
+}
+
 /** Nome de arquivo seguro para os relatórios exportados. */
 export function nomeArquivo(base: string, rotuloPeriodo: string, extensao: string): string {
   const limpo = (t: string) =>

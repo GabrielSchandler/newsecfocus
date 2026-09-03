@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { ROTULOS_TIPO, formatarHorasCurto } from "@/lib/formato";
+import { CodigoInstalacao } from "./codigo-instalacao";
 import {
   aplicarCatalogoPadrao,
   excluirCategoria,
@@ -570,6 +571,12 @@ export function PainelEmpresa({
   const somenteLeitura = contexto.papel !== "OWNER";
 
   return (
+    <div className="space-y-4">
+    <CodigoInstalacao
+      codigo={contexto.empresa.codigoInstalacao}
+      podeGirar={!somenteLeitura}
+    />
+
     <Card className="p-5">
       <h3 className="text-sm font-medium text-slate-200">Dados da empresa</h3>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -670,5 +677,6 @@ export function PainelEmpresa({
         )}
       </form>
     </Card>
+    </div>
   );
 }

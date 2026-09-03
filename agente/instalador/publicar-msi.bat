@@ -72,9 +72,20 @@ if errorlevel 1 goto :erro
 echo.
 echo === Compilando o MSI
 pushd "%AQUI%"
-wix build NewSecFocus.wxs Arquivos.wxs ^
+REM A URL e a chave publica do servico sao iguais para todos os clientes e
+REM entram embutidas; a tela do instalador so pergunta o codigo da empresa.
+if "%FOCUS_URL%"=="" set "FOCUS_URL=https://auwotdrgxjrrhhhmmekc.supabase.co"
+if "%FOCUS_ANON%"=="" (
+    echo *** Defina FOCUS_ANON com a chave anon do projeto antes de gerar o MSI.
+    exit /b 1
+)
+
+wix build NewSecFocus.wxs Arquivos.wxs Interface.wxs ^
     -ext WixToolset.Util.wixext ^
+    -ext WixToolset.UI.wixext ^
     -bindpath "Publicado=%PUBLICADO%" ^
+    -d Url=%FOCUS_URL% ^
+    -d ChaveAnon=%FOCUS_ANON% ^
     -arch x64 ^
     -o NewSecFocus.msi
 set "FALHOU=%errorlevel%"

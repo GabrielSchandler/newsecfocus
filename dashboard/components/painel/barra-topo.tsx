@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,14 +64,18 @@ export function BarraTopo({ contexto, itens, empresas, empresaAtual }: Props) {
             LGPD
           </Badge>
 
-          <div className="flex items-center gap-2 rounded-lg border border-borda bg-fundo-suave px-2.5 py-1.5">
+          <Link
+            href="/painel/conta"
+            title="Minha conta"
+            className="flex items-center gap-2 rounded-lg border border-borda bg-fundo-suave px-2.5 py-1.5 transition-colors hover:border-slate-600"
+          >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-cyan-500/30 to-violet-500/30 text-xs font-medium text-cyan-200">
               {iniciais}
             </span>
             <span className="hidden max-w-[180px] truncate text-xs text-slate-400 lg:block">
               {contexto.email}
             </span>
-          </div>
+          </Link>
 
           <Button variante="contorno" tamanho="sm" onClick={sair}>
             <LogOut className="h-3.5 w-3.5" />

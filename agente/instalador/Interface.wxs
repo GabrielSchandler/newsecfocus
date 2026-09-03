@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   Tela do instalador que pede o código da empresa.
+
+   Quem instala é o TI do cliente, muitas vezes lendo um código de um papel ou
+   de um e-mail. Por isso a tela pede UMA coisa só: o código de instalação, que
+   é numérico. A URL e a chave pública do serviço são iguais para todas as
+   empresas e vão embutidas no pacote em tempo de compilação — não faz sentido
+   pedir isso a quem instala.
+
+   Fluxo: Boas-vindas → Termo → Código → Confirmação → Progresso → Fim
+  ============================================================================
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Fragment>
+
+    <UI Id="InterfaceNewSecFocus">
+      <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+      <!-- Texto de apoio, em português, reaproveitando as fontes do WiX. -->
+      <Dialog Id="DialogoCodigo" Width="370" Height="270" Title="[ProductName] — Código da empresa">
+
+        <Control Id="Titulo" Type="Text" X="15" Y="6" Width="340" Height="15"
+                 Transparent="yes" NoPrefix="yes">
+          <Text Value="{\WixUI_Font_Title}Código de instalação" />
+        </Control>
+
+        <Control Id="Descricao" Type="Text" X="25" Y="23" Width="330" Height="20"
+                 Transparent="yes" NoPrefix="yes">
+          <Text Value="Informe o código de 12 dígitos da empresa. Ele está no painel, em Administração › Empresa." />
+        </Control>
+
+        <Control Id="LinhaTopo" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+        <Control Id="RotuloCodigo" Type="Text" X="25" Y="70" Width="320" Height="12"
+                 NoPrefix="yes" Text="Código de instalação" />
+
+        <Control Id="CampoCodigo" Type="Edit" X="25" Y="85" Width="200" Height="18"
+                 Property="CHAVEMATRICULA" Text="{50}" />
+
+        <Control Id="Exemplo" Type="Text" X="25" Y="107" Width="320" Height="12"
+                 Transparent="yes" NoPrefix="yes">
+          <Text Value="Exemplo: 1076-7646-5722 (pode digitar com ou sem os hífens)" />
+        </Control>
+
+        <Control Id="Aviso" Type="Text" X="25" Y="140" Width="320" Height="60"
+                 Transparent="yes" NoPrefix="yes">
+          <Text Value="Sem o código, o agente é instalado mas fica aguardando: a estação não aparece no painel até receber um código válido. Nesse caso ele pode ser entregue depois, por política de grupo." />
+        </Control>
+
+        <Control Id="LinhaRodape" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="Voltar" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+        </Control>
+
+        <Control Id="Avancar" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+
+        <Control Id="Cancelar" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+      </Dialog>
+
+      <!-- Encaixa a tela nova no meio do fluxo padrão do WixUI_InstallDir,
+           trocando a escolha de pasta: o serviço vai sempre para Arquivos de
+           Programas, e escolher pasta só criaria oportunidade de erro. -->
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="DialogoCodigo"
+               Condition="LicenseAccepted = &quot;1&quot;" Order="10" />
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DialogoCodigo"
+               Order="10" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+  </Fragment>
+</Wix>

@@ -33,6 +33,8 @@ export interface ContextoSessao {
     retencaoDias: number;
     /** Jornada diária padrão da empresa, em minutos. Base da aderência. */
     jornadaPadraoMinutos: number;
+    /** Código de 12 dígitos digitado no instalador do agente. */
+    codigoInstalacao: string | null;
   };
   /** Operador da revenda: administra contas de clientes, não vê telemetria. */
   adminPlataforma: boolean;
@@ -86,6 +88,17 @@ export interface Dispositivo {
   status_online: boolean;
   last_sync_at: string | null;
   agent_version: string | null;
+}
+
+/** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
+export interface UsuarioAcesso {
+  id: string;
+  nome: string | null;
+  email: string | null;
+  papel: PapelUsuario;
+  equipeId: string | null;
+  equipeNome: string | null;
+  ativo: boolean;
 }
 
 /** Configuração que a frota recebe na próxima sincronização. */

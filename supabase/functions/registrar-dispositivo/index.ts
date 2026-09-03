@@ -42,15 +42,17 @@ Deno.serve(async (req) => {
 
   const supabase = clienteAdministrativo();
 
-  // 1. Valida a chave de matrícula e resolve a organização.
-  const { data: org, error: erroOrg } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("enrollment_key", corpo.enrollment_key)
-    .maybeSingle();
+  // 1. Resolve a empresa. Aceita o CÓDIGO DE INSTALAÇÃO numérico (1234-5678-9012,
+  //    com ou sem hífen) ou a chave hexadecimal antiga — quem já instalou não
+  //    precisa mexer em nada.
+  const { data: idEmpresa, error: erroOrg } = await supabase.rpc("empresa_por_chave", {
+    p_chave: corpo.enrollment_key,
+  });
 
   if (erroOrg) return erro("Falha ao validar a matrícula.", 500);
-  if (!org) return erro("Chave de matrícula inválida.", 401);
+  if (!idEmpresa) return erro("Código de instalação inválido.", 401);
+
+  const org = { id: idEmpresa as string };
 
   // 2. Gera token e persiste apenas o hash.
   const token = gerarToken();

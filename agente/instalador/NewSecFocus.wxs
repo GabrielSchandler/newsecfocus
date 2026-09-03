@@ -48,9 +48,17 @@
          ================================================================== -->
     <!-- Secure="yes" permite que a propriedade sobreviva à elevação quando o
          MSI roda sem interface, que é o caso da implantação por GPO. -->
-    <Property Id="URLSUPABASE" Secure="yes" />
-    <Property Id="CHAVEANONIMA" Secure="yes" />
+    <!-- URL e chave publica sao do servico, iguais para toda a base de
+         clientes: entram em tempo de compilacao (-d Url=... -d ChaveAnon=...)
+         e nao sao perguntadas a quem instala. -->
+    <Property Id="URLSUPABASE" Secure="yes" Value="$(var.Url)" />
+    <Property Id="CHAVEANONIMA" Secure="yes" Value="$(var.ChaveAnon)" />
+
+    <!-- A unica coisa que muda por empresa, e a unica que a tela pergunta. -->
     <Property Id="CHAVEMATRICULA" Secure="yes" />
+
+    <!-- Termo mostrado na segunda tela do instalador. -->
+    <WixVariable Id="WixUILicenseRtf" Value="Licenca.rtf" />
 
     <!-- ==================================================================
          Onde instala
@@ -141,6 +149,8 @@
     <!-- ==================================================================
          O que entra na instalação
          ================================================================== -->
+    <UIRef Id="InterfaceNewSecFocus" />
+
     <Feature Id="Principal" Title="NewSec Focus" Level="1">
       <ComponentGroupRef Id="ArquivosDoAgente" />
       <ComponentRef Id="ServicoSupervisor" />
