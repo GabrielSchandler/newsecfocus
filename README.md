@@ -132,10 +132,30 @@ Falta para o ciclo completo:
 1. Publicar as Edge Functions (`supabase functions deploy`) — sem elas o agente não
    consegue se matricular nem sincronizar; exige um access token da conta Supabase.
 2. Instalar o agente como serviço numa estação e validar matrícula e envio de lote.
-3. Gerar instalador MSI **com assinatura de código** — binário não assinado que instala
-   hooks de teclado é bloqueado por antivírus e SmartScreen.
-4. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
+3. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
    servidor já devolve `collection_enabled` na resposta de ingestão.
+
+### Instalador — decisão: sem MSI assinado
+
+Sem certificado de assinatura de código, o MSI ficava bloqueado por SmartScreen e
+antivírus de qualquer forma — então a distribuição para cliente passou a ser um
+instalador guiado em `agente/instalador-cliente/`:
+
+- **`Instalar.bat`** — clique duplo, abre um PowerShell com interface própria (moldura,
+  cores, checklist de progresso), pede só o código de instalação numérico (gerado no
+  painel, em Administração › Empresa) e faz o resto sozinho: copia os binários, grava a
+  identidade da empresa no registro, cria e inicia o serviço Windows.
+- **`Desinstalar.bat`** — remove o serviço; preserva o buffer local por padrão.
+- **`publicar-cliente.bat`** — gera o pacote publicado (auto-contido, sem exigir .NET
+  instalado no cliente) pronto para zipar e enviar.
+
+O `Instalar.ps1` tenta validar o código contra o servidor antes de instalar (mostrando o
+nome da empresa), mas segue mesmo se a validação falhar — a matrícula de verdade
+acontece no primeiro boot do serviço, contra o banco.
+
+Continua faltando **assinatura de código** para o SmartScreen parar de alertar; o MSI
+(WiX, em `agente/instalador/`) fica como opção pronta se um certificado for adquirido
+depois — hoje é caminho secundário, não o entregue ao cliente.
 
 ---
 

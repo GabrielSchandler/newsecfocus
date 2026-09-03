@@ -30,3 +30,8 @@ verify_jwt = false
 
 [functions.registrar-dispositivo]
 verify_jwt = false
+
+# Chamada anonima pelo instalador, so pra mostrar "codigo valido" antes de
+# instalar. Nao matricula nada, so consulta.
+[functions.validar-codigo]
+verify_jwt = false

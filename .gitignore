@@ -43,5 +43,6 @@ desktop.ini
 
 # Instalador — saida de build, nao versionar (60 MB) nem a publicacao gorda
 publicado-msi/
+publicado-cliente/
 *.msi
 *.wixpdb
