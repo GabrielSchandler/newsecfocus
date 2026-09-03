@@ -1,6 +1,8 @@
 import * as React from "react";
+import Link from "next/link";
 import {
   Activity,
+  AlarmClockCheck,
   AppWindow,
   Gauge,
   Keyboard,
@@ -23,11 +25,13 @@ import {
   formatarPorcentagem,
   formatarVariacao,
 } from "@/lib/formato";
-import type { Kpis, KpisComparados } from "@/lib/tipos";
+import type { Kpis, KpisComparados, KpisEscala } from "@/lib/tipos";
 
 interface Props {
   dados: KpisComparados;
   rotuloComparacao: string;
+  /** Corte por janela de jornada. Só aparece quando há janela configurada. */
+  escala: KpisEscala;
 }
 
 /**
@@ -62,9 +66,10 @@ function variacao(atual: number | null, anterior: number | null): number | null 
  *   2. uma faixa técnica com a composição do tempo, para quem quer entender o
  *      porquê do número.
  */
-export function BentoKpis({ dados, rotuloComparacao }: Props) {
+export function BentoKpis({ dados, rotuloComparacao, escala }: Props) {
   const { atual, anterior } = dados;
   const faixa = faixaIndice(atual.indice);
+  const mostrarEscala = escala.temJanela && escala.indiceEscala !== null;
 
   const media = mediaDiariaPorPessoa(atual);
   const mediaAnterior = mediaDiariaPorPessoa(anterior);
@@ -123,6 +128,36 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
                 <p className="mt-2 text-xs text-slate-500">
                   tempo produtivo sobre o tempo classificado
                 </p>
+
+                {/* O índice geral mistura expediente e hora extra. Para avaliar
+                    desempenho, o que vale é o horário contratado. */}
+                {mostrarEscala && (
+                  <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-borda pt-3">
+                    <div>
+                      <dt className="text-xs text-slate-500">Dentro da escala</dt>
+                      <dd className="mt-0.5 text-lg font-semibold text-cyan-300">
+                        {formatarPorcentagem(escala.indiceEscala, 1)}
+                        <span className="ml-1.5 text-xs font-normal text-slate-500">
+                          em {formatarHoras(escala.minutosAtivosEscala)}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-slate-500">Fora da escala</dt>
+                      <dd className="mt-0.5 text-lg font-semibold text-slate-300">
+                        {escala.minutosAtivosExtra === 0
+                          ? "nenhuma"
+                          : formatarHoras(escala.minutosAtivosExtra)}
+                        {escala.pessoasComExtra > 0 && (
+                          <span className="ml-1.5 text-xs font-normal text-slate-500">
+                            · {escala.pessoasComExtra}{" "}
+                            {escala.pessoasComExtra === 1 ? "pessoa" : "pessoas"}
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                )}
               </>
             )}
           </div>
@@ -150,7 +185,7 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
           }
           detalhe={
             atual.jornadaEsperada > 0
-              ? `de ${formatarHoras(atual.jornadaEsperada)} previstas`
+              ? `${formatarHoras(atual.minutosAtivos)} ativos de ${formatarHoras(atual.jornadaEsperada)} previstas`
               : "sem jornada configurada"
           }
         />
@@ -195,7 +230,7 @@ export function BentoKpis({ dados, rotuloComparacao }: Props) {
         />
       </section>
 
-      <ComposicaoTempo kpis={dados} media={media} />
+      <ComposicaoTempo kpis={dados} media={media} escala={escala} />
     </div>
   );
 }
@@ -265,7 +300,15 @@ function Comparacao({
   );
 }
 
-function ComposicaoTempo({ kpis, media }: { kpis: KpisComparados; media: number | null }) {
+function ComposicaoTempo({
+  kpis,
+  media,
+  escala,
+}: {
+  kpis: KpisComparados;
+  media: number | null;
+  escala: KpisEscala;
+}) {
   const { atual } = kpis;
 
   const faixas = [
@@ -342,11 +385,54 @@ function ComposicaoTempo({ kpis, media }: { kpis: KpisComparados; media: number 
             })}
           </dl>
 
+          {/* O gráfico acima só cobre o tempo ATIVO. Sem esta linha, o tempo
+              ocioso e o de tela bloqueada não apareciam em lugar nenhum do
+              painel — e é justamente o que explica uma jornada longa com
+              pouca entrega. */}
+          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-borda pt-3 text-xs">
+            <div className="flex items-center gap-1.5">
+              <dt className="text-slate-500">Ocioso:</dt>
+              <dd className="text-slate-300">
+                {formatarHoras(atual.minutosOciosos)}
+                {atual.minutosRegistrados > 0 && (
+                  <span className="ml-1 text-slate-600">
+                    ({formatarPorcentagem((atual.minutosOciosos / atual.minutosRegistrados) * 100, 0)}{" "}
+                    do tempo registrado)
+                  </span>
+                )}
+              </dd>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <dt className="text-slate-500">Tela bloqueada:</dt>
+              <dd className="text-slate-300">{formatarHoras(atual.minutosBloqueado)}</dd>
+            </div>
+            {escala.temJanela && escala.minutosAtivosExtra > 0 && (
+              <div className="flex items-center gap-1.5">
+                <dt className="flex items-center gap-1 text-slate-500">
+                  <AlarmClockCheck className="h-3.5 w-3.5 text-amber-400" />
+                  Fora da escala:
+                </dt>
+                <dd className="text-amber-300">
+                  <Link href="/painel/horas-extras" className="hover:underline">
+                    {formatarHoras(escala.minutosAtivosExtra)}
+                  </Link>
+                </dd>
+              </div>
+            )}
+          </dl>
+
           {atual.minutosSemClassificar > 0 && (
             <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs leading-relaxed text-amber-300/90">
               {formatarPorcentagem((atual.minutosSemClassificar / totalAtivo) * 100, 0)} do
               tempo ativo está em aplicativos ainda sem categoria — esse tempo fica de fora do
-              índice. Classifique em Administração para o número refletir a operação.
+              índice.{" "}
+              <Link
+                href="/painel/administracao?aba=classificacao"
+                className="font-medium underline underline-offset-2 hover:text-amber-100"
+              >
+                Classificar agora
+              </Link>{" "}
+              para o número refletir a operação.
             </p>
           )}
         </>

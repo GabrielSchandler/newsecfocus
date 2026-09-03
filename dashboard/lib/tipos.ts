@@ -213,6 +213,25 @@ export interface Kpis {
   jornadaEsperada: number;
 }
 
+/**
+ * Índice cortado entre o horário contratado e a hora extra. Existe porque o
+ * índice geral mistura os dois: quem varre e-mail às 22h contava igual a quem
+ * faz o mesmo às 14h.
+ */
+export interface KpisEscala {
+  /** Falso quando ninguém do recorte tem janela — o painel esconde o corte. */
+  temJanela: boolean;
+  minutosAtivosEscala: number;
+  minutosProdutivosEscala: number;
+  minutosNeutrosEscala: number;
+  minutosImprodutivosEscala: number;
+  indiceEscala: number | null;
+  minutosAtivosExtra: number;
+  minutosProdutivosExtra: number;
+  indiceExtra: number | null;
+  pessoasComExtra: number;
+}
+
 export interface KpisComparados {
   atual: Kpis;
   anterior: Kpis;

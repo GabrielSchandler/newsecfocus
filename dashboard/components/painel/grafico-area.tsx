@@ -14,13 +14,25 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { CORES_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
-import type { PontoSerie } from "@/lib/tipos";
+import {
+  CORES_TIPO,
+  ROTULO_BUCKET,
+  formatarHoras,
+  formatarPorcentagem,
+  rotuloCompletoDoBalde,
+} from "@/lib/formato";
+import type { BucketSerie, PontoSerie } from "@/lib/tipos";
 
 type Visao = "composicao" | "indice";
 
 interface Props {
   dados: PontoSerie[];
+  /** Granularidade de cada ponto — vira o "hora a hora" do subtítulo. */
+  bucket: BucketSerie;
+  /** Fuso da empresa, para o tooltip nomear o ponto no horário certo. */
+  fuso: string;
+  /** Nome do recorte ("Hoje", "Setembro de 2026"), para o gráfico se situar. */
+  periodoRotulo: string;
   titulo?: string;
   subtitulo?: string;
 }
@@ -35,6 +47,9 @@ interface Props {
  */
 export function GraficoArea({
   dados,
+  bucket,
+  fuso,
+  periodoRotulo,
   titulo = "Produtividade ao longo do período",
   subtitulo,
 }: Props) {
@@ -44,13 +59,18 @@ export function GraficoArea({
     dados.length === 0 ||
     dados.every((d) => d.ativo + d.ocioso === 0);
 
+  // Sem isto o eixo dizia só "14h" ou "03/09" e não havia como saber de que
+  // recorte era, nem se cada ponto valia uma hora, um dia ou uma semana.
+  const legendaEixo = `${periodoRotulo} · ${ROTULO_BUCKET[bucket]}`;
+
   return (
     <Card className="p-5">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-medium text-slate-200">{titulo}</h3>
           <p className="text-xs text-slate-500">
-            {subtitulo ?? (visao === "composicao" ? "minutos por categoria" : "% de tempo produtivo")}
+            {subtitulo ??
+              `${legendaEixo} · ${visao === "composicao" ? "minutos por categoria" : "% de tempo produtivo"}`}
           </p>
         </div>
 
@@ -93,7 +113,10 @@ export function GraficoArea({
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
             <EixoX />
             <EixoY />
-            <Tooltip content={<TooltipCustom />} cursor={{ stroke: "#334155" }} />
+            <Tooltip
+              content={<TooltipCustom bucket={bucket} fuso={fuso} />}
+              cursor={{ stroke: "#334155" }}
+            />
             <Area
               type="monotone" dataKey="produtivo" name="Produtivo" stackId="1"
               stroke={CORES_TIPO.PRODUCTIVE} strokeWidth={2} fill="url(#gProd)"
@@ -121,7 +144,10 @@ export function GraficoArea({
               stroke="#475569" fontSize={11} tickLine={false} axisLine={false}
               width={44} domain={[0, 100]} unit="%"
             />
-            <Tooltip content={<TooltipIndice />} cursor={{ stroke: "#334155" }} />
+            <Tooltip
+              content={<TooltipIndice bucket={bucket} fuso={fuso} />}
+              cursor={{ stroke: "#334155" }}
+            />
             <Line
               type="monotone" dataKey="indice" name="Índice"
               stroke={CORES_TIPO.PRODUCTIVE} strokeWidth={2.5}
@@ -191,13 +217,21 @@ function Legenda() {
   );
 }
 
-function TooltipCustom({ active, payload, label }: any) {
+/** Nome completo do ponto ("03/09, 14h às 15h") — o rótulo do eixo é curto demais. */
+function rotuloDoPonto(payload: any, bucket: BucketSerie, fuso: string, fallback: string): string {
+  const balde = payload?.[0]?.payload?.balde;
+  return balde ? rotuloCompletoDoBalde(balde, bucket, fuso) : fallback;
+}
+
+function TooltipCustom({ active, payload, label, bucket, fuso }: any) {
   if (!active || !payload?.length) return null;
   const total = payload.reduce((s: number, p: any) => s + (p.value ?? 0), 0);
 
   return (
     <div className="rounded-lg border border-borda bg-fundo-cartao/95 px-3 py-2 text-xs shadow-glow backdrop-blur">
-      <p className="mb-1.5 font-medium text-slate-300">{label}</p>
+      <p className="mb-1.5 font-medium text-slate-300">
+        {rotuloDoPonto(payload, bucket, fuso, label)}
+      </p>
       {payload.map((p: any) => (
         <p key={p.name} className="flex items-center gap-2 text-slate-400">
           <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
@@ -211,13 +245,15 @@ function TooltipCustom({ active, payload, label }: any) {
   );
 }
 
-function TooltipIndice({ active, payload, label }: any) {
+function TooltipIndice({ active, payload, label, bucket, fuso }: any) {
   if (!active || !payload?.length) return null;
   const valor = payload[0]?.value;
 
   return (
     <div className="rounded-lg border border-borda bg-fundo-cartao/95 px-3 py-2 text-xs shadow-glow backdrop-blur">
-      <p className="mb-1 font-medium text-slate-300">{label}</p>
+      <p className="mb-1 font-medium text-slate-300">
+        {rotuloDoPonto(payload, bucket, fuso, label)}
+      </p>
       <p className="text-slate-400">
         Índice:{" "}
         <span className="text-slate-100">

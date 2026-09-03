@@ -12,9 +12,11 @@ import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, paramsDoRecorte, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
+  KPIS_ESCALA_VAZIO,
   KPIS_VAZIOS,
   buscarDistribuicao,
   buscarKpisComparados,
+  buscarKpisEscala,
   buscarRankingColaboradores,
   buscarSerie,
 } from "@/lib/consultas";
@@ -56,7 +58,7 @@ export default async function PaginaDetalheEquipe({
     dispositivoId: null,
   };
 
-  const [kpis, serie, distribuicao, pessoas] = await Promise.all([
+  const [kpis, escala, serie, distribuicao, pessoas] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
       atual: KPIS_VAZIOS,
       anterior: KPIS_VAZIOS,
@@ -67,12 +69,13 @@ export default async function PaginaDetalheEquipe({
         interacoes: null,
       },
     }),
+    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
     comFalha(buscarRankingColaboradores(supabase, periodo, id, 100, escopo.orgId), []),
   ]);
 
-  const erro = primeiroErro(kpis, serie, distribuicao, pessoas);
+  const erro = primeiroErro(kpis, escala, serie, distribuicao, pessoas);
 
   return (
     <div className="space-y-5">
@@ -99,11 +102,21 @@ export default async function PaginaDetalheEquipe({
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      <BentoKpis dados={kpis.dados} rotuloComparacao={rotuloComparacao(periodo)} />
+      <BentoKpis
+        dados={kpis.dados}
+        rotuloComparacao={rotuloComparacao(periodo)}
+        escala={escala.dados}
+      />
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
         <div className="min-w-0 xl:col-span-3">
-          <GraficoArea dados={serie.dados} titulo="Produtividade da equipe" />
+          <GraficoArea
+            dados={serie.dados}
+            bucket={periodo.bucket}
+            fuso={fuso}
+            periodoRotulo={periodo.rotulo}
+            titulo="Produtividade da equipe"
+          />
         </div>
         <div className="min-w-0 xl:col-span-2">
           <GraficoDonut dados={distribuicao.dados} titulo="Ferramentas da equipe" />

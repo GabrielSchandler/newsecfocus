@@ -19,6 +19,7 @@ import type {
   FatiaDistribuicao,
   Kpis,
   KpisComparados,
+  KpisEscala,
   LinhaCatalogoApp,
   LinhaHorasExtras,
   LinhaRankingColaborador,
@@ -331,6 +332,48 @@ export async function buscarKpisComparados(
     },
   };
 }
+
+/** Índice separado entre o horário contratado e a hora extra. */
+export async function buscarKpisEscala(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<KpisEscala> {
+  const { data, error } = await supabase.rpc("painel_kpis_escala", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    ...paramsEscopo(escopo),
+  });
+
+  if (error) throw error;
+  const r = (Array.isArray(data) ? data[0] : data) ?? {};
+
+  return {
+    temJanela: !!r.tem_janela,
+    minutosAtivosEscala: num(r.minutos_ativos_escala),
+    minutosProdutivosEscala: num(r.minutos_produtivos_escala),
+    minutosNeutrosEscala: num(r.minutos_neutros_escala),
+    minutosImprodutivosEscala: num(r.minutos_improdutivos_escala),
+    indiceEscala: numOuNulo(r.indice_escala),
+    minutosAtivosExtra: num(r.minutos_ativos_extra),
+    minutosProdutivosExtra: num(r.minutos_produtivos_extra),
+    indiceExtra: numOuNulo(r.indice_extra),
+    pessoasComExtra: num(r.pessoas_com_extra),
+  };
+}
+
+export const KPIS_ESCALA_VAZIO: KpisEscala = {
+  temJanela: false,
+  minutosAtivosEscala: 0,
+  minutosProdutivosEscala: 0,
+  minutosNeutrosEscala: 0,
+  minutosImprodutivosEscala: 0,
+  indiceEscala: null,
+  minutosAtivosExtra: 0,
+  minutosProdutivosExtra: 0,
+  indiceExtra: null,
+  pessoasComExtra: 0,
+};
 
 // ----------------------------------------------------------------------------
 //  Série temporal

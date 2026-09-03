@@ -75,6 +75,50 @@ export function dataCurta(iso: string | null, fuso: string): string {
   return `${String(p.dia).padStart(2, "0")}/${String(p.mes).padStart(2, "0")}/${p.ano}`;
 }
 
+const DIAS_SEMANA = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+
+const MESES_CURTOS = [
+  "jan", "fev", "mar", "abr", "mai", "jun",
+  "jul", "ago", "set", "out", "nov", "dez",
+];
+
+/** Como se chama a granularidade do gráfico, em português claro. */
+export const ROTULO_BUCKET: Record<BucketSerie, string> = {
+  hour: "hora a hora",
+  day: "dia a dia",
+  week: "semana a semana",
+  month: "mês a mês",
+};
+
+/**
+ * Rótulo completo de um ponto da série, para o tooltip.
+ *
+ * O rótulo curto do eixo ("14h", "03/09") é ambíguo fora de contexto: não dá
+ * para saber de que dia é aquela hora, nem se "03/09" é um dia ou a semana que
+ * começa nele. Aqui o ponto se explica sozinho.
+ */
+export function rotuloCompletoDoBalde(iso: string, bucket: BucketSerie, fuso: string): string {
+  const p = partesNoFuso(new Date(iso), fuso);
+  const dd = String(p.dia).padStart(2, "0");
+  const mm = String(p.mes).padStart(2, "0");
+  const hh = String(p.hora).padStart(2, "0");
+
+  switch (bucket) {
+    case "hour":
+      return `${dd}/${mm}, ${hh}h às ${String((p.hora + 1) % 24).padStart(2, "0")}h`;
+    case "day": {
+      // Dia da semana da data LOCAL: montar em UTC a partir das partes já
+      // convertidas evita o deslocamento de um dia em fuso à frente de UTC.
+      const diaSemana = DIAS_SEMANA[new Date(Date.UTC(p.ano, p.mes - 1, p.dia)).getUTCDay()];
+      return `${diaSemana}, ${dd}/${mm}/${p.ano}`;
+    }
+    case "week":
+      return `semana de ${dd}/${mm}/${p.ano}`;
+    case "month":
+      return `${MESES_CURTOS[p.mes - 1]} de ${p.ano}`;
+  }
+}
+
 /** Rótulo de um ponto da série, adequado ao bucket em uso. */
 export function rotuloDoBalde(iso: string, bucket: BucketSerie, fuso: string): string {
   const p = partesNoFuso(new Date(iso), fuso);
@@ -131,6 +175,16 @@ export function faixaIndice(indice: number | null): {
   if (indice >= 70) return { rotulo: "alto", cor: "#34d399", classe: "text-emerald-400" };
   if (indice >= 45) return { rotulo: "médio", cor: "#fbbf24", classe: "text-amber-400" };
   return { rotulo: "baixo", cor: "#fb7185", classe: "text-rose-400" };
+}
+
+/**
+ * O agregado guarda aplicativo e site no mesmo campo de texto, então "é
+ * processo ou domínio?" se decide pelo nome. O agente sempre grava processo
+ * terminando em ".exe" — mesma regra usada pela RPC painel_catalogo_apps
+ * (migration 0012). Se mudar aqui, mudar lá também.
+ */
+export function ehProcessoWindows(alvo: string): boolean {
+  return alvo.toLowerCase().endsWith(".exe");
 }
 
 /**

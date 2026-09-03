@@ -13,9 +13,11 @@ import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, paramsDoRecorte, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
+  KPIS_ESCALA_VAZIO,
   KPIS_VAZIOS,
   buscarDistribuicao,
   buscarKpisComparados,
+  buscarKpisEscala,
   buscarRelatorioDiario,
   buscarSerie,
 } from "@/lib/consultas";
@@ -60,7 +62,7 @@ export default async function PaginaDetalhePessoa({
     dispositivoId: null,
   };
 
-  const [kpis, serie, distribuicao, diario] = await Promise.all([
+  const [kpis, escala, serie, distribuicao, diario] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
       atual: KPIS_VAZIOS,
       anterior: KPIS_VAZIOS,
@@ -71,12 +73,13 @@ export default async function PaginaDetalhePessoa({
         interacoes: null,
       },
     }),
+    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 10), []),
     comFalha(buscarRelatorioDiario(supabase, periodo, escopo) as Promise<LinhaDia[]>, []),
   ]);
 
-  const erro = primeiroErro(kpis, serie, distribuicao, diario);
+  const erro = primeiroErro(kpis, escala, serie, distribuicao, diario);
 
   return (
     <div className="space-y-5">
@@ -96,11 +99,21 @@ export default async function PaginaDetalhePessoa({
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      <BentoKpis dados={kpis.dados} rotuloComparacao={rotuloComparacao(periodo)} />
+      <BentoKpis
+        dados={kpis.dados}
+        rotuloComparacao={rotuloComparacao(periodo)}
+        escala={escala.dados}
+      />
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
         <div className="min-w-0 xl:col-span-3">
-          <GraficoArea dados={serie.dados} titulo="Atividade no período" />
+          <GraficoArea
+            dados={serie.dados}
+            bucket={periodo.bucket}
+            fuso={fuso}
+            periodoRotulo={periodo.rotulo}
+            titulo="Atividade no período"
+          />
         </div>
         <div className="min-w-0 xl:col-span-2">
           <GraficoDonut dados={distribuicao.dados} titulo="Ferramentas mais usadas" />

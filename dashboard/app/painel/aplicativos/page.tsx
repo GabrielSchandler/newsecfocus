@@ -10,7 +10,12 @@ import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
-import { buscarColaboradores, buscarDistribuicao, buscarEquipes } from "@/lib/consultas";
+import {
+  buscarCategorias,
+  buscarColaboradores,
+  buscarDistribuicao,
+  buscarEquipes,
+} from "@/lib/consultas";
 import { ROTULOS_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +35,13 @@ export default async function PaginaAplicativos({
 
   const org = orgEfetiva(contexto, escopo);
 
-  const [equipes, colaboradores, distribuicao] = await Promise.all([
+  const admin = podeAdministrar(contexto);
+
+  const [equipes, colaboradores, distribuicao, categorias] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
+    admin ? comFalha(buscarCategorias(supabase, org), []) : Promise.resolve({ dados: [], erro: null }),
   ]);
 
   const erro = primeiroErro(equipes, colaboradores, distribuicao);
@@ -70,7 +78,7 @@ export default async function PaginaAplicativos({
         />
       ) : (
         <>
-          {minutosSemCategoria > 0 && podeAdministrar(contexto) && (
+          {minutosSemCategoria > 0 && admin && (
             <p className="rounded-xl2 border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs leading-relaxed text-amber-200/90">
               {semCategoria.length}{" "}
               {semCategoria.length === 1 ? "ferramenta representa" : "ferramentas representam"}{" "}
@@ -87,7 +95,12 @@ export default async function PaginaAplicativos({
           )}
 
           <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <GraficoDonut dados={apps.slice(0, 8)} titulo="Top 8 do período" />
+            <GraficoDonut
+              dados={apps.slice(0, 8)}
+              titulo="Top 8 do período"
+              categorias={categorias.dados}
+              podeClassificar={admin}
+            />
 
             <div className="rounded-xl2 border border-borda vidro p-5">
               <h3 className="text-sm font-medium text-slate-200">Por categoria</h3>

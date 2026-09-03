@@ -9,16 +9,19 @@ import { GraficoBarras } from "@/components/painel/grafico-barras";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
-import { carregarContexto } from "@/lib/sessao";
+import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, orgEfetiva, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
+  KPIS_ESCALA_VAZIO,
   KPIS_VAZIOS,
+  buscarCategorias,
   buscarColaboradores,
   buscarDispositivos,
   buscarDistribuicao,
   buscarEquipes,
   buscarKpisComparados,
+  buscarKpisEscala,
   buscarRankingEquipes,
   buscarSerie,
   buscarTempoReal,
@@ -42,13 +45,17 @@ export default async function PaginaVisaoGeral({
   const fuso = contexto.empresa.fuso;
   const org = orgEfetiva(contexto, escopo);
 
-  const [equipes, colaboradores, dispositivos] = await Promise.all([
+  const admin = podeAdministrar(contexto);
+
+  const [equipes, colaboradores, dispositivos, categorias] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarDispositivos(supabase, org), []),
+    // Só quem administra classifica direto da distribuição.
+    admin ? comFalha(buscarCategorias(supabase, org), []) : Promise.resolve({ dados: [], erro: null }),
   ]);
 
-  const [kpis, serie, distribuicao, rankingEquipes, tempoReal] = await Promise.all([
+  const [kpis, escala, serie, distribuicao, rankingEquipes, tempoReal] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
       atual: KPIS_VAZIOS,
       anterior: KPIS_VAZIOS,
@@ -59,13 +66,14 @@ export default async function PaginaVisaoGeral({
         interacoes: null,
       },
     }),
+    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
     comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []),
     comFalha(buscarTempoReal(supabase, escopo.orgId), []),
   ]);
 
-  const erro = primeiroErro(kpis, serie, distribuicao, rankingEquipes, tempoReal);
+  const erro = primeiroErro(kpis, escala, serie, distribuicao, rankingEquipes, tempoReal);
 
   // Comparar equipes só faz sentido quando o recorte não é de uma equipe só.
   const mostrarComparativo =
@@ -93,14 +101,27 @@ export default async function PaginaVisaoGeral({
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      <BentoKpis dados={kpis.dados} rotuloComparacao={rotuloComparacao(periodo)} />
+      <BentoKpis
+        dados={kpis.dados}
+        rotuloComparacao={rotuloComparacao(periodo)}
+        escala={escala.dados}
+      />
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
         <div className="min-w-0 xl:col-span-3">
-          <GraficoArea dados={serie.dados} />
+          <GraficoArea
+            dados={serie.dados}
+            bucket={periodo.bucket}
+            fuso={fuso}
+            periodoRotulo={periodo.rotulo}
+          />
         </div>
         <div className="min-w-0 xl:col-span-2">
-          <GraficoDonut dados={distribuicao.dados} />
+          <GraficoDonut
+            dados={distribuicao.dados}
+            categorias={categorias.dados}
+            podeClassificar={admin}
+          />
         </div>
       </div>
 
