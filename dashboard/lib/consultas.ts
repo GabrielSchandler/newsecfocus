@@ -19,6 +19,7 @@ import type {
   FatiaDistribuicao,
   Kpis,
   KpisComparados,
+  LinhaCatalogoApp,
   LinhaHorasExtras,
   LinhaRankingColaborador,
   LinhaRankingEquipe,
@@ -232,6 +233,26 @@ export async function buscarMapeamentos(
       categoria_tipo: cat?.type ?? null,
     };
   });
+}
+
+export async function buscarCatalogoApps(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<LinhaCatalogoApp[]> {
+  const { data, error } = await supabase.rpc("painel_catalogo_apps", { p_org: orgId ?? null });
+  if (error) throw error;
+
+  return (data ?? []).map((r: any) => ({
+    alvo: r.alvo,
+    ehProcesso: !!r.eh_processo,
+    mapeamentoId: r.mapeamento_id,
+    categoryId: r.category_id,
+    categoriaNome: r.categoria_nome,
+    categoriaTipo: r.categoria_tipo,
+    primeiroVisto: r.primeiro_visto,
+    ultimoVisto: r.ultimo_visto,
+    minutosTotais: num(r.minutos_totais),
+  }));
 }
 
 // ----------------------------------------------------------------------------

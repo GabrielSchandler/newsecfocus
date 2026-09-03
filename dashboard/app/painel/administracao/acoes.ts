@@ -253,6 +253,47 @@ export async function excluirMapeamento(
 }
 
 /**
+ * Classifica direto da tela de catálogo: cria a regra se o app/site ainda não
+ * tinha uma (mapeamento_id vazio) ou troca a categoria de uma regra
+ * existente. eh_processo decide se o alvo detectado vira process_name ou
+ * domain — ver o comentário da migration 0012 sobre por que isso não dá pra
+ * saber só olhando o agregado.
+ */
+export async function classificarApp(
+  _anterior: ResultadoAcao | null,
+  dados: FormData,
+): Promise<ResultadoAcao> {
+  const supabase = await criarClienteServidor();
+  const contexto = await carregarContexto(supabase);
+  if (!contexto) return FALHA("Sessão expirada.");
+
+  const alvo = texto(dados, "alvo");
+  const ehProcesso = dados.get("eh_processo") === "true";
+  const categoria = texto(dados, "category_id");
+  const mapeamentoId = texto(dados, "mapeamento_id");
+
+  if (!alvo) return FALHA("App ou site não informado.");
+  if (!categoria) return FALHA("Escolha a categoria.");
+
+  const registro = {
+    org_id: contexto.empresa.id,
+    process_name: ehProcesso ? alvo : null,
+    domain: ehProcesso ? null : alvo,
+    category_id: categoria,
+  };
+
+  const { error } = mapeamentoId
+    ? await supabase.from("app_mappings").update({ category_id: categoria }).eq("id", mapeamentoId)
+    : await supabase.from("app_mappings").insert(registro);
+
+  if (error) return FALHA(error.message);
+
+  await reconsolidar(supabase, contexto.empresa.id);
+  atualizarTelas();
+  return OK(`"${alvo}" classificado.`);
+}
+
+/**
  * Repõe o catálogo padrão de categorias e regras. Não sobrescreve o que a
  * empresa já configurou — serve para quem apagou algo sem querer ou quer
  * completar a lista depois de ver a tela de Aplicativos.

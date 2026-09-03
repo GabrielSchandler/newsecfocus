@@ -130,6 +130,19 @@ export interface Categoria {
   color: string | null;
 }
 
+/** Uma linha do catálogo de apps/sites detectados — usado, ou não, para classificar. */
+export interface LinhaCatalogoApp {
+  alvo: string;
+  ehProcesso: boolean;
+  mapeamentoId: string | null;
+  categoryId: string | null;
+  categoriaNome: string | null;
+  categoriaTipo: TipoCategoria | null;
+  primeiroVisto: string;
+  ultimoVisto: string;
+  minutosTotais: number;
+}
+
 export interface MapeamentoApp {
   id: string;
   process_name: string | null;

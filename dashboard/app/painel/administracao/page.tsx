@@ -14,6 +14,7 @@ import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import {
+  buscarCatalogoApps,
   buscarCategorias,
   buscarColaboradores,
   buscarEquipes,
@@ -55,11 +56,12 @@ export default async function PaginaAdministracao({
 
   const org = contexto.empresa.id;
 
-  const [equipes, colaboradores, categorias, mapeamentos, organizacao, usuarios] = await Promise.all([
+  const [equipes, colaboradores, categorias, mapeamentos, catalogo, organizacao, usuarios] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarCategorias(supabase, org), []),
     comFalha(buscarMapeamentos(supabase, org), []),
+    comFalha(buscarCatalogoApps(supabase, org), []),
     comFalha(
       (async () => {
         const { data } = await supabase
@@ -76,7 +78,7 @@ export default async function PaginaAdministracao({
     comFalha(buscarUsuariosAcesso(supabase, org), []),
   ]);
 
-  const erro = primeiroErro(equipes, colaboradores, categorias, mapeamentos);
+  const erro = primeiroErro(equipes, colaboradores, categorias, mapeamentos, catalogo);
 
   const semEquipe = colaboradores.dados.filter((c) => !c.team_id).length;
 
@@ -136,7 +138,11 @@ export default async function PaginaAdministracao({
       )}
 
       {aba === "classificacao" && (
-        <PainelClassificacao categorias={categorias.dados} mapeamentos={mapeamentos.dados} />
+        <PainelClassificacao
+          categorias={categorias.dados}
+          mapeamentos={mapeamentos.dados}
+          catalogo={catalogo.dados}
+        />
       )}
 
       {aba === "agente" && (

@@ -12,6 +12,7 @@ import { ROTULOS_TIPO, formatarHorasCurto } from "@/lib/formato";
 import { CodigoInstalacao } from "./codigo-instalacao";
 import {
   aplicarCatalogoPadrao,
+  classificarApp,
   excluirCategoria,
   excluirEquipe,
   excluirMapeamento,
@@ -22,7 +23,14 @@ import {
   salvarMapeamento,
   type ResultadoAcao,
 } from "./acoes";
-import type { Categoria, Colaborador, ContextoSessao, Equipe, MapeamentoApp } from "@/lib/tipos";
+import type {
+  Categoria,
+  Colaborador,
+  ContextoSessao,
+  Equipe,
+  LinhaCatalogoApp,
+  MapeamentoApp,
+} from "@/lib/tipos";
 
 // ----------------------------------------------------------------------------
 //  Peças compartilhadas
@@ -372,9 +380,11 @@ function FormularioColaborador({
 export function PainelClassificacao({
   categorias,
   mapeamentos,
+  catalogo,
 }: {
   categorias: Categoria[];
   mapeamentos: MapeamentoApp[];
+  catalogo: LinhaCatalogoApp[];
 }) {
   return (
     <div className="space-y-4">
@@ -384,12 +394,13 @@ export function PainelClassificacao({
           Cada aplicativo ou site é ligado a uma categoria, e a categoria diz se aquele tempo é
           produtivo, neutro ou improdutivo. O índice é o tempo produtivo dividido pelo tempo
           classificado. O que não tem regra fica de fora da conta — por isso vale classificar
-          primeiro o que mais aparece na tela de Aplicativos. Ao salvar uma regra, os últimos 90
-          dias são recalculados automaticamente.
+          primeiro o que mais aparece no catálogo abaixo. Ao salvar uma regra, os últimos 90 dias
+          são recalculados automaticamente.
         </p>
       </Card>
 
       <BotaoCatalogoPadrao />
+      <CatalogoApps catalogo={catalogo} categorias={categorias} />
       <FormularioCategoria categorias={categorias} />
       <FormularioMapeamento categorias={categorias} mapeamentos={mapeamentos} />
     </div>
@@ -412,6 +423,102 @@ function BotaoCatalogoPadrao() {
         <Mensagem estado={estado} />
       </form>
     </Card>
+  );
+}
+
+/** app.ultimoVisto vem como "AAAA-MM-DD" (coluna date, sem hora) — sem fuso pra converter. */
+function formatarDataCurta(data: string): string {
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano.slice(2)}`;
+}
+
+/**
+ * Catálogo de tudo que já foi detectado nas estações, para classificar sem
+ * precisar digitar processo/domínio de cabeça. O que ainda não tem regra
+ * fica destacado e sobe para o topo da lista (a RPC já ordena assim) — é o
+ * "precisa classificar" que aparece assim que uma ferramenta nova sobe.
+ */
+function CatalogoApps({
+  catalogo,
+  categorias,
+}: {
+  catalogo: LinhaCatalogoApp[];
+  categorias: Categoria[];
+}) {
+  const pendentes = catalogo.filter((a) => !a.mapeamentoId).length;
+
+  return (
+    <Card className="p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-medium text-slate-200">Aplicativos e sites detectados</h3>
+        {pendentes > 0 && <Badge variante="ocioso">{pendentes} aguardando classificação</Badge>}
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-slate-500">
+        Tudo que já apareceu em alguma estação, com o tempo acumulado. Escolha a categoria e ela
+        vale a partir de agora — o histórico dos últimos 90 dias é recalculado sozinho.
+      </p>
+
+      {categorias.length === 0 ? (
+        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-200/90">
+          Crie ao menos uma categoria (ou aplique o catálogo padrão acima) antes de classificar.
+        </p>
+      ) : catalogo.length === 0 ? (
+        <p className="mt-4 text-center text-sm text-slate-500">
+          Nada detectado ainda. Assim que uma estação sincronizar, os aplicativos e sites usados
+          aparecem aqui.
+        </p>
+      ) : (
+        <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
+          {catalogo.map((app) => (
+            <LinhaCatalogo key={`${app.ehProcesso}:${app.alvo}`} app={app} categorias={categorias} />
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+function LinhaCatalogo({ app, categorias }: { app: LinhaCatalogoApp; categorias: Categoria[] }) {
+  const [estado, enviar] = useFormState(classificarApp, null);
+  const [categoriaId, setCategoriaId] = useState(app.categoryId ?? "");
+  const pendente = !app.mapeamentoId;
+
+  return (
+    <li className={`flex flex-wrap items-center gap-3 py-3 ${pendente ? "bg-amber-500/5" : ""}`}>
+      <form action={enviar} className="flex flex-1 flex-wrap items-center gap-3">
+        <input type="hidden" name="alvo" value={app.alvo} />
+        <input type="hidden" name="eh_processo" value={String(app.ehProcesso)} />
+        {app.mapeamentoId && <input type="hidden" name="mapeamento_id" value={app.mapeamentoId} />}
+
+        <div className="min-w-0 flex-1">
+          <span className="block truncate font-mono text-sm text-slate-200">{app.alvo}</span>
+          <span className="block text-xs text-slate-500">
+            {app.ehProcesso ? "programa" : "site"} · {formatarHorasCurto(app.minutosTotais)} no
+            total · visto até {formatarDataCurta(app.ultimoVisto)}
+          </span>
+        </div>
+
+        {pendente && (
+          <Badge variante="ocioso" className="shrink-0">
+            classificar
+          </Badge>
+        )}
+
+        <Select
+          aria-label={`Categoria de ${app.alvo}`}
+          className="w-48 shrink-0"
+          valor={categoriaId}
+          aoMudar={setCategoriaId}
+          opcoes={[
+            { valor: "", rotulo: "— escolher categoria —" },
+            ...categorias.map((c) => ({ valor: c.id, rotulo: `${c.name} · ${ROTULOS_TIPO[c.type]}` })),
+          ]}
+        />
+
+        <BotaoEnviar>{pendente ? "Classificar" : "Salvar"}</BotaoEnviar>
+        <Mensagem estado={estado} />
+      </form>
+    </li>
   );
 }
 
