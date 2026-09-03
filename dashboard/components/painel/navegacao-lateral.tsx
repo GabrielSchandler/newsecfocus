@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity,
+  AlarmClockCheck,
   AppWindow,
   Building2,
   FileSpreadsheet,
@@ -29,6 +30,7 @@ const ICONES: Record<IconeMenu, typeof LayoutDashboard> = {
   pessoas: UserSquare2,
   aplicativos: AppWindow,
   dispositivos: MonitorSmartphone,
+  horasExtras: AlarmClockCheck,
   registros: ScrollText,
   relatorios: FileSpreadsheet,
   administracao: Settings,

@@ -237,9 +237,33 @@ $exeServico = Join-Path $PastaInstalacao 'Telemetria.Servico.exe'
 $ok = $true
 
 $ok = $ok -and (Escrever-Passo "Parando versao anterior (se houver)" {
-    & sc.exe stop $NomeServico 2>&1 | Out-Null
-    Start-Sleep -Milliseconds 400
-    & sc.exe delete $NomeServico 2>&1 | Out-Null
+    $servicoAntigo = Get-Service -Name $NomeServico -ErrorAction SilentlyContinue
+    if ($servicoAntigo) {
+        & sc.exe stop $NomeServico 2>&1 | Out-Null
+
+        # Espera de verdade o processo antigo sair da memoria — sem isso, o
+        # `sc.exe create` seguinte pode falhar (servico "pendente de exclusao")
+        # ou, pior, ter sucesso sem que o processo antigo tenha realmente
+        # morrido, deixando o binario ANTIGO rodando enquanto os arquivos NOVOS
+        # sao copiados por cima. Foi exatamente isso que aconteceu na primeira
+        # vez que este script rodou numa maquina real (03/09/2026): o PID do
+        # servico continuou o mesmo antes e depois de uma "reinstalacao".
+        $limite = (Get-Date).AddSeconds(15)
+        while ((Get-Process -Name 'Telemetria.Servico' -ErrorAction SilentlyContinue) -and (Get-Date) -lt $limite) {
+            Start-Sleep -Milliseconds 300
+        }
+        Get-Process -Name 'Telemetria.Servico' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+
+        & sc.exe delete $NomeServico 2>&1 | Out-Null
+
+        # sc.exe delete e assincrono no SCM: o nome pode ficar "pendente de
+        # exclusao" por um instante antes de liberar de verdade para recriar.
+        $limite2 = (Get-Date).AddSeconds(10)
+        while ((Get-Service -Name $NomeServico -ErrorAction SilentlyContinue) -and (Get-Date) -lt $limite2) {
+            Start-Sleep -Milliseconds 300
+        }
+    }
+    Get-Process -Name 'Telemetria.Coletor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     $true
 })
 

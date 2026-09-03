@@ -19,6 +19,7 @@ export type IconeMenu =
   | "pessoas"
   | "aplicativos"
   | "dispositivos"
+  | "horasExtras"
   | "registros"
   | "relatorios"
   | "administracao"
@@ -41,6 +42,7 @@ export function itensDoMenu(opcoes: {
     { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas" },
     { href: "/painel/aplicativos", rotulo: "Aplicativos", icone: "aplicativos" },
     { href: "/painel/dispositivos", rotulo: "Dispositivos", icone: "dispositivos" },
+    { href: "/painel/horas-extras", rotulo: "Horas extras", icone: "horasExtras" },
     { href: "/painel/registros", rotulo: "Registros", icone: "registros" },
     { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios" },
   ];

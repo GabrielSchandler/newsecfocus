@@ -19,6 +19,7 @@ import type {
   FatiaDistribuicao,
   Kpis,
   KpisComparados,
+  LinhaHorasExtras,
   LinhaRankingColaborador,
   LinhaRankingEquipe,
   LinhaTempoReal,
@@ -116,7 +117,9 @@ export async function buscarColaboradores(
 ): Promise<Colaborador[]> {
   let consulta = supabase
     .from("employees")
-    .select("id, team_id, os_user, nome, cargo, email, ativo, jornada_minutos_dia, teams(nome)")
+    .select(
+      "id, team_id, os_user, nome, cargo, email, ativo, jornada_minutos_dia, jornada_hora_inicio, jornada_hora_fim, perfil_completo, teams(nome)",
+    )
     .order("nome", { nullsFirst: false });
 
   if (equipeId) consulta = consulta.eq("team_id", equipeId);
@@ -135,6 +138,9 @@ export async function buscarColaboradores(
     email: e.email,
     ativo: e.ativo,
     jornada_minutos_dia: e.jornada_minutos_dia,
+    jornada_hora_inicio: e.jornada_hora_inicio,
+    jornada_hora_fim: e.jornada_hora_fim,
+    perfil_completo: e.perfil_completo ?? false,
   }));
 }
 
@@ -431,6 +437,42 @@ export async function buscarRankingColaboradores(
     cliques: num(r.cliques),
     indice: numOuNulo(r.indice),
     aderencia: numOuNulo(r.aderencia),
+  }));
+}
+
+// ----------------------------------------------------------------------------
+//  Horas extras — atividade fora da janela de jornada esperada
+// ----------------------------------------------------------------------------
+
+export async function buscarHorasExtras(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<LinhaHorasExtras[]> {
+  // Sem p_dispositivo: a RPC não tem esse parâmetro (horas extras são por
+  // colaborador, não por estação) — espalhar paramsEscopo() quebraria a chamada.
+  const { data, error } = await supabase.rpc("painel_horas_extras", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+
+  if (error) throw error;
+
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    cargo: r.cargo,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    temJanelaDefinida: !!r.tem_janela_definida,
+    minutosExtras: num(r.minutos_extras),
+    diasComHoraExtra: num(r.dias_com_hora_extra),
+    minutosAtivosTotais: num(r.minutos_ativos_totais),
+    percentualExtra: numOuNulo(r.percentual_extra),
+    janela: r.janela ?? null,
   }));
 }
 

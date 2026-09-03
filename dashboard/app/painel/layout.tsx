@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { NavegacaoLateral } from "@/components/painel/navegacao-lateral";
 import { itensDoMenu } from "@/lib/menu";
 import { BarraTopo } from "@/components/painel/barra-topo";
+import { BannerPendencias } from "@/components/painel/banner-pendencias";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { buscarEmpresasClientes } from "@/lib/consultas";
@@ -34,7 +35,10 @@ export default async function LayoutPainel({ children }: { children: React.React
       <NavegacaoLateral itens={itens} />
       <div className="flex min-w-0 flex-1 flex-col">
         <BarraTopo contexto={contexto} itens={itens} empresas={empresas} />
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className="flex-1 space-y-4 p-4 sm:p-6">
+          <BannerPendencias />
+          {children}
+        </main>
       </div>
     </div>
   );

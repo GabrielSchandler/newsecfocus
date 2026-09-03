@@ -99,6 +99,7 @@ const ROTAS = [
   ["/painel/pessoas", "Pessoas"],
   ["/painel/aplicativos", "Aplicativos"],
   ["/painel/dispositivos", "Dispositivos"],
+  ["/painel/horas-extras", "Horas extras"],
   ["/painel/registros", "Registros"],
   ["/painel/registros?estado=OCIOSO&pagina=2", "Registros — filtro e página 2"],
   ["/painel/relatorios", "Relatórios"],

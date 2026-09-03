@@ -33,6 +33,9 @@ export interface ContextoSessao {
     retencaoDias: number;
     /** Jornada diária padrão da empresa, em minutos. Base da aderência. */
     jornadaPadraoMinutos: number;
+    /** Início/fim esperado do expediente (HH:MM). NULL = sem controle de horas extras por padrão. */
+    jornadaPadraoHoraInicio: string | null;
+    jornadaPadraoHoraFim: string | null;
     /** Código de 12 dígitos digitado no instalador do agente. */
     codigoInstalacao: string | null;
   };
@@ -79,6 +82,11 @@ export interface Colaborador {
   ativo: boolean;
   /** NULL = herda a jornada padrão da empresa. */
   jornada_minutos_dia: number | null;
+  /** Exceção de horário desta pessoa (HH:MM). NULL = herda o padrão da empresa. */
+  jornada_hora_inicio: string | null;
+  jornada_hora_fim: string | null;
+  /** Falso até um administrador salvar esta pessoa — "aguardando configuração". */
+  perfil_completo: boolean;
 }
 
 export interface Dispositivo {
@@ -253,6 +261,24 @@ export interface LinhaRankingColaborador {
   cliques: number;
   indice: number | null;
   aderencia: number | null;
+}
+
+/** Uma linha do ranking de horas extras — atividade fora da janela de jornada. */
+export interface LinhaHorasExtras {
+  colaboradorId: string;
+  colaborador: string;
+  cargo: string | null;
+  equipeId: string | null;
+  equipe: string | null;
+  /** Falso quando a pessoa não tem janela própria nem herdada da empresa. */
+  temJanelaDefinida: boolean;
+  minutosExtras: number;
+  diasComHoraExtra: number;
+  minutosAtivosTotais: number;
+  /** NULL quando não há janela definida — nunca tratado como 0%. */
+  percentualExtra: number | null;
+  /** "09:00–18:00", ou null sem janela definida. */
+  janela: string | null;
 }
 
 export interface LinhaTempoReal {

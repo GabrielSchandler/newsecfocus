@@ -111,7 +111,12 @@ export async function salvarColaborador(
       jornada_minutos_dia: texto(dados, "jornada_minutos_dia")
         ? inteiro(dados, "jornada_minutos_dia", 480)
         : null,
+      jornada_hora_inicio: texto(dados, "jornada_hora_inicio"),
+      jornada_hora_fim: texto(dados, "jornada_hora_fim"),
       ativo: dados.get("ativo") === "on" || dados.get("ativo") === "true",
+      // Salvar aqui é o sinal de "um administrador olhou para esta pessoa" —
+      // é o que tira o aviso de "aguardando configuração" do painel.
+      perfil_completo: true,
     })
     .eq("id", id);
 
@@ -300,6 +305,19 @@ export async function salvarEmpresa(
     return FALHA("A jornada padrão precisa ficar entre 60 e 1440 minutos.");
   }
 
+  const horario = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+  const janelaInicio = texto(dados, "jornada_padrao_hora_inicio");
+  const janelaFim = texto(dados, "jornada_padrao_hora_fim");
+
+  if ((janelaInicio && !horario.test(janelaInicio)) || (janelaFim && !horario.test(janelaFim))) {
+    return FALHA("Horário do expediente inválido. Use HH:MM, por exemplo 09:00.");
+  }
+  if ((janelaInicio && !janelaFim) || (!janelaInicio && janelaFim)) {
+    return FALHA(
+      "Preencha início e fim do expediente, ou deixe os dois vazios para não medir horas extras.",
+    );
+  }
+
   const { error } = await supabase
     .from("organizations")
     .update({
@@ -307,6 +325,8 @@ export async function salvarEmpresa(
       fuso: texto(dados, "fuso") ?? contexto.empresa.fuso,
       retencao_dias: retencao,
       jornada_padrao_minutos: jornada,
+      jornada_padrao_hora_inicio: janelaInicio,
+      jornada_padrao_hora_fim: janelaFim,
       contato_email: texto(dados, "contato_email"),
       sync_interval_minutes: Number(dados.get("sync_interval_minutes")) || null,
     })

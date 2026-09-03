@@ -287,6 +287,9 @@ function FormularioColaborador({
           <Badge variante="neutro">{colaborador.os_user}</Badge>
           {!colaborador.ativo && <Badge variante="offline">inativo</Badge>}
           {!colaborador.team_id && <Badge variante="ocioso">sem equipe</Badge>}
+          {!colaborador.perfil_completo && (
+            <Badge variante="ocioso">aguardando configuração</Badge>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -326,6 +329,20 @@ function FormularioColaborador({
               step={30}
               placeholder={String(jornadaPadrao)}
               defaultValue={colaborador.jornada_minutos_dia ?? ""}
+            />
+          </Campo>
+          <Campo rotulo="Início do expediente" dica="vazio = padrão da empresa">
+            <Input
+              type="time"
+              name="jornada_hora_inicio"
+              defaultValue={colaborador.jornada_hora_inicio ?? ""}
+            />
+          </Campo>
+          <Campo rotulo="Fim do expediente" dica="atividade fora disso conta como hora extra">
+            <Input
+              type="time"
+              name="jornada_hora_fim"
+              defaultValue={colaborador.jornada_hora_fim ?? ""}
             />
           </Campo>
         </div>
@@ -569,6 +586,8 @@ export function PainelEmpresa({
   const [estado, enviar] = useFormState(salvarEmpresa, null);
   const [fuso, setFuso] = useState(contexto.empresa.fuso);
   const somenteLeitura = contexto.papel !== "OWNER";
+  const jornadaJaDefinida =
+    !!contexto.empresa.jornadaPadraoHoraInicio && !!contexto.empresa.jornadaPadraoHoraFim;
 
   return (
     <div className="space-y-4">
@@ -619,6 +638,29 @@ export function PainelEmpresa({
               max={1440}
               step={30}
               defaultValue={contexto.empresa.jornadaPadraoMinutos}
+              disabled={somenteLeitura}
+            />
+          </Campo>
+          <Campo
+            rotulo="Início do expediente"
+            dica={
+              jornadaJaDefinida
+                ? "janela padrão da empresa"
+                : "vazio = sem controle de horas extras por padrão"
+            }
+          >
+            <Input
+              type="time"
+              name="jornada_padrao_hora_inicio"
+              defaultValue={contexto.empresa.jornadaPadraoHoraInicio ?? ""}
+              disabled={somenteLeitura}
+            />
+          </Campo>
+          <Campo rotulo="Fim do expediente" dica="atividade fora disso conta como hora extra">
+            <Input
+              type="time"
+              name="jornada_padrao_hora_fim"
+              defaultValue={contexto.empresa.jornadaPadraoHoraFim ?? ""}
               disabled={somenteLeitura}
             />
           </Campo>
