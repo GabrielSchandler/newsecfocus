@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,13 +9,11 @@ import {
   Building2,
   FileSpreadsheet,
   LayoutDashboard,
-  Menu,
   MonitorSmartphone,
   ScrollText,
   Settings,
   Users,
   UserSquare2,
-  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { IconeMenu, ItemNavegacao } from "@/lib/menu";
@@ -56,15 +53,7 @@ function Marca() {
   );
 }
 
-function ListaLinks({
-  itens,
-  caminho,
-  aoNavegar,
-}: {
-  itens: ItemNavegacao[];
-  caminho: string;
-  aoNavegar?: () => void;
-}) {
+function ListaLinks({ itens, caminho }: { itens: ItemNavegacao[]; caminho: string }) {
   return (
     <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
       {itens.map(({ href, rotulo, icone }) => {
@@ -74,7 +63,6 @@ function ListaLinks({
           <Link
             key={href}
             href={href}
-            onClick={aoNavegar}
             aria-current={ativo ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
@@ -112,77 +100,5 @@ export function NavegacaoLateral({ itens }: { itens: ItemNavegacao[] }) {
       <ListaLinks itens={itens} caminho={caminho} />
       <Rodape />
     </aside>
-  );
-}
-
-/**
- * Menu do celular. Sem isso a navegação simplesmente sumia abaixo de 1024px —
- * a lateral era `hidden lg:flex` e não havia alternativa.
- */
-export function MenuMobile({ itens }: { itens: ItemNavegacao[] }) {
-  const [aberto, setAberto] = useState(false);
-  const caminho = usePathname();
-
-  // Fecha ao trocar de rota e trava a rolagem do fundo enquanto está aberto.
-  useEffect(() => setAberto(false), [caminho]);
-
-  useEffect(() => {
-    if (!aberto) return;
-    const anterior = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function aoTeclar(e: KeyboardEvent) {
-      if (e.key === "Escape") setAberto(false);
-    }
-    document.addEventListener("keydown", aoTeclar);
-
-    return () => {
-      document.body.style.overflow = anterior;
-      document.removeEventListener("keydown", aoTeclar);
-    };
-  }, [aberto]);
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setAberto(true)}
-        aria-label="Abrir menu"
-        aria-expanded={aberto}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-borda text-slate-300 transition-colors hover:bg-slate-800/60 lg:hidden"
-      >
-        <Menu className="h-4 w-4" />
-      </button>
-
-      {aberto && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
-            onClick={() => setAberto(false)}
-            aria-hidden
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu de navegação"
-            className="absolute inset-y-0 left-0 flex w-64 animate-entrada-suave flex-col border-r border-borda bg-fundo"
-          >
-            <div className="flex items-center justify-between pr-3">
-              <Marca />
-              <button
-                type="button"
-                onClick={() => setAberto(false)}
-                aria-label="Fechar menu"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800/60"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <ListaLinks itens={itens} caminho={caminho} aoNavegar={() => setAberto(false)} />
-            <Rodape />
-          </div>
-        </div>
-      )}
-    </>
   );
 }

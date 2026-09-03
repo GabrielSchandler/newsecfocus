@@ -6,6 +6,7 @@ import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { SeletorPeriodo } from "./seletor-periodo";
+import { FiltrosCelular } from "./filtros-celular";
 import { periodoParaParams } from "@/lib/periodos";
 import type { Colaborador, Dispositivo, Equipe, Escopo, Periodo } from "@/lib/tipos";
 
@@ -84,9 +85,27 @@ export function BarraFiltros({
     !!escopo.equipeId || !!escopo.colaboradorId || !!escopo.dispositivoId;
 
   return (
+    <>
+      {/* Celular e desktop mostram os mesmos filtros com desenhos diferentes.
+          Os dois leem o mesmo estado (a URL), então não há o que sincronizar —
+          cada um simplesmente aparece na sua faixa de largura. */}
+      <FiltrosCelular
+        periodo={periodo}
+        escopo={escopo}
+        fuso={fuso}
+        equipes={equipes}
+        colaboradores={colaboradores}
+        dispositivos={dispositivos}
+        mostrarEquipe={mostrarEquipe}
+        mostrarColaborador={mostrarColaborador}
+        mostrarDispositivo={mostrarDispositivo}
+        aoMudarPeriodo={mudarPeriodo}
+        aoAplicar={aplicar}
+      />
+
     <section
       aria-label="Filtros do painel"
-      className="flex flex-col gap-4 rounded-xl2 border border-borda vidro p-4"
+      className="hidden flex-col gap-4 rounded-xl2 border border-borda vidro p-4 lg:flex"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -168,5 +187,6 @@ export function BarraFiltros({
       </div>
       )}
     </section>
+    </>
   );
 }

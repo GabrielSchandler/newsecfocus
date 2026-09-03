@@ -20,7 +20,9 @@ export function CabecalhoPagina({
   acoes,
 }: CabecalhoProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    // As ações ficam na linha do título já no celular: empurradas para baixo,
+    // gastavam uma faixa inteira de tela antes do primeiro número aparecer.
+    <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         {voltarPara && (
           <Link
@@ -35,7 +37,7 @@ export function CabecalhoPagina({
           {icone}
           <h2 className="truncate text-lg font-semibold text-slate-100">{titulo}</h2>
         </div>
-        {descricao && <p className="mt-1 text-sm text-slate-500">{descricao}</p>}
+        {descricao && <p className="mt-1 text-xs text-slate-500 sm:text-sm">{descricao}</p>}
       </div>
 
       {acoes && <div className="flex shrink-0 items-center gap-2">{acoes}</div>}

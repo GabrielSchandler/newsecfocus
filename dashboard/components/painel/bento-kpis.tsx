@@ -86,10 +86,13 @@ export function BentoKpis({ dados, rotuloComparacao, escala }: Props) {
 
   return (
     <div className="space-y-4">
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Duas colunas já no celular: em uma só, os seis cartões viravam cinco
+          telas de rolagem antes do primeiro gráfico. O herói ocupa a linha
+          inteira nos dois casos — é o número que a pessoa abre o app para ver. */}
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Herói: índice de produtividade. */}
-        <GlowCard acento="ciano" animar className="sm:col-span-2">
-          <div className="flex h-full flex-col justify-between p-6">
+        <GlowCard acento="ciano" animar className="col-span-2">
+          <div className="flex h-full flex-col justify-between p-5 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <span className="flex items-center gap-2 text-sm text-slate-400">
                 <Gauge className="h-4 w-4 text-cyan-400" />
@@ -252,13 +255,13 @@ function CartaoKpi({
 }) {
   return (
     <GlowCard>
-      <div className="flex h-full flex-col justify-between p-5">
-        <span className="flex items-center gap-2 text-sm text-slate-400">
-          {icone}
+      <div className="flex h-full flex-col justify-between p-4 sm:p-5">
+        <span className="flex items-start gap-2 text-xs leading-tight text-slate-400 sm:text-sm">
+          <span className="mt-0.5 shrink-0">{icone}</span>
           {rotulo}
         </span>
         <p className={`mt-3 font-semibold text-slate-100 ${valorClasse}`}>{valor}</p>
-        <div className="mt-3 space-y-1 text-xs">
+        <div className="mt-3 space-y-1 text-[11px] sm:text-xs">
           {rodape}
           {detalhe && <div className="text-slate-600">{detalhe}</div>}
         </div>

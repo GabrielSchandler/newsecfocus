@@ -31,6 +31,15 @@ export interface ItemNavegacao {
   icone: IconeMenu;
 }
 
+/**
+ * O que fica nas abas fixas do celular. São quatro por escolha: a quinta vaga
+ * é sempre o "Mais", e passar disso vira alvo de toque pequeno demais.
+ *
+ * A seleção é deliberada, não "os quatro primeiros do menu": no celular o
+ * gestor abre para ver como está o time agora, não para exportar relatório.
+ */
+export const ABAS_CELULAR: IconeMenu[] = ["visao", "pessoas", "equipes", "horasExtras"];
+
 /** Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece. */
 export function itensDoMenu(opcoes: {
   podeAdministrar: boolean;

@@ -23,6 +23,56 @@ body {
   color: #e2e8f0;
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+  /* Sem isto, cada toque num link pinta um retângulo cinza no Android —
+     o detalhe que mais denuncia "isto é um site" num app instalado. */
+  -webkit-tap-highlight-color: transparent;
+  /* Impede o "puxar além do fim" arrastar a página inteira no iOS. */
+  overscroll-behavior-y: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Áreas seguras (notch, ilha dinâmica e indicador de home).
+
+   Com viewport-fit=cover o conteúdo passa a ir até a borda física da tela, o
+   que é o que se quer — desde que barra de topo e navegação inferior respeitem
+   os recortes. Estas classes carregam esse respeito para onde for preciso.
+   --------------------------------------------------------------------------- */
+.area-segura-topo {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.area-segura-base {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* Espaço reservado para a navegação inferior não cobrir o fim do conteúdo. */
+.espaco-navegacao {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Feedback tátil: o toque afunda levemente, como em app nativo. */
+.toque-afunda {
+  transition: transform 0.12s ease;
+}
+.toque-afunda:active {
+  transform: scale(0.96);
+}
+
+/* Rolagem horizontal com encaixe — usada nos cartões de indicador no celular. */
+.trilho-cartoes {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.trilho-cartoes::-webkit-scrollbar {
+  display: none;
+}
+.trilho-cartoes > * {
+  scroll-snap-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toque-afunda:active {
+    transform: none;
+  }
 }
 
 /* Malha de brilho radial ao fundo — clima "futuristic enterprise". */

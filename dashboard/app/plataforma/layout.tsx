@@ -1,6 +1,7 @@
 import * as React from "react";
 import { redirect } from "next/navigation";
 import { NavegacaoLateral } from "@/components/painel/navegacao-lateral";
+import { NavegacaoInferior } from "@/components/painel/navegacao-inferior";
 import { itensDoMenu } from "@/lib/menu";
 import { BarraTopo } from "@/components/painel/barra-topo";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -30,9 +31,11 @@ export default async function LayoutPlataforma({
     <div className="flex min-h-screen">
       <NavegacaoLateral itens={itens} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <BarraTopo contexto={contexto} itens={itens} />
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <BarraTopo contexto={contexto} />
+        <main className="espaco-navegacao flex-1 p-4 sm:p-6 lg:pb-6">{children}</main>
       </div>
+
+      <NavegacaoInferior itens={itens} contexto={contexto} />
     </div>
   );
 }

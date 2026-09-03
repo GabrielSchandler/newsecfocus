@@ -2,25 +2,22 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { Activity, LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteNavegador } from "@/lib/supabase/client";
-import { MenuMobile } from "./navegacao-lateral";
 import { SeletorEmpresa } from "./seletor-empresa";
-import type { ItemNavegacao } from "@/lib/menu";
 import { ROTULO_PAPEL } from "@/lib/sessao";
 import type { ContextoSessao, EmpresaCliente } from "@/lib/tipos";
 
 interface Props {
   contexto: ContextoSessao;
-  itens: ItemNavegacao[];
   /** Só chega preenchido para a operação da NewSec. */
   empresas?: EmpresaCliente[];
   empresaAtual?: string;
 }
 
-export function BarraTopo({ contexto, itens, empresas, empresaAtual }: Props) {
+export function BarraTopo({ contexto, empresas, empresaAtual }: Props) {
   const router = useRouter();
 
   async function sair() {
@@ -36,10 +33,14 @@ export function BarraTopo({ contexto, itens, empresas, empresaAtual }: Props) {
     contexto.empresa.status === "SUSPENSA" || contexto.empresa.status === "CANCELADA";
 
   return (
-    <header className="sticky top-0 z-20 border-b border-borda bg-fundo/80 backdrop-blur-md">
+    <header className="area-segura-topo sticky top-0 z-20 border-b border-borda bg-fundo/80 backdrop-blur-md">
       <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
-        <div className="flex min-w-0 items-center gap-3">
-          <MenuMobile itens={itens} />
+        <div className="flex min-w-0 items-center gap-2.5">
+          {/* A marca só aparece no celular: no desktop ela já está na barra
+              lateral, e repetir rouba espaço do nome da empresa. */}
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 shadow-glow lg:hidden">
+            <Activity className="h-[18px] w-[18px] text-slate-950" />
+          </span>
           <div className="min-w-0 leading-tight">
             <h1 className="truncate text-base font-semibold text-slate-100">
               {contexto.empresa.nome}
@@ -64,22 +65,24 @@ export function BarraTopo({ contexto, itens, empresas, empresaAtual }: Props) {
             LGPD
           </Badge>
 
+          {/* Conta e saída moram no "Mais" da barra de abas no celular; aqui
+              ficam só para o desktop, que não tem essa barra. */}
           <Link
             href="/painel/conta"
             title="Minha conta"
-            className="flex items-center gap-2 rounded-lg border border-borda bg-fundo-suave px-2.5 py-1.5 transition-colors hover:border-slate-600"
+            className="hidden items-center gap-2 rounded-lg border border-borda bg-fundo-suave px-2.5 py-1.5 transition-colors hover:border-slate-600 lg:flex"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-cyan-500/30 to-violet-500/30 text-xs font-medium text-cyan-200">
               {iniciais}
             </span>
-            <span className="hidden max-w-[180px] truncate text-xs text-slate-400 lg:block">
+            <span className="max-w-[180px] truncate text-xs text-slate-400">
               {contexto.email}
             </span>
           </Link>
 
-          <Button variante="contorno" tamanho="sm" onClick={sair}>
+          <Button variante="contorno" tamanho="sm" onClick={sair} className="hidden lg:inline-flex">
             <LogOut className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Sair</span>
+            Sair
           </Button>
         </div>
       </div>

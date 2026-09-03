@@ -102,7 +102,8 @@ export function GraficoArea({
       {vazio ? (
         <EstadoVazio />
       ) : visao === "composicao" ? (
-        <ResponsiveContainer width="100%" height={288}>
+        <div className="h-[232px] sm:h-[288px]">
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={dados} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <defs>
               <Gradiente id="gProd" cor={CORES_TIPO.PRODUCTIVE} />
@@ -135,8 +136,10 @@ export function GraficoArea({
             />
           </AreaChart>
         </ResponsiveContainer>
+        </div>
       ) : (
-        <ResponsiveContainer width="100%" height={288}>
+        <div className="h-[232px] sm:h-[288px]">
+        <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={dados} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
             <EixoX />
@@ -156,6 +159,7 @@ export function GraficoArea({
             />
           </ComposedChart>
         </ResponsiveContainer>
+        </div>
       )}
 
       {!vazio && visao === "composicao" && <Legenda />}
@@ -266,7 +270,7 @@ function TooltipIndice({ active, payload, label, bucket, fuso }: any) {
 
 function EstadoVazio() {
   return (
-    <div className="flex h-[288px] flex-col items-center justify-center gap-2 text-center">
+    <div className="flex h-[232px] flex-col items-center justify-center gap-2 text-center sm:h-[288px]">
       <p className="text-sm text-slate-400">Sem atividade registrada no período</p>
       <p className="text-xs text-slate-600">
         Os dados aparecem aqui assim que os agentes sincronizarem.
