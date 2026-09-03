@@ -5,12 +5,20 @@
 // ============================================================================
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 import { FUSO_PADRAO } from "./periodos";
 import type { ContextoSessao, PapelUsuario } from "./tipos";
 
-export async function carregarContexto(
+/**
+ * cache() deduplica dentro do mesmo request: o layout do painel e a página
+ * (quase todas chamam isto de novo, para não depender de prop drilling)
+ * acabavam fazendo a mesma consulta de perfil/empresa duas vezes em toda
+ * navegação. Funciona porque criarClienteServidor() também é cache() — o
+ * mesmo cliente entra aqui nas duas chamadas, então a chave bate.
+ */
+export const carregarContexto = cache(async (
   supabase: SupabaseClient,
-): Promise<ContextoSessao | null> {
+): Promise<ContextoSessao | null> => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -56,7 +64,7 @@ export async function carregarContexto(
     },
     adminPlataforma: !!admin,
   };
-}
+});
 
 /** Papéis que podem mexer em cadastros (equipes, pessoas, classificação). */
 export function podeAdministrar(contexto: ContextoSessao | null): boolean {

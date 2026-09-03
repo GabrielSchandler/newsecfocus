@@ -263,17 +263,41 @@ $ok = $ok -and (Escrever-Passo "Parando versao anterior (se houver)" {
             Start-Sleep -Milliseconds 300
         }
     }
+    # O Coletor roda na sessao do usuario, fora do controle do SCM: matar o
+    # servico nao garante que ele ja morreu. Sem esperar aqui tambem, o
+    # Accessibility.dll (carregado pelo WinForms) ainda estava com o handle
+    # aberto quando o passo seguinte tentava sobrescrever — foi o que travou
+    # a reinstalacao numa maquina real (03/09/2026): "O processo nao pode
+    # acessar o arquivo [...] Accessibility.dll porque ele esta sendo usado
+    # por outro processo."
     Get-Process -Name 'Telemetria.Coletor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    $limite3 = (Get-Date).AddSeconds(10)
+    while ((Get-Process -Name 'Telemetria.Coletor' -ErrorAction SilentlyContinue) -and (Get-Date) -lt $limite3) {
+        Start-Sleep -Milliseconds 300
+    }
     $true
 })
 
 $ok = $ok -and (Escrever-Passo "Copiando arquivos para $PastaInstalacao" {
     New-Item -ItemType Directory -Path $PastaInstalacao -Force | Out-Null
-    Get-ChildItem -Path $origem -Force |
-        Where-Object { $_.Name -notin @('Instalar.bat', 'Instalar.ps1', 'Desinstalar.bat', 'Desinstalar.ps1', 'Licenca.rtf') } |
-        ForEach-Object {
-            Copy-Item -Path $_.FullName -Destination $PastaInstalacao -Recurse -Force
+    $arquivos = Get-ChildItem -Path $origem -Force |
+        Where-Object { $_.Name -notin @('Instalar.bat', 'Instalar.ps1', 'Desinstalar.bat', 'Desinstalar.ps1', 'Licenca.rtf') }
+
+    foreach ($item in $arquivos) {
+        # Mesmo com o processo ja encerrado, o Windows (ou um antivirus fazendo
+        # varredura em tempo real) pode segurar o handle por mais alguns
+        # instantes. Tenta novamente por ate 5s antes de desistir de verdade.
+        $limiteCopia = (Get-Date).AddSeconds(5)
+        while ($true) {
+            try {
+                Copy-Item -Path $item.FullName -Destination $PastaInstalacao -Recurse -Force
+                break
+            } catch {
+                if ((Get-Date) -ge $limiteCopia) { throw }
+                Start-Sleep -Milliseconds 400
+            }
         }
+    }
     if (-not (Test-Path $exeServico)) { throw 'Telemetria.Servico.exe nao encontrado na pasta do instalador.' }
 })
 
