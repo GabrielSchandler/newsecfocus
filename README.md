@@ -127,12 +127,22 @@ Validado com 23.300 minutos de atividade sintética (5 pessoas, 3 equipes, 14 di
 - o **isolamento por RLS funciona**: um líder de equipe enxergou 2 das 5 pessoas e
   7.001 dos 17.869 minutos, sem que nenhuma consulta precisasse saber disso.
 
+**As 5 Edge Functions estão publicadas e testadas em produção** (02/09/2026):
+`registrar-dispositivo`, `ingestao-lote`, `validar-codigo`, `provisionar-empresa`,
+`convidar-usuario`. O ciclo completo foi provado por chamada HTTP direta, sem precisar
+instalar o agente numa máquina: `validar-codigo` reconheceu o código real e devolveu o
+nome da empresa; `registrar-dispositivo` matriculou uma estação de teste e devolveu
+device_id, token e a configuração remota; `ingestao-lote` aceitou um registro de
+atividade com esse token, **resolveu o colaborador automaticamente**
+(`teste.ponta-a-ponta` → "Teste Ponta-A-Ponta") e gravou a linha em `activity_logs`
+vinculada a ele. Os dados de teste foram apagados depois de confirmados.
+
 Falta para o ciclo completo:
 
-1. Publicar as Edge Functions (`supabase functions deploy`) — sem elas o agente não
-   consegue se matricular nem sincronizar; exige um access token da conta Supabase.
-2. Instalar o agente como serviço numa estação e validar matrícula e envio de lote.
-3. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
+1. Instalar o agente como serviço numa estação de verdade (o `Instalar.bat` guiado
+   existe e está publicado, mas a instalação em si exige um clique humano na
+   confirmação do Windows — não testável nesta sessão automatizada).
+2. O serviço propagar ao coletor a pausa de coleta quando a conta está suspensa; o
    servidor já devolve `collection_enabled` na resposta de ingestão.
 
 ### Instalador — decisão: sem MSI assinado
