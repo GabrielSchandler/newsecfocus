@@ -28,11 +28,15 @@ internal static class Program
 
         var construtor = Host.CreateApplicationBuilder(args);
 
-        construtor.Configuration.AddJsonFile(
-            Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: true, reloadOnChange: true);
-        if (File.Exists(CaminhosAplicacao.ConfiguracaoSobreposta))
-            construtor.Configuration.AddJsonFile(CaminhosAplicacao.ConfiguracaoSobreposta, optional: true, reloadOnChange: true);
-        construtor.Configuration.AddEnvironmentVariables("TELEMETRIA_");
+        // Mesma precedencia do Coletor (appsettings.json < registro gravado pelo
+        // instalador < configuracao.json em ProgramData < variaveis de ambiente).
+        // Ate 03/09/2026 este bloco duplicava essa logica na mao, SEM ler o
+        // registro — so o Coletor usava CarregadorConfiguracao. Bug real: numa
+        // instalacao de verdade, o servico (quem fala com o Supabase) nunca via a
+        // URL/chaves que o Instalar.ps1 grava, so o appsettings.json de fabrica
+        // (com placeholder). Corrigido reaproveitando o mesmo carregador.
+        construtor.Configuration.AddConfiguration(
+            CarregadorConfiguracao.Montar(AppContext.BaseDirectory));
 
         // Roda como serviço do Windows quando instalado; como console quando depurado.
         construtor.Services.AddWindowsService(opcoes => opcoes.ServiceName = "TelemetriaProdutividade");
