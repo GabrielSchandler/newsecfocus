@@ -1,0 +1,12 @@
+{
+  "name": "newsecfocus-banco",
+  "private": true,
+  "type": "module",
+  "description": "Ferramentas de verificacao do banco. Rode npm install aqui antes do primeiro uso.",
+  "scripts": {
+    "verificar": "node verificar-numeros.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
