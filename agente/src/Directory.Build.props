@@ -19,7 +19,7 @@
     vai para a tabela versoes_agente.
   -->
   <PropertyGroup>
-    <VersaoAgente>1.1.0</VersaoAgente>
+    <VersaoAgente>1.2.0</VersaoAgente>
 
     <Version>$(VersaoAgente)</Version>
     <AssemblyVersion>$(VersaoAgente).0</AssemblyVersion>

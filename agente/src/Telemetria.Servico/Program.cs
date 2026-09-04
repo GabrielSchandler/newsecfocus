@@ -92,6 +92,16 @@ internal static class Program
         construtor.Services.AddHostedService<WorkerSincronizacao>();
 
         var host = construtor.Build();
+
+        // Primeira linha util do log: com atualizacao automatica, "qual versao
+        // esta rodando nesta maquina?" vira a pergunta mais frequente do
+        // suporte, e a resposta tem de estar no topo do arquivo.
+        host.Services.GetRequiredService<ILoggerFactory>()
+            .CreateLogger("Agente")
+            .LogInformation("NewSec Focus {v} iniciando de {pasta}",
+                Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?",
+                AppContext.BaseDirectory);
+
         host.Run();
     }
 
