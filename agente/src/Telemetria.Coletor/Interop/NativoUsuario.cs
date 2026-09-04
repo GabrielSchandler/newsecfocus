@@ -24,6 +24,9 @@ internal static class NativoUsuario
 
     internal const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 
+    /// <summary>Direito mínimo para testar o desktop de entrada — só queremos abrir, não usar.</summary>
+    internal const uint DESKTOP_SWITCHDESKTOP = 0x0100;
+
     internal delegate IntPtr ProcHook(int nCode, IntPtr wParam, IntPtr lParam);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -105,4 +108,17 @@ internal static class NativoUsuario
             CloseHandle(handle);
         }
     }
+
+    /// <summary>
+    /// Abre o desktop que está recebendo entrada. Com a sessão bloqueada, quem
+    /// recebe entrada é o desktop seguro do Winlogon, ao qual um processo do
+    /// usuário não tem acesso — a chamada devolve nulo, e é assim que se
+    /// descobre que a tela está travada.
+    /// </summary>
+    [DllImport("user32.dll", SetLastError = true)]
+    internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, uint dwDesiredAccess);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool CloseDesktop(IntPtr hDesktop);
 }

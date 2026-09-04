@@ -90,11 +90,21 @@ public sealed class AmostradorAtividade
         if (DetectorOcioso.SegundosDesdeUltimaEntrada() < SegundosPorAmostra)
             acumulador.AmostrasAtivas++;
 
+        // O bloqueio é decidido ANTES de olhar a janela. A tela de bloqueio do
+        // Windows moderno tem janela em primeiro plano (o LockApp), então deduzir
+        // bloqueio por "janela nula" nunca acusava nada — e ainda registrava
+        // lockapp.exe como aplicativo em uso. Ver DetectorSessao.
+        if (DetectorSessao.EstaBloqueada())
+        {
+            acumulador.AmostrasBloqueado++;
+            return;
+        }
+
         var janela = _inspetor.CapturarPrimeiroPlano();
         if (janela is null)
         {
-            // Sem janela em primeiro plano costuma significar tela bloqueada/segura.
-            acumulador.AmostrasBloqueado++;
+            // Desbloqueado e sem nada em foco é ociosidade, não bloqueio. Sem
+            // processo dominante, o minuto vira "sessao.ociosa" no fechamento.
             return;
         }
 
