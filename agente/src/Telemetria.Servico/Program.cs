@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,6 +8,7 @@ using Telemetria.Nucleo.Configuracao;
 using Telemetria.Nucleo.Dados;
 using Telemetria.Nucleo.Seguranca;
 using Telemetria.Nucleo.Utilitarios;
+using Telemetria.Servico.Atualizacao;
 using Telemetria.Servico.Sincronizacao;
 using Telemetria.Servico.Supervisao;
 
@@ -25,6 +27,12 @@ internal static class Program
     {
         SqlcipherBootstrap.Garantir();
         CaminhosAplicacao.GarantirEstrutura();
+
+        // O script que troca de versao mora em ProgramData, fora da pasta de
+        // instalacao, e e republicado aqui a cada boot. A ordem importa: quem
+        // executa a troca e sempre o script da versao que JA PROVOU que sobe,
+        // nunca o da versao nova, que ainda nao rodou nesta maquina.
+        PublicarScriptDeTroca();
 
         var construtor = Host.CreateApplicationBuilder(args);
 
@@ -71,10 +79,38 @@ internal static class Program
         construtor.Services.AddHttpClient<ClienteSupabase>();
         construtor.Services.AddSingleton<GerenciadorMatricula>();
 
+        // O atualizador usa HttpClient próprio: baixa dezenas de megabytes do
+        // Storage e não deve dividir tempo limite nem cabeçalhos com o cliente
+        // de telemetria, que troca pacotes pequenos e frequentes.
+        construtor.Services.AddHttpClient("atualizacao", c => c.Timeout = TimeSpan.FromMinutes(10));
+        construtor.Services.AddSingleton(sp => new AtualizadorAgente(
+            sp.GetRequiredService<IHttpClientFactory>().CreateClient("atualizacao"),
+            sp.GetRequiredService<ILogger<AtualizadorAgente>>(),
+            Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0"));
+
         construtor.Services.AddHostedService<SupervisorSessoes>();
         construtor.Services.AddHostedService<WorkerSincronizacao>();
 
         var host = construtor.Build();
         host.Run();
+    }
+
+    /// <summary>
+    /// Copia o Trocar.ps1 desta versao para ProgramData. Idempotente e
+    /// silencioso: falhar aqui nao pode impedir o servico de subir e coletar.
+    /// </summary>
+    private static void PublicarScriptDeTroca()
+    {
+        try
+        {
+            var origem = Path.Combine(AppContext.BaseDirectory, "Trocar.ps1");
+            if (File.Exists(origem))
+                File.Copy(origem, CaminhosAplicacao.ScriptTroca, overwrite: true);
+        }
+        catch
+        {
+            // Sem o script, a atualizacao automatica nao acontece e a maquina
+            // segue coletando normalmente. E o modo de falhar correto.
+        }
     }
 }

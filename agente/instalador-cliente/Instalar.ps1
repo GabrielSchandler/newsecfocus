@@ -232,7 +232,23 @@ if ($confirmar -notmatch '^[sS]') {
 Escrever-Secao 'Instalando'
 
 $origem = $PSScriptRoot
-$exeServico = Join-Path $PastaInstalacao 'Telemetria.Servico.exe'
+
+# A versao e lida do proprio binario que esta sendo instalado. Ela nomeia a
+# pasta, e e o que permite a maquina se atualizar depois sem ninguem ir ate la:
+# as versoes ficam lado a lado e o servico so muda para qual delas aponta.
+# Sobrescrever binario em uso e o que travou uma reinstalacao real em
+# 03/09/2026, com o Windows segurando um DLL do coletor.
+$exeOrigem = Join-Path $origem 'Telemetria.Servico.exe'
+if (-not (Test-Path $exeOrigem)) {
+    Escrever-Linha 'Telemetria.Servico.exe nao encontrado na pasta do instalador.' $CorErro
+    Sair-ComPausa 1
+}
+$Versao = (Get-Item $exeOrigem).VersionInfo.FileVersion
+if (-not $Versao) { $Versao = '1.0.0.0' }
+
+$PastaVersoes = Join-Path $PastaInstalacao 'versoes'
+$PastaVersao  = Join-Path $PastaVersoes $Versao
+$exeServico   = Join-Path $PastaVersao 'Telemetria.Servico.exe'
 
 $ok = $true
 
@@ -278,8 +294,8 @@ $ok = $ok -and (Escrever-Passo "Parando versao anterior (se houver)" {
     $true
 })
 
-$ok = $ok -and (Escrever-Passo "Copiando arquivos para $PastaInstalacao" {
-    New-Item -ItemType Directory -Path $PastaInstalacao -Force | Out-Null
+$ok = $ok -and (Escrever-Passo "Instalando a versao $Versao" {
+    New-Item -ItemType Directory -Path $PastaVersao -Force | Out-Null
     $arquivos = Get-ChildItem -Path $origem -Force |
         Where-Object { $_.Name -notin @('Instalar.bat', 'Instalar.ps1', 'Desinstalar.bat', 'Desinstalar.ps1', 'Licenca.rtf') }
 
@@ -290,7 +306,7 @@ $ok = $ok -and (Escrever-Passo "Copiando arquivos para $PastaInstalacao" {
         $limiteCopia = (Get-Date).AddSeconds(5)
         while ($true) {
             try {
-                Copy-Item -Path $item.FullName -Destination $PastaInstalacao -Recurse -Force
+                Copy-Item -Path $item.FullName -Destination $PastaVersao -Recurse -Force
                 break
             } catch {
                 if ((Get-Date) -ge $limiteCopia) { throw }

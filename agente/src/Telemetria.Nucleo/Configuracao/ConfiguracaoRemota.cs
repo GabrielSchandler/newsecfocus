@@ -53,4 +53,37 @@ public sealed class ConfiguracaoRemota
     /// </summary>
     [JsonPropertyName("assinatura")]
     public string? Assinatura { get; set; }
+
+    /// <summary>
+    /// Versão que esta máquina deveria estar rodando. Nulo quando nenhuma versão
+    /// foi publicada — e aí o agente fica onde está.
+    ///
+    /// Fica FORA da assinatura de propósito: atualizar é decidido comparando
+    /// versões, não detectando mudança de configuração de coleta.
+    /// </summary>
+    [JsonPropertyName("atualizacao")]
+    public AlvoAtualizacao? Atualizacao { get; set; }
+}
+
+/// <summary>
+/// Para onde a estação deve ir.
+///
+/// O sha256 é do MANIFESTO, não de um binário: o manifesto lista cada arquivo
+/// com o próprio hash. Conferir o manifesto contra este valor, e depois cada
+/// arquivo contra o manifesto, fecha a corrente desde o banco — onde só a
+/// plataforma escreve — até o byte gravado em disco.
+/// </summary>
+public sealed class AlvoAtualizacao
+{
+    [JsonPropertyName("versao")]
+    public string? Versao { get; set; }
+
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
+
+    [JsonPropertyName("sha256")]
+    public string? Sha256 { get; set; }
+
+    [JsonPropertyName("tamanho_bytes")]
+    public long? TamanhoBytes { get; set; }
 }

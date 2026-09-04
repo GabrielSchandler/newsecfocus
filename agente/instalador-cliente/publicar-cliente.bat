@@ -56,6 +56,10 @@ echo === Publicando o coletor de sessao (auto-contido, win-x64)...
 if errorlevel 1 goto :erro
 
 echo.
+REM O script de troca de versao viaja com o binario: o servico o publica em
+REM ProgramData ao subir, garantindo que quem troca e a versao que funciona.
+copy /Y "%AQUI%..\atualizador\Trocar.ps1" "%SAIDA%\" >nul
+
 echo === Copiando o instalador para a pasta do pacote...
 copy /y "%AQUI%Instalar.bat"      "%SAIDA%\Instalar.bat"      >nul
 copy /y "%AQUI%Instalar.ps1"      "%SAIDA%\Instalar.ps1"      >nul

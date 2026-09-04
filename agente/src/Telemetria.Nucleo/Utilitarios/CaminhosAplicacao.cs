@@ -24,10 +24,32 @@ public static class CaminhosAplicacao
 
     public static string PastaLogs => Path.Combine(Raiz, "logs");
 
+    // ------------------------------------------------------------------------
+    //  Atualização automática
+    //
+    //  Tudo que troca versão mora em ProgramData, FORA da pasta de instalação.
+    //  O motivo é direto: a pasta de instalação é justamente o que está sendo
+    //  substituído, e um atualizador que vive dentro do que ele troca não
+    //  sobrevive à própria operação.
+    // ------------------------------------------------------------------------
+
+    /// <summary>Área de trabalho da atualização: script de troca, marcadores e log.</summary>
+    public static string PastaAtualizacao => Path.Combine(Raiz, "atualizacao");
+
+    /// <summary>Script que para o serviço, aponta para a versão nova e devolve no ar.</summary>
+    public static string ScriptTroca => Path.Combine(PastaAtualizacao, "Trocar.ps1");
+
+    /// <summary>
+    /// Versões que já falharam ao subir nesta máquina. Sem isto, uma versão ruim
+    /// viraria laço infinito: baixa, troca, quebra, volta, tenta de novo.
+    /// </summary>
+    public static string VersoesRecusadas => Path.Combine(PastaAtualizacao, "recusadas.txt");
+
     /// <summary>Cria a árvore de pastas. Idempotente, pode ser chamada a cada boot.</summary>
     public static void GarantirEstrutura()
     {
         Directory.CreateDirectory(Raiz);
         Directory.CreateDirectory(PastaLogs);
+        Directory.CreateDirectory(PastaAtualizacao);
     }
 }

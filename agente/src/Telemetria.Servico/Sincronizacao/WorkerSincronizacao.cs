@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Telemetria.Nucleo.Configuracao;
 using Telemetria.Nucleo.Dados;
 using Telemetria.Nucleo.Modelos;
+using Telemetria.Servico.Atualizacao;
 
 namespace Telemetria.Servico.Sincronizacao;
 
@@ -18,6 +19,7 @@ public sealed class WorkerSincronizacao : BackgroundService
     private readonly ClienteSupabase _cliente;
     private readonly GerenciadorMatricula _matricula;
     private readonly OpcoesAgente _opcoes;
+    private readonly AtualizadorAgente _atualizador;
     private readonly ILogger<WorkerSincronizacao> _log;
 
     private readonly string _versao = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
@@ -34,12 +36,14 @@ public sealed class WorkerSincronizacao : BackgroundService
         ClienteSupabase cliente,
         GerenciadorMatricula matricula,
         OpcoesAgente opcoes,
+        AtualizadorAgente atualizador,
         ILogger<WorkerSincronizacao> log)
     {
         _buffer = buffer;
         _cliente = cliente;
         _matricula = matricula;
         _opcoes = opcoes;
+        _atualizador = atualizador;
         _log = log;
         _intervaloMinutos = Math.Max(1, opcoes.MinutosEntreSincronizacoes);
     }
@@ -176,6 +180,10 @@ public sealed class WorkerSincronizacao : BackgroundService
 
             AjustarIntervalo(resposta.ProximaSincronizacaoEmMinutos);
             AplicarConfiguracaoRemota(resposta.Configuracao);
+
+            // Só depois de um lote aceito: se o envio está funcionando, a rede
+            // está boa o suficiente para baixar a versão nova.
+            await _atualizador.VerificarAsync(resposta.Configuracao?.Atualizacao, token);
 
             if (lote.Count < _opcoes.TamanhoLote)
                 break; // Último lote parcial: acabou o pendente.
