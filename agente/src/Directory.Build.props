@@ -1,0 +1,35 @@
+<Project>
+
+  <!--
+    Versão de TODO o agente, num lugar só.
+
+    Antes nenhum projeto declarava versão, então tudo compilava como 1.0.0.0 e
+    o painel mostrava "1.0.0.0" para qualquer máquina, de qualquer build. Isso
+    era feio enquanto era só informação; com atualização automática vira
+    impeditivo, porque a estação decide se precisa atualizar comparando a
+    versão que roda com a que o servidor anuncia. Sem número real, ela nunca
+    saberia que está velha.
+
+    Regra de bolso ao publicar:
+      • correção de bug no agente      → sobe o terceiro número (1.1.0 → 1.1.1)
+      • recurso novo, sem quebrar nada  → sobe o segundo    (1.1.3 → 1.2.0)
+      • mudança que exige reinstalar    → sobe o primeiro   (1.2.0 → 2.0.0)
+
+    O publicar-cliente.bat carimba este número no nome do pacote, e é ele que
+    vai para a tabela versoes_agente.
+  -->
+  <PropertyGroup>
+    <VersaoAgente>1.1.0</VersaoAgente>
+
+    <Version>$(VersaoAgente)</Version>
+    <AssemblyVersion>$(VersaoAgente).0</AssemblyVersion>
+    <FileVersion>$(VersaoAgente).0</FileVersion>
+    <InformationalVersion>$(VersaoAgente)</InformationalVersion>
+
+    <Company>NewSec</Company>
+    <Product>NewSec Focus</Product>
+    <!-- Aparece nas propriedades do arquivo no Windows e no aviso do SmartScreen. -->
+    <AssemblyTitle>NewSec Focus — agente de produtividade</AssemblyTitle>
+  </PropertyGroup>
+
+</Project>
