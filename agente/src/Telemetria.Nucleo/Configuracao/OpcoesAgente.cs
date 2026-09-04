@@ -28,7 +28,7 @@ public sealed class OpcoesAgente
     public int SegundosParaOcioso { get; set; } = 180;
 
     /// <summary>Intervalo entre sincronizações em lote com o Supabase.</summary>
-    public int MinutosEntreSincronizacoes { get; set; } = 60;
+    public int MinutosEntreSincronizacoes { get; set; } = 5;
 
     /// <summary>Quantidade máxima de registros por requisição POST.</summary>
     public int TamanhoLote { get; set; } = 120;
