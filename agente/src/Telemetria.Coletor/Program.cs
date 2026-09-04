@@ -9,6 +9,7 @@ using Telemetria.Coletor.Interface;
 using Telemetria.Coletor.Monitoramento;
 using Telemetria.Nucleo.Configuracao;
 using Telemetria.Nucleo.Dados;
+using Telemetria.Nucleo.Modelos;
 using Telemetria.Nucleo.Seguranca;
 using Telemetria.Nucleo.Utilitarios;
 
@@ -118,7 +119,13 @@ internal static class Program
         });
 
         // Encerra de forma limpa em logoff/shutdown da sessão.
-        SystemEvents_HookSessionEnd(cts);
+        SystemEvents_HookSessionEnd(cts, buffer);
+
+        // Diário de bordo: suspensão e retomada da máquina. É o que permite ao
+        // painel dizer "estava dormindo" em vez de deixar um buraco mudo que
+        // parece agente quebrado. Quem escuta é o coletor, e não o serviço,
+        // porque o evento de energia chega à sessão do usuário.
+        SystemEvents_HookEnergia(buffer, logGeral);
 
         Application.ApplicationExit += (_, _) =>
         {
@@ -133,14 +140,46 @@ internal static class Program
         Application.Run();
     }
 
-    private static void SystemEvents_HookSessionEnd(CancellationTokenSource cts)
+    private static void SystemEvents_HookSessionEnd(CancellationTokenSource cts, BufferTelemetria buffer)
     {
         Microsoft.Win32.SystemEvents.SessionEnding += (_, _) =>
         {
+            // Grava ANTES de encerrar: daqui a instantes não há mais processo.
+            buffer.InserirEvento(TiposEvento.Desligando, DateTimeOffset.UtcNow, VersaoAtual());
             cts.Cancel();
             Application.Exit();
         };
     }
+
+    /// <summary>
+    /// Suspensão e retomada da máquina.
+    ///
+    /// O evento de suspensão é o mais delicado do agente: ele chega segundos
+    /// antes de a máquina congelar, e não há tempo de falar com a rede. Por
+    /// isso ele só é GRAVADO no buffer local, com o instante correto, e sobe
+    /// junto do primeiro lote depois que a máquina acordar.
+    /// </summary>
+    private static void SystemEvents_HookEnergia(BufferTelemetria buffer, ILogger log)
+    {
+        Microsoft.Win32.SystemEvents.PowerModeChanged += (_, e) =>
+        {
+            switch (e.Mode)
+            {
+                case Microsoft.Win32.PowerModes.Suspend:
+                    buffer.InserirEvento(TiposEvento.Suspensa, DateTimeOffset.UtcNow, VersaoAtual());
+                    log.LogInformation("Máquina suspendendo — registrado no diário de bordo.");
+                    break;
+
+                case Microsoft.Win32.PowerModes.Resume:
+                    buffer.InserirEvento(TiposEvento.Retomada, DateTimeOffset.UtcNow, VersaoAtual());
+                    log.LogInformation("Máquina retomada.");
+                    break;
+            }
+        };
+    }
+
+    private static string VersaoAtual() =>
+        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?";
 
     private static ILoggerFactory CriarLogger()
     {

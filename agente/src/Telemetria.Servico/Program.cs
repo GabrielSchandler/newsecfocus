@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 using Telemetria.Nucleo.Configuracao;
 using Telemetria.Nucleo.Dados;
+using Telemetria.Nucleo.Modelos;
 using Telemetria.Nucleo.Seguranca;
 using Telemetria.Nucleo.Utilitarios;
 using Telemetria.Servico.Atualizacao;
@@ -92,6 +93,16 @@ internal static class Program
         construtor.Services.AddHostedService<WorkerSincronizacao>();
 
         var host = construtor.Build();
+
+        // Diario de bordo: o servico registra que subiu, e que parou de forma
+        // limpa. Um buraco de coleta entre AGENTE_PARADO e AGENTE_INICIADO tem
+        // explicacao; um buraco sem nenhum dos dois e o que merece atencao.
+        var bufferEventos = host.Services.GetRequiredService<BufferTelemetria>();
+        var versaoAtual = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?";
+        bufferEventos.InserirEvento(TiposEvento.AgenteIniciado, DateTimeOffset.UtcNow, versaoAtual);
+
+        host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping.Register(() =>
+            bufferEventos.InserirEvento(TiposEvento.AgenteParado, DateTimeOffset.UtcNow, versaoAtual));
 
         // Primeira linha util do log: com atualizacao automatica, "qual versao
         // esta rodando nesta maquina?" vira a pergunta mais frequente do

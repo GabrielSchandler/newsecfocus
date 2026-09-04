@@ -88,8 +88,106 @@ public sealed class BufferTelemetria
                 chave TEXT PRIMARY KEY,
                 valor TEXT
             );
+
+            -- Diario de bordo da estacao: quando o agente subiu/parou e quando a
+            -- maquina dormiu/acordou. Fica em tabela separada de pending_logs
+            -- porque NAO e medicao de tempo — se entrasse la, um "suspensa"
+            -- viraria um minuto de atividade e sujaria a produtividade.
+            --
+            -- Guardado localmente porque o evento mais importante (suspensao)
+            -- acontece justamente quando nao da para enviar nada: a maquina esta
+            -- congelando. Sobe junto do proximo lote, com o instante original.
+            CREATE TABLE IF NOT EXISTS pending_eventos (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                tipo        TEXT NOT NULL,
+                momento_utc TEXT NOT NULL,
+                versao      TEXT,
+                detalhe     TEXT,
+                UNIQUE(tipo, momento_utc)
+            );
             """;
         cmd.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// Registra um marco do ciclo de vida da estacao. Silencioso e tolerante:
+    /// perder um evento de diario nunca pode atrapalhar a coleta, que e o
+    /// trabalho de verdade do agente. O UNIQUE evita duplicar quando o mesmo
+    /// evento e registrado duas vezes (ex.: encerramento + desligamento).
+    /// </summary>
+    public void InserirEvento(string tipo, DateTimeOffset momento, string? versao = null, string? detalhe = null)
+    {
+        try
+        {
+            using var conexao = Abrir();
+            using var cmd = conexao.CreateCommand();
+            cmd.CommandText =
+                """
+                INSERT OR IGNORE INTO pending_eventos (tipo, momento_utc, versao, detalhe)
+                VALUES ($tipo, $momento, $versao, $detalhe);
+                """;
+            cmd.Parameters.AddWithValue("$tipo", tipo);
+            cmd.Parameters.AddWithValue("$momento", momento.UtcDateTime.ToString("o"));
+            cmd.Parameters.AddWithValue("$versao", (object?)versao ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$detalhe", (object?)detalhe ?? DBNull.Value);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _log.LogDebug(ex, "Nao consegui registrar o evento {t}.", tipo);
+        }
+    }
+
+    /// <summary>Eventos aguardando envio, mais antigos primeiro.</summary>
+    public List<EventoEstacao> LerEventos(int limite = 200)
+    {
+        var saida = new List<EventoEstacao>();
+        try
+        {
+            using var conexao = Abrir();
+            using var cmd = conexao.CreateCommand();
+            cmd.CommandText =
+                "SELECT id, tipo, momento_utc, versao, detalhe FROM pending_eventos ORDER BY id LIMIT $limite;";
+            cmd.Parameters.AddWithValue("$limite", limite);
+
+            using var leitor = cmd.ExecuteReader();
+            while (leitor.Read())
+            {
+                saida.Add(new EventoEstacao
+                {
+                    IdLocal = leitor.GetInt64(0),
+                    Tipo = leitor.GetString(1),
+                    Momento = DateTimeOffset.Parse(leitor.GetString(2)),
+                    Versao = leitor.IsDBNull(3) ? null : leitor.GetString(3),
+                    Detalhe = leitor.IsDBNull(4) ? null : leitor.GetString(4),
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.LogDebug(ex, "Nao consegui ler os eventos pendentes.");
+        }
+        return saida;
+    }
+
+    /// <summary>Apaga os eventos ja confirmados pelo servidor.</summary>
+    public void ApagarEventos(IEnumerable<long> ids)
+    {
+        var lista = ids.ToList();
+        if (lista.Count == 0) return;
+
+        try
+        {
+            using var conexao = Abrir();
+            using var cmd = conexao.CreateCommand();
+            cmd.CommandText =
+                $"DELETE FROM pending_eventos WHERE id IN ({string.Join(',', lista)});";
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _log.LogDebug(ex, "Nao consegui limpar os eventos enviados.");
+        }
     }
 
     public void Inserir(RegistroAtividade registro)

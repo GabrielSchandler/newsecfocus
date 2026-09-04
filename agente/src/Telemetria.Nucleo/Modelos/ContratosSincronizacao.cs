@@ -51,6 +51,16 @@ public sealed class LoteTelemetria
 
     [JsonPropertyName("logs")]
     public List<RegistroAtividade> Registros { get; set; } = [];
+
+    /// <summary>
+    /// Diário de bordo da estação, se houver. Viaja junto do lote em vez de
+    /// ter endpoint próprio: reaproveita a autenticação e, principalmente, o
+    /// evento mais importante (suspensão) acontece quando a máquina está
+    /// congelando e não dá para enviar nada — ele fica no buffer e sobe depois,
+    /// com o instante original.
+    /// </summary>
+    [JsonPropertyName("eventos")]
+    public List<EventoEstacao> Eventos { get; set; } = [];
 }
 
 /// <summary>Resposta da Edge Function ingestao-lote.</summary>

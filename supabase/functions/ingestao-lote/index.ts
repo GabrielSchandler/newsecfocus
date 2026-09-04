@@ -33,11 +33,25 @@ interface RegistroEntrada {
   os_user?: string;
 }
 
+interface EventoEntrada {
+  tipo?: string;
+  momento?: string;
+  versao?: string;
+  detalhe?: string;
+}
+
 interface LoteEntrada {
   agent_version?: string;
   sent_at?: string;
   logs: RegistroEntrada[];
+  /** Diário de bordo da estação — opcional: agente antigo não manda. */
+  eventos?: EventoEntrada[];
 }
+
+/** Espelha o enum tipo_evento_estacao. Tipo desconhecido é descartado. */
+const TIPOS_EVENTO = new Set([
+  "AGENTE_INICIADO", "AGENTE_PARADO", "SUSPENSA", "RETOMADA", "DESLIGANDO",
+]);
 
 const LIMITE_LOTE = 500; // Trava de segurança contra payload gigante.
 
@@ -131,6 +145,32 @@ Deno.serve(async (req) => {
 
   const aceitos = inseridos?.length ?? 0;
   const duplicados = linhas.length - aceitos;
+
+  // 4b. Diário de bordo, se veio. Falha aqui não derruba o lote: perder um
+  // marco de suspensão é chato, perder a telemetria do dia é grave.
+  if (Array.isArray(lote.eventos) && lote.eventos.length > 0) {
+    const eventos = lote.eventos
+      .filter((e) => e.tipo && TIPOS_EVENTO.has(e.tipo) && e.momento)
+      .slice(0, 200)
+      .map((e) => ({
+        org_id: dispositivo.org_id,
+        device_id: dispositivo.id,
+        tipo: e.tipo,
+        momento: e.momento,
+        versao: e.versao ?? null,
+        detalhe: e.detalhe ?? null,
+      }));
+
+    if (eventos.length > 0) {
+      const { error: erroEventos } = await supabase
+        .from("eventos_estacao")
+        .upsert(eventos, { onConflict: "device_id,tipo,momento", ignoreDuplicates: true });
+
+      if (erroEventos) {
+        console.error("Falha ao gravar eventos da estacao:", erroEventos.message);
+      }
+    }
+  }
 
   // 5. Marca o dispositivo online e busca a configuração remota da empresa.
   await supabase

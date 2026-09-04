@@ -131,6 +131,7 @@ public sealed class WorkerSincronizacao : BackgroundService
 
         _log.LogInformation("Iniciando sincronização de {n} registros pendentes.", pendentes);
         var totalEnviado = 0;
+        var eventosEnviados = false;
 
         // Esvazia em lotes até acabar o pendente ou a rede falhar (aí paramos e tentamos depois).
         while (!token.IsCancellationRequested)
@@ -139,11 +140,17 @@ public sealed class WorkerSincronizacao : BackgroundService
             if (lote.Count == 0)
                 break;
 
+            // O diário de bordo pega carona no primeiro lote do ciclo. Só nele:
+            // reenviar os mesmos eventos em cada lote seria desperdício, e o
+            // servidor os ignoraria por duplicidade de qualquer forma.
+            var eventos = eventosEnviados ? [] : _buffer.LerEventos();
+
             var pacote = new LoteTelemetria
             {
                 VersaoAgente = _versao,
                 EnviadoEm = DateTimeOffset.UtcNow,
-                Registros = [.. lote]
+                Registros = [.. lote],
+                Eventos = eventos
             };
 
             RespostaIngestao? resposta;
@@ -174,6 +181,13 @@ public sealed class WorkerSincronizacao : BackgroundService
             // (duplicado = servidor já tem; não faz sentido reenviar).
             var removidos = _buffer.ApagarPorId(lote.Select(r => r.IdLocal));
             totalEnviado += resposta.Aceitos;
+
+            if (eventos.Count > 0)
+            {
+                _buffer.ApagarEventos(eventos.Select(e => e.IdLocal));
+                eventosEnviados = true;
+                _log.LogInformation("{n} eventos de estação enviados.", eventos.Count);
+            }
 
             _log.LogInformation("Lote enviado: {a} aceitos, {d} duplicados, {r} limpos do buffer.",
                 resposta.Aceitos, resposta.Duplicados, removidos);
