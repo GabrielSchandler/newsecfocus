@@ -23,6 +23,12 @@ public sealed class WorkerSincronizacao : BackgroundService
     private readonly string _versao = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
     private int _intervaloMinutos;
 
+    /// <summary>
+    /// Ciclos que falharam seguidos. Zera no primeiro sucesso e comanda a
+    /// espera curta entre tentativas — ver o recuo progressivo em ExecuteAsync.
+    /// </summary>
+    private int _falhasSeguidas;
+
     public WorkerSincronizacao(
         BufferTelemetria buffer,
         ClienteSupabase cliente,
@@ -47,10 +53,11 @@ public sealed class WorkerSincronizacao : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            var sucesso = false;
             try
             {
                 _buffer.PurgarAntigos(_opcoes.DiasRetencaoLocal);
-                await SincronizarTudoPendenteAsync(stoppingToken);
+                sucesso = await SincronizarTudoPendenteAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -58,29 +65,64 @@ public sealed class WorkerSincronizacao : BackgroundService
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Ciclo de sincronização falhou. Tentando no próximo intervalo.");
+                _log.LogError(ex, "Ciclo de sincronização falhou.");
             }
 
-            await EsperarSeguro(TimeSpan.FromMinutes(_intervaloMinutos), stoppingToken);
+            await EsperarSeguro(ProximaEspera(sucesso), stoppingToken);
         }
 
         _log.LogInformation("Worker de sincronização encerrado.");
     }
 
-    private async Task SincronizarTudoPendenteAsync(CancellationToken token)
+    /// <summary>
+    /// Quanto esperar até a próxima tentativa.
+    ///
+    /// Antes o worker esperava o intervalo inteiro depois de qualquer falha, e
+    /// isso doeu de verdade: numa máquina recém-ligada (04/09/2026) a primeira
+    /// tentativa pegou a rede ainda subindo, falhou, e o agente ficou UMA HORA
+    /// em silêncio por causa de alguns segundos de Wi-Fi.
+    ///
+    /// Agora a falha encurta a espera e vai cedendo — 1, 2, 4, 8... minutos —
+    /// até o teto do intervalo configurado. Nunca fica mais lento que o normal
+    /// nem mais agressivo que o combinado com a empresa.
+    /// </summary>
+    private TimeSpan ProximaEspera(bool sucesso)
+    {
+        if (sucesso)
+        {
+            _falhasSeguidas = 0;
+            return TimeSpan.FromMinutes(_intervaloMinutos);
+        }
+
+        // Limitado a 6 para o deslocamento não estourar e a conta ficar óbvia.
+        _falhasSeguidas = Math.Min(_falhasSeguidas + 1, 6);
+        var minutos = Math.Min(_intervaloMinutos, 1 << (_falhasSeguidas - 1));
+
+        _log.LogInformation(
+            "Ciclo sem sucesso ({f}ª seguida). Nova tentativa em {m} min.", _falhasSeguidas, minutos);
+
+        return TimeSpan.FromMinutes(minutos);
+    }
+
+    /// <returns>
+    /// true quando o ciclo terminou sem pendência retida por falha — inclusive
+    /// quando não havia nada a enviar. false quando algo impediu o envio, e aí
+    /// o laço tenta de novo mais cedo em vez de esperar o intervalo inteiro.
+    /// </returns>
+    private async Task<bool> SincronizarTudoPendenteAsync(CancellationToken token)
     {
         var pendentes = _buffer.ContarPendentes();
         if (pendentes == 0)
         {
             _log.LogDebug("Nada pendente para sincronizar.");
-            return;
+            return true;
         }
 
         var tokenDispositivo = await _matricula.ObterTokenAsync(token);
         if (string.IsNullOrEmpty(tokenDispositivo))
         {
             _log.LogWarning("Sem token de dispositivo; adiando envio. {n} registros aguardando.", pendentes);
-            return;
+            return false;
         }
 
         _log.LogInformation("Iniciando sincronização de {n} registros pendentes.", pendentes);
@@ -112,7 +154,7 @@ public sealed class WorkerSincronizacao : BackgroundService
                 if (string.IsNullOrEmpty(tokenDispositivo))
                 {
                     _log.LogError("Rematrícula falhou; abortando este ciclo.");
-                    return;
+                    return false;
                 }
                 continue; // Refaz o mesmo lote com o token novo.
             }
@@ -121,7 +163,7 @@ public sealed class WorkerSincronizacao : BackgroundService
             {
                 // Falha recuperável: preserva o lote e para. Próximo intervalo tenta de novo.
                 _log.LogWarning("Envio interrompido; {n} registros seguem no buffer.", _buffer.ContarPendentes());
-                break;
+                return false;
             }
 
             // Servidor confirmou: apaga localmente tanto os aceitos quanto os duplicados
@@ -141,6 +183,8 @@ public sealed class WorkerSincronizacao : BackgroundService
 
         if (totalEnviado > 0)
             _buffer.CompactarSePreciso();
+
+        return true;
     }
 
     /// <summary>
