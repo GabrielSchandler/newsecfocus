@@ -10,6 +10,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/server";
+import { SINCRONIZACAO_PADRAO_MINUTOS } from "@/lib/agente";
 import { carregarContexto } from "@/lib/sessao";
 
 export interface ResultadoAcao {
@@ -475,7 +476,7 @@ export async function salvarConfiguracaoAgente(
 
   atualizarTelas();
   return OK(
-    `Configuração salva. As estações aplicam na próxima sincronização (até ${sincronizacao ?? 60} minutos).`,
+    `Configuração salva. As estações aplicam na próxima sincronização (até ${sincronizacao ?? SINCRONIZACAO_PADRAO_MINUTOS} minutos).`,
   );
 }
 

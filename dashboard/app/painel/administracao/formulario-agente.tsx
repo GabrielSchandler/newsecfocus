@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { Check, Loader2, TriangleAlert } from "lucide-react";
+import { SINCRONIZACAO_PADRAO_MINUTOS } from "@/lib/agente";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/input";
@@ -87,7 +88,7 @@ export function PainelAgente({
     );
   }
 
-  const intervalo = config.sync_interval_minutes ?? 60;
+  const intervalo = config.sync_interval_minutes ?? SINCRONIZACAO_PADRAO_MINUTOS;
 
   return (
     <div className="space-y-4">
@@ -135,7 +136,10 @@ export function PainelAgente({
                   disabled={somenteLeitura}
                 />
               </Campo>
-              <Campo rotulo="Sincronizar a cada (min)" dica="vazio = padrão do agente">
+              <Campo
+                rotulo="Sincronizar a cada (min)"
+                dica={`vazio = padrão do agente (${SINCRONIZACAO_PADRAO_MINUTOS} min)`}
+              >
                 <Input
                   type="number"
                   name="sync_interval_minutes"

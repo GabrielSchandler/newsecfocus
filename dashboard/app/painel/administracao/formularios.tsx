@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { SINCRONIZACAO_PADRAO_MINUTOS } from "@/lib/agente";
 import { ROTULOS_TIPO, formatarHorasCurto } from "@/lib/formato";
 import { CodigoInstalacao } from "./codigo-instalacao";
 import {
@@ -859,7 +860,10 @@ export function PainelEmpresa({
               disabled={somenteLeitura}
             />
           </Campo>
-          <Campo rotulo="Sincronização (min)" dica="em branco = padrão do agente">
+          <Campo
+            rotulo="Sincronização (min)"
+            dica={`em branco = padrão do agente (${SINCRONIZACAO_PADRAO_MINUTOS} min)`}
+          >
             <Input
               type="number"
               name="sync_interval_minutes"
