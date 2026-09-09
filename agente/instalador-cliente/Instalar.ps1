@@ -194,6 +194,7 @@ for ($tentativa = 1; $tentativa -le 5; $tentativa++) {
 
         if ($resp.valido) {
             $nomeEmpresa = $resp.empresa
+            $equipesEmpresa = $resp.equipes
             Escrever-Linha "  ✓ Codigo valido — empresa: $nomeEmpresa" $CorSucesso
             if ($resp.conta_ativa -eq $false) {
                 Escrever-Linha '  ATENCAO: esta conta esta suspensa. A instalacao segue, mas a coleta ficara pausada.' $CorAlerta
@@ -217,6 +218,74 @@ for ($tentativa = 1; $tentativa -le 5; $tentativa++) {
 if (-not $codigo) {
     Escrever-Linha 'Numero maximo de tentativas. Rode o instalador de novo quando tiver o codigo correto.' $CorErro
     Sair-ComPausa 1
+}
+
+# ----------------------------------------------------------------------------
+#  3b. Como esta maquina vai aparecer no painel
+#
+#  Antes, a estacao entrava no site com o nome do Windows e sem departamento —
+#  e alguem tinha de arrumar depois, procurando a maquina certa no meio das
+#  outras. Quem instala e quem sabe de qual sala e de qual setor ela e, entao a
+#  escolha passou para ca.
+# ----------------------------------------------------------------------------
+Escrever-Secao 'Como esta maquina vai aparecer no painel'
+
+$nomeAutomatico = $env:COMPUTERNAME
+$nomeExibicao   = $nomeAutomatico
+
+Escrever-Linha "  Nome detectado:  $nomeAutomatico" $CorTexto
+Escrever-Linha '  E assim que a estacao sera identificada na lista do painel.' 'DarkGray'
+Write-Host ''
+$trocar = Read-Host '  Quer usar outro nome? (s/N)'
+
+if ($trocar -match '^[sS]') {
+    for ($i = 1; $i -le 3; $i++) {
+        $escolhido = (Read-Host '  Nome desta maquina').Trim()
+        if ([string]::IsNullOrWhiteSpace($escolhido)) {
+            Escrever-Linha '  Nome vazio — mantendo o detectado.' $CorAlerta
+            break
+        }
+        if ($escolhido.Length -gt 60) {
+            Escrever-Linha '  No maximo 60 caracteres.' $CorErro
+            continue
+        }
+        $nomeExibicao = $escolhido
+        break
+    }
+}
+
+Escrever-Linha "  → Vai aparecer como: $nomeExibicao" $CorSucesso
+
+# --- Departamento -------------------------------------------------------------
+$equipeId = ''
+
+if ($equipesEmpresa -and @($equipesEmpresa).Count -gt 0) {
+    $lista = @($equipesEmpresa)
+    Write-Host ''
+    Escrever-Linha '  Departamento desta maquina:' $CorTexto
+    Escrever-Linha '    0) Deixar sem departamento (define depois no painel)' 'DarkGray'
+    for ($i = 0; $i -lt $lista.Count; $i++) {
+        Escrever-Linha ("    {0}) {1}" -f ($i + 1), $lista[$i].nome) $CorTexto
+    }
+    Write-Host ''
+
+    for ($tent = 1; $tent -le 3; $tent++) {
+        $op = (Read-Host '  Numero do departamento').Trim()
+        if ($op -eq '0' -or [string]::IsNullOrWhiteSpace($op)) {
+            Escrever-Linha '  → Sem departamento por enquanto.' $CorAlerta
+            break
+        }
+        $n = 0
+        if ([int]::TryParse($op, [ref]$n) -and $n -ge 1 -and $n -le $lista.Count) {
+            $equipeId = $lista[$n - 1].id
+            Escrever-Linha ("  → Departamento: {0}" -f $lista[$n - 1].nome) $CorSucesso
+            break
+        }
+        Escrever-Linha "  Escolha um numero entre 0 e $($lista.Count)." $CorErro
+    }
+} else {
+    # Sem internet na validacao, ou empresa que ainda nao criou equipe nenhuma.
+    Escrever-Linha '  (nenhum departamento cadastrado nesta empresa — define depois no painel)' 'DarkGray'
 }
 
 Write-Host ''
@@ -330,6 +399,10 @@ $ok = $ok -and (Escrever-Passo "Gravando a identidade da empresa" {
     New-ItemProperty -Path $ChaveRegistro -Name 'UrlSupabase'    -Value $UrlSupabase  -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $ChaveRegistro -Name 'ChaveAnonima'   -Value $ChaveAnonima -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $ChaveRegistro -Name 'ChaveMatricula' -Value $codigo       -PropertyType String -Force | Out-Null
+    # O que o instalador escolheu sobre a identidade desta maquina. O servico le
+    # daqui e manda na matricula, entao a estacao ja nasce certa no painel.
+    New-ItemProperty -Path $ChaveRegistro -Name 'NomeExibicao'   -Value $nomeExibicao -PropertyType String -Force | Out-Null
+    New-ItemProperty -Path $ChaveRegistro -Name 'EquipeId'       -Value $equipeId     -PropertyType String -Force | Out-Null
 })
 
 $ok = $ok -and (Escrever-Passo "Criando o servico Windows" {

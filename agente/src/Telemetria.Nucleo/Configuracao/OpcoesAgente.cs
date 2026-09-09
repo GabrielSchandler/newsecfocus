@@ -24,6 +24,15 @@ public sealed class OpcoesAgente
     /// </summary>
     public string ChaveMatricula { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Nome escolhido na instalacao para esta maquina aparecer no painel.
+    /// Vazio = usa o nome do Windows.
+    /// </summary>
+    public string NomeExibicao { get; set; } = string.Empty;
+
+    /// <summary>Departamento escolhido na instalacao. Vazio = nenhum.</summary>
+    public string EquipeId { get; set; } = string.Empty;
+
     /// <summary>Segundos sem entrada de mouse/teclado para o minuto ser marcado como ocioso.</summary>
     public int SegundosParaOcioso { get; set; } = 180;
 

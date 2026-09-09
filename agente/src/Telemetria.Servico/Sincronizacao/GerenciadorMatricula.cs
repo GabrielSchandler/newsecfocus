@@ -53,7 +53,12 @@ public sealed class GerenciadorMatricula
         var pedido = new PedidoMatricula
         {
             ChaveMatricula = _opcoes.ChaveMatricula,
-            NomeMaquina = IdentidadeMaquina.NomeMaquina,
+            // O nome escolhido na instalacao vence o do Windows; sem escolha,
+            // cai no nome da maquina como sempre foi.
+            NomeMaquina = string.IsNullOrWhiteSpace(_opcoes.NomeExibicao)
+                ? IdentidadeMaquina.NomeMaquina
+                : _opcoes.NomeExibicao.Trim(),
+            EquipeId = string.IsNullOrWhiteSpace(_opcoes.EquipeId) ? null : _opcoes.EquipeId.Trim(),
             UsuarioSo = IdentidadeMaquina.UsuarioAtual,
             IdHardware = IdentidadeMaquina.ObterIdHardware(),
             VersaoAgente = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0"

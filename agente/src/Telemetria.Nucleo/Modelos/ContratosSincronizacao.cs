@@ -9,8 +9,20 @@ public sealed class PedidoMatricula
     [JsonPropertyName("enrollment_key")]
     public string ChaveMatricula { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Nome que a maquina vai exibir no painel. Quem instala pode trocar o nome
+    /// do Windows por algo que a empresa reconheca ("Balcao 2", "Recepcao") —
+    /// DESKTOP-4F2K9A1 nao ajuda ninguem a achar a estacao na lista.
+    /// </summary>
     [JsonPropertyName("machine_name")]
     public string NomeMaquina { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Departamento escolhido na instalacao. Vazio = quem instalou nao escolheu,
+    /// e o colaborador nasce sem equipe como antes.
+    /// </summary>
+    [JsonPropertyName("team_id")]
+    public string? EquipeId { get; set; }
 
     [JsonPropertyName("os_user")]
     public string UsuarioSo { get; set; } = string.Empty;

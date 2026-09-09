@@ -19,6 +19,8 @@ interface PedidoMatricula {
   os_user?: string;
   agent_version?: string;
   hardware_id: string;
+  /** Departamento escolhido por quem instalou. Aplicado ao colaborador quando ele nascer. */
+  team_id?: string | null;
 }
 
 Deno.serve(async (req) => {
@@ -69,6 +71,7 @@ Deno.serve(async (req) => {
         os_user: corpo.os_user ?? null,
         hardware_id: corpo.hardware_id,
         agent_version: corpo.agent_version ?? null,
+        equipe_padrao_id: corpo.team_id ?? null,
         token_hash,
         token_prefix,
         status_online: true,

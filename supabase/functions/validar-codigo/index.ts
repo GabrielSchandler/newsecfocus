@@ -41,9 +41,17 @@ Deno.serve(async (req) => {
     .eq("id", idEmpresa)
     .maybeSingle();
 
+  // Departamentos vao junto: o instalador precisa deles para oferecer a escolha
+  // sem uma segunda ida a rede. Exige o codigo, que e o mesmo segredo que ja
+  // permite matricular uma maquina nesta empresa.
+  const { data: equipes } = await supabase.rpc("equipes_por_chave", {
+    p_chave: String(corpo.codigo),
+  });
+
   return json({
     valido: true,
     empresa: org?.name ?? null,
     conta_ativa: org?.status !== "SUSPENSA" && org?.status !== "CANCELADA",
+    equipes: equipes ?? [],
   });
 });

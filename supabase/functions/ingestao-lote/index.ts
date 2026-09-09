@@ -86,7 +86,9 @@ Deno.serve(async (req) => {
   const token_hash = await hashToken(token);
   const { data: dispositivo, error: erroDisp } = await supabase
     .from("devices")
-    .select("id, org_id")
+    // equipe_padrao_id vem junto: e o departamento escolhido na instalacao, que
+    // sera aplicado ao colaborador quando ele nascer, logo abaixo.
+    .select("id, org_id, equipe_padrao_id")
     .eq("token_hash", token_hash)
     .maybeSingle();
 
@@ -102,7 +104,7 @@ Deno.serve(async (req) => {
   for (const usuario of usuarios) {
     const { data: colaboradorId, error: erroColab } = await supabase.rpc(
       "resolver_colaborador",
-      { p_org: dispositivo.org_id, p_os_user: usuario },
+      { p_org: dispositivo.org_id, p_os_user: usuario, p_equipe: dispositivo.equipe_padrao_id ?? null },
     );
     if (erroColab) {
       return erro(`Falha ao resolver o colaborador: ${erroColab.message}`, 500);
