@@ -300,7 +300,14 @@ if ($confirmar -notmatch '^[sS]') {
 # ----------------------------------------------------------------------------
 Escrever-Secao 'Instalando'
 
-$origem = $PSScriptRoot
+# Os binarios ficam numa subpasta 'agente' dentro do zip, para quem extrai ver
+# so o Instalar.bat em vez de 500 DLLs soltas. Se a subpasta nao existir, cai
+# no comportamento antigo (tudo ao lado do script) — util em quem ja tem o
+# pacote plano e para o desenvolvimento.
+$origem = Join-Path $PSScriptRoot 'agente'
+if (-not (Test-Path (Join-Path $origem 'Telemetria.Servico.exe'))) {
+    $origem = $PSScriptRoot
+}
 
 # A versao e lida do proprio binario que esta sendo instalado. Ela nomeia a
 # pasta, e e o que permite a maquina se atualizar depois sem ninguem ir ate la:

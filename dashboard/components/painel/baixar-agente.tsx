@@ -16,16 +16,17 @@ interface Pacote {
  * TI do cliente, que muitas vezes não tem conta no painel — se o download
  * exigisse login, ele teria de pedir o arquivo a outra pessoa a cada máquina.
  *
- * São dois caminhos, e a ordem importa:
+ * O download é o pacote completo, e isso é uma decisão corrigida na marra.
  *
- *   • O botão principal entrega UM arquivo de 3 KB. Ele baixa o agente
- *     sozinho e instala. A primeira versão desta tela oferecia o zip completo
- *     e o Gabriel reclamou na hora: o cliente extraía uma pasta com mais de
- *     500 DLLs e tinha de caçar o instalador no meio.
+ * A primeira versão entregava o zip e o cliente extraía uma pasta com 500
+ * DLLs, tendo de caçar o instalador no meio. Troquei por um .bat de 3 KB que
+ * baixava o agente sozinho — e o Defender bloqueou como
+ * Trojan:Win32/ClickFix, porque baixar da internet e executar do temporário
+ * é exatamente a assinatura dessa família de ataque.
  *
- *   • O zip completo continua ali embaixo, discreto, porque resolve o caso
- *     que o arquivo pequeno não resolve: instalar em dezenas de máquinas sem
- *     baixar 97 MB em cada uma.
+ * A saída foi arrumar o zip por dentro: os binários vão numa subpasta e a
+ * raiz tem só o Instalar.bat. Quem extrai vê um arquivo para clicar, e nada
+ * se comporta como malware.
  */
 export async function BaixarAgente() {
   let pacote: Pacote | null = null;
@@ -52,14 +53,14 @@ export async function BaixarAgente() {
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-medium text-slate-200">Instalar nas estações</h2>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            Baixe e clique duas vezes no arquivo, na máquina que vai ser
-            acompanhada. Ele pede o código de instalação da empresa — está em
-            Administração &rsaquo; Empresa — e pergunta o nome e o departamento
-            que a estação vai ter no painel.
+            Baixe, extraia e clique duas vezes em <strong>Instalar.bat</strong> na
+            máquina que vai ser acompanhada. Ele pede o código de instalação da
+            empresa — está em Administração &rsaquo; Empresa — e pergunta o nome
+            e o departamento que a estação vai ter no painel.
           </p>
 
           <a
-            href={`${BASE_PACOTE}/Instalar.bat`}
+            href={`${BASE_PACOTE}/NewSecFocus-Instalador.zip`}
             className="toque-afunda mt-3 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3.5 py-2 text-sm font-medium text-slate-950 transition-colors hover:bg-cyan-400"
           >
             <Download className="h-4 w-4" />
@@ -67,8 +68,9 @@ export async function BaixarAgente() {
           </a>
 
           <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
-            Windows 10 ou 11 · requer permissão de administrador
-            {pacote ? ` · versão ${pacote.versao}` : ""}
+            Windows 10 ou 11 · {tamanho ? `${tamanho} · ` : ""}
+            {pacote ? `versão ${pacote.versao} · ` : ""}requer permissão de
+            administrador
           </p>
           {/* Vale dizer: senão o TI acha que precisa repetir o download a cada
               correção, que é justamente o trabalho que a atualização automática
@@ -79,15 +81,9 @@ export async function BaixarAgente() {
           </p>
 
           <p className="mt-3 border-t border-borda pt-3 text-[11px] leading-relaxed text-slate-600">
-            Vai instalar em várias máquinas?{" "}
-            <a
-              href={`${BASE_PACOTE}/NewSecFocus-Instalador.zip`}
-              className="text-slate-400 underline underline-offset-2 transition-colors hover:text-cyan-300"
-            >
-              Baixe o pacote completo
-            </a>{" "}
-            {tamanho ? `(${tamanho})` : ""} uma vez, coloque numa pasta de rede e
-            rode o <strong>Instalar.bat</strong> de dentro dele em cada estação.
+            Vai instalar em várias máquinas? Baixe uma vez, coloque a pasta
+            extraída num compartilhamento de rede e rode o{" "}
+            <strong>Instalar.bat</strong> a partir dele em cada estação.
           </p>
         </div>
       </div>
