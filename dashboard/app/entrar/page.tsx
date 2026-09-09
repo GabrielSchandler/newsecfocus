@@ -1,4 +1,5 @@
 import { FormularioLogin } from "./formulario-login";
+import { BaixarAgente } from "@/components/painel/baixar-agente";
 import { Activity, ShieldCheck } from "lucide-react";
 
 export default function PaginaEntrar() {
@@ -18,6 +19,8 @@ export default function PaginaEntrar() {
         <div className="rounded-xl2 border border-borda vidro p-6 shadow-glow">
           <FormularioLogin />
         </div>
+
+        <BaixarAgente />
 
         <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-slate-600">
           <ShieldCheck className="h-3.5 w-3.5" />

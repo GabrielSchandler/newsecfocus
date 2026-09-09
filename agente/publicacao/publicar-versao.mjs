@@ -28,9 +28,11 @@
 //  A chave nunca é gravada: vem do ambiente e morre com o processo.
 // ============================================================================
 
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { tmpdir } from "node:os";
 
 const URL_SUPABASE = "https://auwotdrgxjrrhhhmmekc.supabase.co";
 const BUCKET = "agente";
@@ -48,6 +50,13 @@ const notas = (() => {
   const i = process.argv.indexOf("--notas");
   return i > 0 ? process.argv[i + 1] : null;
 })();
+
+// O zip do site é opcional de propósito. Ele é a porta de ENTRADA (primeira
+// instalação numa máquina), não o canal de atualização — quem já está
+// instalado se atualiza sozinho pelos blobs, baixando centenas de KB. Refazer
+// um zip de 97 MB a cada publicação seria desperdício, e uma cópia levemente
+// atrasada no site se corrige sozinha na primeira sincronização.
+const refazerPacote = process.argv.includes("--pacote");
 
 // ---------------------------------------------------------------------------
 //  1. Versão: lida do mesmo arquivo que carimba os binários
@@ -188,3 +197,40 @@ if (!r.ok) {
 
 console.log(`Versão ${versao} publicada e marcada como vigente.`);
 console.log("As estações vão migrar sozinhas na próxima sincronização.");
+
+// ---------------------------------------------------------------------------
+//  6. Zip para baixar do site (opcional: --pacote)
+// ---------------------------------------------------------------------------
+if (refazerPacote) {
+  console.log("");
+  console.log("Montando o zip para download no site...");
+
+  const zip = join(tmpdir(), "NewSecFocus-Instalador.zip");
+  try { unlinkSync(zip); } catch { /* não existia */ }
+
+  // Compress-Archive do Windows: evita dependência nova só para zipar.
+  execFileSync("powershell.exe", [
+    "-NoProfile", "-Command",
+    `Compress-Archive -Path '${PASTA_PACOTE}\*' -DestinationPath '${zip}' -CompressionLevel Optimal -Force`,
+  ], { stdio: "inherit" });
+
+  const bytesZip = readFileSync(zip);
+  console.log(`  ${(bytesZip.length / 1048576).toFixed(0)} MB`);
+
+  // Nome FIXO: o link da página de login nunca muda de versão para versão.
+  await subir("instalador/NewSecFocus-Instalador.zip", bytesZip, "application/zip");
+
+  // A página lê isto para mostrar versão, tamanho e data sem consultar o banco.
+  await subir(
+    "instalador/atual.json",
+    Buffer.from(JSON.stringify({
+      versao,
+      bytes: bytesZip.length,
+      publicado_em: new Date().toISOString(),
+    }, null, 2)),
+    "application/json",
+  );
+
+  unlinkSync(zip);
+  console.log(`  no ar: ${URL_SUPABASE}/storage/v1/object/public/${BUCKET}/instalador/NewSecFocus-Instalador.zip`);
+}
