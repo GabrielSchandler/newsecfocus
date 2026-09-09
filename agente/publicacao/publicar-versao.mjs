@@ -211,7 +211,7 @@ if (refazerPacote) {
   // Compress-Archive do Windows: evita dependência nova só para zipar.
   execFileSync("powershell.exe", [
     "-NoProfile", "-Command",
-    `Compress-Archive -Path '${PASTA_PACOTE}\*' -DestinationPath '${zip}' -CompressionLevel Optimal -Force`,
+    `Compress-Archive -Path '${join(PASTA_PACOTE, "*")}' -DestinationPath '${zip}' -CompressionLevel Optimal -Force`,
   ], { stdio: "inherit" });
 
   const bytesZip = readFileSync(zip);
