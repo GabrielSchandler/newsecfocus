@@ -22,6 +22,12 @@ REM  proprio Instalar.ps1 — funciona tanto de duplo clique quanto pelo termina
 REM ============================================================================
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0agente\Instalar.ps1"
 '@
+$launcherDiagnostico = @'
+@echo off
+REM Le o estado local e testa a conexao, para descobrir por que a maquina nao
+REM aparece no painel. So le — nao instala nem altera nada.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0agente\Diagnostico.ps1"
+'@
 $launcherDesinstalar = @'
 @echo off
 REM Remove o agente desta maquina. Precisa de permissao de Administrador.
@@ -30,10 +36,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0agente\Desinstalar
 
 [IO.File]::WriteAllText((Join-Path $monta 'Instalar.bat'), ($launcherInstalar -replace "`r?`n", "`r`n"), [Text.Encoding]::ASCII)
 [IO.File]::WriteAllText((Join-Path $monta 'Desinstalar.bat'), ($launcherDesinstalar -replace "`r?`n", "`r`n"), [Text.Encoding]::ASCII)
+[IO.File]::WriteAllText((Join-Path $monta 'Diagnostico.bat'), ($launcherDiagnostico -replace "`r?`n", "`r`n"), [Text.Encoding]::ASCII)
 
 # Tudo o mais (inclusive os .ps1) vai para 'agente'.
 Get-ChildItem $origem -Force |
-  Where-Object { $_.Name -notin @('Instalar.bat','Desinstalar.bat') } |
+  Where-Object { $_.Name -notin @('Instalar.bat','Desinstalar.bat','Diagnostico.bat') } |
   ForEach-Object { Copy-Item $_.FullName (Join-Path $monta 'agente') -Recurse -Force }
 
 $zip = Join-Path $env:TEMP 'NewSecFocus-Instalador.zip'
