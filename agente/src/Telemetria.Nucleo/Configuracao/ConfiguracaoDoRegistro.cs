@@ -49,6 +49,7 @@ public static class ConfiguracaoDoRegistro
             Copiar(chave, valores, "ChaveMatricula");
             Copiar(chave, valores, "NomeExibicao");
             Copiar(chave, valores, "EquipeId");
+            Copiar(chave, valores, "NomeColaborador");
         }
         catch
         {

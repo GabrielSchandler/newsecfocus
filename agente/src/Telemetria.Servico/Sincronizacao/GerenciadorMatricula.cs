@@ -59,6 +59,7 @@ public sealed class GerenciadorMatricula
                 ? IdentidadeMaquina.NomeMaquina
                 : _opcoes.NomeExibicao.Trim(),
             EquipeId = string.IsNullOrWhiteSpace(_opcoes.EquipeId) ? null : _opcoes.EquipeId.Trim(),
+            NomeColaborador = string.IsNullOrWhiteSpace(_opcoes.NomeColaborador) ? null : _opcoes.NomeColaborador.Trim(),
             UsuarioSo = IdentidadeMaquina.UsuarioAtual,
             IdHardware = IdentidadeMaquina.ObterIdHardware(),
             VersaoAgente = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0"

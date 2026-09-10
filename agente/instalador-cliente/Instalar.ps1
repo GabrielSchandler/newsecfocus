@@ -221,26 +221,52 @@ if (-not $codigo) {
 }
 
 # ----------------------------------------------------------------------------
-#  3b. Como esta maquina vai aparecer no painel
+#  3b. Como esta estacao vai aparecer no painel
 #
 #  Antes, a estacao entrava no site com o nome do Windows e sem departamento —
 #  e alguem tinha de arrumar depois, procurando a maquina certa no meio das
 #  outras. Quem instala e quem sabe de qual sala e de qual setor ela e, entao a
 #  escolha passou para ca.
+#
+#  Sao DUAS perguntas de proposito. Ate a 1.4 havia so "nome desta maquina", e
+#  na segunda instalacao real (10/09/2026) quem instalou digitou "Robson" ali:
+#  o nome foi para a ESTACAO, e a PESSOA — que e o que o painel mais mostra —
+#  nasceu com o nome da conta do Windows, "Usuario".
 # ----------------------------------------------------------------------------
-Escrever-Secao 'Como esta maquina vai aparecer no painel'
+Escrever-Secao 'Como esta estacao vai aparecer no painel'
 
+# --- Pessoa -------------------------------------------------------------------
+Escrever-Linha '  Quem usa esta maquina?' $CorTexto
+Escrever-Linha '  E o nome que aparece em Pessoas, rankings e horas extras.' 'DarkGray'
+$nomeColaborador = ''
+for ($i = 1; $i -le 3; $i++) {
+    $escolhido = (Read-Host '  Nome da pessoa (ENTER para deixar para depois)').Trim()
+    if ([string]::IsNullOrWhiteSpace($escolhido)) { break }
+    if ($escolhido.Length -gt 80) {
+        Escrever-Linha '  No maximo 80 caracteres.' $CorErro
+        continue
+    }
+    $nomeColaborador = $escolhido
+    break
+}
+if ($nomeColaborador) {
+    Escrever-Linha "  → Pessoa: $nomeColaborador" $CorSucesso
+} else {
+    Escrever-Linha '  → Sem nome agora: aparece com o nome da conta do Windows ate alguem ajustar no painel.' $CorAlerta
+}
+
+# --- Estacao ------------------------------------------------------------------
+Write-Host ''
 $nomeAutomatico = $env:COMPUTERNAME
 $nomeExibicao   = $nomeAutomatico
 
-Escrever-Linha "  Nome detectado:  $nomeAutomatico" $CorTexto
-Escrever-Linha '  E assim que a estacao sera identificada na lista do painel.' 'DarkGray'
-Write-Host ''
-$trocar = Read-Host '  Quer usar outro nome? (s/N)'
+Escrever-Linha "  Nome da estacao (o computador):  $nomeAutomatico" $CorTexto
+Escrever-Linha '  E como a maquina aparece na lista de Dispositivos.' 'DarkGray'
+$trocar = Read-Host '  Quer dar outro nome a estacao? (s/N)'
 
 if ($trocar -match '^[sS]') {
     for ($i = 1; $i -le 3; $i++) {
-        $escolhido = (Read-Host '  Nome desta maquina').Trim()
+        $escolhido = (Read-Host '  Nome da estacao').Trim()
         if ([string]::IsNullOrWhiteSpace($escolhido)) {
             Escrever-Linha '  Nome vazio — mantendo o detectado.' $CorAlerta
             break
@@ -254,10 +280,11 @@ if ($trocar -match '^[sS]') {
     }
 }
 
-Escrever-Linha "  → Vai aparecer como: $nomeExibicao" $CorSucesso
+Escrever-Linha "  → Estacao: $nomeExibicao" $CorSucesso
 
 # --- Departamento -------------------------------------------------------------
 $equipeId = ''
+$nomeEquipe = ''
 
 if ($equipesEmpresa -and @($equipesEmpresa).Count -gt 0) {
     $lista = @($equipesEmpresa)
@@ -278,6 +305,7 @@ if ($equipesEmpresa -and @($equipesEmpresa).Count -gt 0) {
         $n = 0
         if ([int]::TryParse($op, [ref]$n) -and $n -ge 1 -and $n -le $lista.Count) {
             $equipeId = $lista[$n - 1].id
+            $nomeEquipe = $lista[$n - 1].nome
             Escrever-Linha ("  → Departamento: {0}" -f $lista[$n - 1].nome) $CorSucesso
             break
         }
@@ -288,6 +316,11 @@ if ($equipesEmpresa -and @($equipesEmpresa).Count -gt 0) {
     Escrever-Linha '  (nenhum departamento cadastrado nesta empresa — define depois no painel)' 'DarkGray'
 }
 
+Write-Host ''
+Escrever-Linha '  Vai aparecer no painel assim:' $CorTexto
+Escrever-Linha ('    Pessoa:        ' + $(if ($nomeColaborador) { $nomeColaborador } else { '(nome da conta do Windows)' })) 'White'
+Escrever-Linha ('    Estacao:       ' + $nomeExibicao) 'White'
+Escrever-Linha ('    Departamento:  ' + $(if ($nomeEquipe) { $nomeEquipe } else { '(nenhum)' })) 'White'
 Write-Host ''
 $confirmar = Read-Host '  Instalar agora nesta estacao? (S/N)'
 if ($confirmar -notmatch '^[sS]') {
@@ -410,6 +443,7 @@ $ok = $ok -and (Escrever-Passo "Gravando a identidade da empresa" {
     # daqui e manda na matricula, entao a estacao ja nasce certa no painel.
     New-ItemProperty -Path $ChaveRegistro -Name 'NomeExibicao'   -Value $nomeExibicao -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $ChaveRegistro -Name 'EquipeId'       -Value $equipeId     -PropertyType String -Force | Out-Null
+    New-ItemProperty -Path $ChaveRegistro -Name 'NomeColaborador' -Value $nomeColaborador -PropertyType String -Force | Out-Null
 })
 
 $ok = $ok -and (Escrever-Passo "Criando o servico Windows" {
@@ -427,6 +461,18 @@ $ok = $ok -and (Escrever-Passo "Criando o servico Windows" {
     & sc.exe failure $NomeServico reset= 86400 actions= restart/5000/restart/10000/restart/30000 | Out-Null
 })
 
+# Uma reinstalacao reaproveitava o token da matricula anterior, e o servico
+# nunca reenviava as escolhas novas (pessoa, estacao, departamento). Sem o
+# token, ele matricula de novo — o servidor reconhece a maquina pelo hardware
+# e atualiza o MESMO registro, sem duplicar a estacao.
+$tokenAntigo = Join-Path $PastaDados 'dispositivo.bin'
+if (Test-Path $tokenAntigo) { Remove-Item $tokenAntigo -Force -ErrorAction SilentlyContinue }
+
+# Marca onde o log esta agora, para so considerar o que for escrito depois:
+# o arquivo acumula as execucoes anteriores, inclusive matriculas antigas.
+$logServico      = Join-Path $PastaDados 'logs\servico.log'
+$tamanhoLogAntes = if (Test-Path $logServico) { (Get-Item $logServico).Length } else { 0 }
+
 $ok = $ok -and (Escrever-Passo "Iniciando o servico" {
     & sc.exe start $NomeServico | Out-Null
     Start-Sleep -Seconds 2
@@ -437,6 +483,46 @@ $ok = $ok -and (Escrever-Passo "Iniciando o servico" {
 })
 
 # ----------------------------------------------------------------------------
+#  4b. Confirmar que a estacao ja esta no painel
+#
+#  Quem instala precisa saber NA HORA se deu certo. Antes a mensagem era "a
+#  estacao aparece em ate uma hora", e a segunda instalacao real levou 7
+#  minutos para aparecer — tempo de sobra para achar que tinha falhado.
+# ----------------------------------------------------------------------------
+function Log-TemDesde {
+    param([string]$Arquivo, [long]$Desde, [string]$Padrao)
+    if (-not (Test-Path $Arquivo)) { return $false }
+    try {
+        # FileShare ReadWrite: o servico mantem o arquivo aberto para escrita.
+        $fs = [IO.File]::Open($Arquivo, 'Open', 'Read', 'ReadWrite')
+        try {
+            if ($fs.Length -lt $Desde) { $Desde = 0 }   # arquivo recriado
+            if ($fs.Length -eq $Desde) { return $false }
+            [void]$fs.Seek($Desde, 'Begin')
+            $leitor = New-Object IO.StreamReader($fs, [Text.Encoding]::UTF8)
+            return ($leitor.ReadToEnd() -match $Padrao)
+        } finally { $fs.Dispose() }
+    } catch { return $false }
+}
+
+$registrada = $false
+if ($ok) {
+    Escrever-Linha '   › ' $CorMarca -SemQuebra
+    Escrever-Linha 'Registrando a estacao no painel' $CorTexto -SemQuebra
+    $limiteRegistro = (Get-Date).AddSeconds(45)
+    while ((Get-Date) -lt $limiteRegistro) {
+        if (Log-TemDesde $logServico $tamanhoLogAntes 'matriculada') { $registrada = $true; break }
+        Start-Sleep -Seconds 1
+        Escrever-Linha '.' 'DarkGray' -SemQuebra
+    }
+    if ($registrada) {
+        Escrever-Linha '  ✓' $CorSucesso
+    } else {
+        Escrever-Linha '  (ainda nao confirmou)' $CorAlerta
+    }
+}
+
+# ----------------------------------------------------------------------------
 #  5. Resultado
 # ----------------------------------------------------------------------------
 Write-Host ''
@@ -444,8 +530,14 @@ if ($ok) {
     $rotuloEmpresa = if ($nomeEmpresa) { $nomeEmpresa } else { 'empresa configurada' }
     Escrever-Moldura @('Instalacao concluida', "Estacao registrada para: $rotuloEmpresa") $CorSucesso
     Write-Host ''
-    Escrever-Linha '  A estacao aparece no painel, em Dispositivos, em ate uma hora' $CorTexto
-    Escrever-Linha '  (o primeiro envio acontece pouco depois do servico iniciar).' $CorTexto
+    if ($registrada) {
+        Escrever-Linha '  A estacao ja aparece no painel, em Dispositivos.' $CorTexto
+    } else {
+        Escrever-Linha '  A estacao aparece no painel, em Dispositivos, assim que a rede responder.' $CorTexto
+        Escrever-Linha '  Se demorar mais de alguns minutos, rode o Diagnostico.bat.' $CorTexto
+    }
+    Escrever-Linha '  A pessoa entra em Pessoas em cerca de 2 minutos: o agente fecha um' $CorTexto
+    Escrever-Linha '  minuto inteiro de atividade antes do primeiro envio.' $CorTexto
     Escrever-Linha "  Dados locais: $PastaDados" 'DarkGray'
 } else {
     Escrever-Moldura @('A instalacao nao terminou', 'Veja o passo marcado com X acima') $CorErro

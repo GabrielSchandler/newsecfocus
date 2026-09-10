@@ -239,9 +239,9 @@ export function PainelColaboradores({
       <Card className="p-5">
         <h3 className="text-sm font-medium text-slate-200">Colaboradores</h3>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">
-          As pessoas aparecem sozinhas na primeira sincronização de cada estação, identificadas
-          pelo usuário do Windows. Aqui você dá o nome de verdade, o cargo, a equipe e a jornada
-          esperada — a jornada é a base do indicador de aderência.
+          As pessoas aparecem sozinhas minutos depois da instalação, com o nome digitado no
+          instalador — ou, se ninguém digitou, com o usuário do Windows. Aqui você ajusta o nome,
+          o cargo, a equipe e a jornada esperada — a jornada é a base do indicador de aderência.
         </p>
         <div className="mt-4">
           <Input

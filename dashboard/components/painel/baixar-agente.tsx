@@ -55,8 +55,9 @@ export async function BaixarAgente() {
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             Baixe, extraia e clique duas vezes em <strong>Instalar.bat</strong> na
             máquina que vai ser acompanhada. Ele pede o código de instalação da
-            empresa — está em Administração &rsaquo; Empresa — e pergunta o nome
-            e o departamento que a estação vai ter no painel.
+            empresa — está em Administração &rsaquo; Empresa — e pergunta quem
+            usa a máquina, o nome da estação e o departamento. A estação aparece
+            no painel assim que a instalação termina.
           </p>
 
           <a

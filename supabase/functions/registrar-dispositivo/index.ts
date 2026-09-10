@@ -21,6 +21,11 @@ interface PedidoMatricula {
   hardware_id: string;
   /** Departamento escolhido por quem instalou. Aplicado ao colaborador quando ele nascer. */
   team_id?: string | null;
+  /**
+   * Nome da PESSOA que usa a máquina, digitado na instalação. É o que aparece
+   * em Pessoas, rankings e horas extras — machine_name é só o da estação.
+   */
+  employee_name?: string | null;
 }
 
 Deno.serve(async (req) => {
@@ -72,6 +77,9 @@ Deno.serve(async (req) => {
         hardware_id: corpo.hardware_id,
         agent_version: corpo.agent_version ?? null,
         equipe_padrao_id: corpo.team_id ?? null,
+        // Reinstalação sem nome zera a escolha anterior de propósito: vale o que
+        // quem instalou decidiu por último.
+        nome_colaborador_padrao: corpo.employee_name?.trim() || null,
         token_hash,
         token_prefix,
         status_online: true,

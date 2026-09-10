@@ -65,6 +65,8 @@ copy /y "%AQUI%Instalar.bat"      "%SAIDA%\Instalar.bat"      >nul
 copy /y "%AQUI%Instalar.ps1"      "%SAIDA%\Instalar.ps1"      >nul
 copy /y "%AQUI%Desinstalar.bat"   "%SAIDA%\Desinstalar.bat"   >nul
 copy /y "%AQUI%Desinstalar.ps1"   "%SAIDA%\Desinstalar.ps1"   >nul
+copy /y "%AQUI%Diagnostico.bat"   "%SAIDA%\Diagnostico.bat"   >nul
+copy /y "%AQUI%Diagnostico.ps1"   "%SAIDA%\Diagnostico.ps1"   >nul
 
 echo.
 echo ============================================================================

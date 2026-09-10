@@ -74,7 +74,7 @@ export default async function PaginaPessoas({
       {pessoas.length === 0 ? (
         <EstadoVazio
           titulo="Nenhum colaborador ainda"
-          descricao="Os colaboradores são criados automaticamente na primeira sincronização de cada estação. Depois disso, dê nome e equipe a cada um em Administração."
+          descricao="Cada pessoa aparece sozinha cerca de 2 minutos depois de o agente ser instalado na estação dela, já com o nome e o departamento escolhidos na instalação. Ajustes ficam em Administração."
         />
       ) : (
         <>

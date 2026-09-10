@@ -74,7 +74,7 @@ export default async function PaginaDispositivos({
       {dispositivos.length === 0 ? (
         <EstadoVazio
           titulo="Nenhuma estação matriculada"
-          descricao="Instale o agente numa máquina Windows com a chave de matrícula da empresa. Na primeira sincronização ela aparece aqui."
+          descricao="Instale o agente numa máquina Windows com o código de instalação da empresa. Ela aparece aqui assim que a instalação termina."
         />
       ) : (
         <TabelaDispositivos linhas={dispositivos} />

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Telemetria.Nucleo.Configuracao;
 using Telemetria.Nucleo.Dados;
 using Telemetria.Nucleo.Modelos;
+using Telemetria.Nucleo.Seguranca;
 using Telemetria.Servico.Atualizacao;
 
 namespace Telemetria.Servico.Sincronizacao;
@@ -24,6 +25,15 @@ public sealed class WorkerSincronizacao : BackgroundService
 
     private readonly string _versao = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
     private int _intervaloMinutos;
+
+    /// <summary>
+    /// Ate o primeiro lote sair, o laco olha de novo em segundos em vez de esperar
+    /// o intervalo inteiro — e esse lote que faz a PESSOA aparecer no painel.
+    /// Limitado aos primeiros minutos de vida, para uma maquina sem ninguem logado
+    /// (e portanto sem atividade) nao ficar acordando a cada 20 segundos para sempre.
+    /// </summary>
+    private bool _primeiroLoteEnviado;
+    private readonly DateTimeOffset _inicio = DateTimeOffset.UtcNow;
 
     /// <summary>
     /// Ciclos que falharam seguidos. Zera no primeiro sucesso e comanda a
@@ -52,8 +62,28 @@ public sealed class WorkerSincronizacao : BackgroundService
     {
         _log.LogInformation("Worker de sincronização iniciado (intervalo {m} min).", _intervaloMinutos);
 
-        // Pequeno atraso inicial: deixa o boot da máquina/rede assentar antes do primeiro envio.
-        await EsperarSeguro(TimeSpan.FromSeconds(45), stoppingToken);
+        // Atraso curto, so para o servico terminar de subir. Antes eram 45 s fixos
+        // que, somados a regra de so matricular quando havia registro pendente,
+        // faziam a estacao levar uns 7 minutos para aparecer no painel depois de
+        // instalada — o instalador dizia "em ate uma hora". Se a rede ainda nao
+        // estiver pronta (maquina recem-ligada), o recuo progressivo cuida disso.
+        await EsperarSeguro(TimeSpan.FromSeconds(5), stoppingToken);
+
+        // Matricula JA, sem esperar ter atividade para enviar: a estacao precisa
+        // aparecer no painel no instante em que e instalada, para quem instalou
+        // conferir na hora que deu certo. O instalador espera por esta matricula.
+        try
+        {
+            await _matricula.ObterTokenAsync(stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            _log.LogWarning(ex, "Matricula inicial falhou; nova tentativa no proximo ciclo.");
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -95,6 +125,13 @@ public sealed class WorkerSincronizacao : BackgroundService
         if (sucesso)
         {
             _falhasSeguidas = 0;
+
+            // O coletor so grava o primeiro registro depois de fechar um minuto
+            // inteiro. Esperar o intervalo aqui era o que atrasava a primeira
+            // aparicao da pessoa no painel.
+            if (!_primeiroLoteEnviado && DateTimeOffset.UtcNow - _inicio < TimeSpan.FromMinutes(10))
+                return TimeSpan.FromSeconds(20);
+
             return TimeSpan.FromMinutes(_intervaloMinutos);
         }
 
@@ -149,6 +186,7 @@ public sealed class WorkerSincronizacao : BackgroundService
             {
                 VersaoAgente = _versao,
                 EnviadoEm = DateTimeOffset.UtcNow,
+                NomeComputador = IdentidadeMaquina.NomeMaquina,
                 Registros = [.. lote],
                 Eventos = eventos
             };
@@ -181,6 +219,7 @@ public sealed class WorkerSincronizacao : BackgroundService
             // (duplicado = servidor já tem; não faz sentido reenviar).
             var removidos = _buffer.ApagarPorId(lote.Select(r => r.IdLocal));
             totalEnviado += resposta.Aceitos;
+            _primeiroLoteEnviado = true;
 
             if (eventos.Count > 0)
             {

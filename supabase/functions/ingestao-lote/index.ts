@@ -43,6 +43,12 @@ interface EventoEntrada {
 interface LoteEntrada {
   agent_version?: string;
   sent_at?: string;
+  /**
+   * Nome do computador no Windows. Comparado ao domínio de cada conta do lote
+   * para saber se ela é LOCAL (pertence a esta máquina) ou de domínio. Agente
+   * anterior à 1.5 não manda, e aí o banco usa o comportamento antigo.
+   */
+  computer_name?: string;
   logs: RegistroEntrada[];
   /** Diário de bordo da estação — opcional: agente antigo não manda. */
   eventos?: EventoEntrada[];
@@ -88,7 +94,7 @@ Deno.serve(async (req) => {
     .from("devices")
     // equipe_padrao_id vem junto: e o departamento escolhido na instalacao, que
     // sera aplicado ao colaborador quando ele nascer, logo abaixo.
-    .select("id, org_id, equipe_padrao_id")
+    .select("id, org_id, equipe_padrao_id, nome_colaborador_padrao")
     .eq("token_hash", token_hash)
     .maybeSingle();
 
@@ -101,10 +107,33 @@ Deno.serve(async (req) => {
   const usuarios = [...new Set(lote.logs.map((r) => (r.os_user ?? "").trim()))];
   const porUsuario = new Map<string, string>();
 
+  const computador = (lote.computer_name ?? "").trim().toLowerCase();
+
   for (const usuario of usuarios) {
+    // Conta LOCAL do Windows é aquela cujo domínio é o próprio computador
+    // (GRS\Usuario na máquina GRS). Ela pertence a esta máquina: a mesma conta
+    // "Usuario" em outra máquina é outra pessoa. Conta de domínio (EMPRESA\joao,
+    // AzureAD\Joao) é a mesma pessoa onde ela logar. Formato joao@empresa é
+    // conta de nuvem, portanto de domínio.
+    let contaLocal: boolean | null = null;
+    if (computador) {
+      if (usuario.includes("\\")) {
+        contaLocal = usuario.split("\\")[0].toLowerCase() === computador;
+      } else {
+        contaLocal = !usuario.includes("@");
+      }
+    }
+
     const { data: colaboradorId, error: erroColab } = await supabase.rpc(
       "resolver_colaborador",
-      { p_org: dispositivo.org_id, p_os_user: usuario, p_equipe: dispositivo.equipe_padrao_id ?? null },
+      {
+        p_org: dispositivo.org_id,
+        p_os_user: usuario,
+        p_equipe: dispositivo.equipe_padrao_id ?? null,
+        p_nome: dispositivo.nome_colaborador_padrao ?? null,
+        p_device: dispositivo.id,
+        p_conta_local: contaLocal,
+      },
     );
     if (erroColab) {
       return erro(`Falha ao resolver o colaborador: ${erroColab.message}`, 500);

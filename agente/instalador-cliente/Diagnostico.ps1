@@ -77,7 +77,8 @@ if (-not $reg) {
 } else {
     $codigo = if ($reg.ChaveMatricula) { $reg.ChaveMatricula } else { '(vazio)' }
     Dizer ("  Codigo da empresa: " + $codigo) $(if ($reg.ChaveMatricula) { 'Green' } else { 'Red' })
-    Dizer ("  Nome escolhido:    " + $(if ($reg.NomeExibicao) { $reg.NomeExibicao } else { '(usa o nome do Windows)' }))
+    Dizer ("  Pessoa:            " + $(if ($reg.NomeColaborador) { $reg.NomeColaborador } else { '(nome da conta do Windows)' }))
+    Dizer ("  Nome da estacao:   " + $(if ($reg.NomeExibicao) { $reg.NomeExibicao } else { '(usa o nome do Windows)' }))
     Dizer ("  Departamento:      " + $(if ($reg.EquipeId) { $reg.EquipeId } else { '(nenhum)' }))
     Dizer ("  Servidor:          " + $reg.UrlSupabase)
     if (-not $reg.ChaveMatricula) {
@@ -85,6 +86,18 @@ if (-not $reg) {
     }
     if ($reg.UrlSupabase -and $reg.UrlSupabase -notlike '*auwotdrgxjrrhhhmmekc*') {
         $problemas.Add('O servidor gravado nao e o do NewSec Focus. Pacote antigo ou adulterado — baixe de novo do painel.')
+    }
+}
+
+# O token so existe depois que o servico conseguiu se registrar no servidor.
+# Servico rodando sem token = ele esta tentando e nao consegue chegar la.
+$tokenDispositivo = Join-Path $PastaDados 'dispositivo.bin'
+if (Test-Path $tokenDispositivo) {
+    Dizer '  Registro no painel: feito (a estacao ja tem a credencial dela)' 'Green'
+} else {
+    Dizer '  Registro no painel: AINDA NAO — o servico nao conseguiu se registrar.' 'Red'
+    if ($svc -and $svc.Status -eq 'Running') {
+        $problemas.Add('O servico esta rodando mas ainda nao se registrou no painel. Quase sempre e rede: veja a secao Conexao abaixo.')
     }
 }
 
@@ -153,8 +166,8 @@ try {
 Titulo 'Conclusao'
 if ($problemas.Count -eq 0) {
     Dizer '  Nada de errado encontrado localmente.' 'Green'
-    Dizer '  Se ainda nao aparece no painel, aguarde ate 5 minutos apos a instalacao —' 'Gray'
-    Dizer '  a estacao so aparece depois do primeiro envio.' 'Gray'
+    Dizer '  A estacao aparece no painel segundos depois de o servico iniciar, e a' 'Gray'
+    Dizer '  pessoa em cerca de 2 minutos. Se passou disso, envie este relatorio ao suporte.' 'Gray'
 } else {
     $i = 1
     foreach ($p in $problemas) { Dizer ("  " + $i + ") " + $p) 'Yellow'; $i++ }

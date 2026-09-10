@@ -24,6 +24,14 @@ public sealed class PedidoMatricula
     [JsonPropertyName("team_id")]
     public string? EquipeId { get; set; }
 
+    /// <summary>
+    /// Nome da PESSOA que usa esta maquina, digitado na instalacao. E o nome que
+    /// aparece em Pessoas, rankings e horas extras. Vazio = ela nasce com o nome
+    /// da conta do Windows ("Usuario") ate alguem ajustar no painel.
+    /// </summary>
+    [JsonPropertyName("employee_name")]
+    public string? NomeColaborador { get; set; }
+
     [JsonPropertyName("os_user")]
     public string UsuarioSo { get; set; } = string.Empty;
 
@@ -60,6 +68,15 @@ public sealed class LoteTelemetria
 
     [JsonPropertyName("sent_at")]
     public DateTimeOffset EnviadoEm { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Nome do computador no Windows. O servidor compara com o dominio de cada
+    /// conta do lote: se forem iguais, a conta e LOCAL e a pessoa fica amarrada
+    /// a esta maquina. Sem isso, a conta generica "Usuario" de dez maquinas
+    /// diferentes virava uma pessoa so.
+    /// </summary>
+    [JsonPropertyName("computer_name")]
+    public string NomeComputador { get; set; } = string.Empty;
 
     [JsonPropertyName("logs")]
     public List<RegistroAtividade> Registros { get; set; } = [];
