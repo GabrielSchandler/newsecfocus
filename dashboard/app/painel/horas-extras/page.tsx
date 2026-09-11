@@ -1,10 +1,8 @@
 import { AlarmClockCheck } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
-import { AvisoErro, CabecalhoPagina, EstadoVazio } from "@/components/painel/cabecalho";
-import { TabelaHorasExtras } from "@/components/painel/tabela-horas-extras";
-import { Card } from "@/components/ui/card";
+import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
+import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
@@ -32,9 +30,6 @@ export default async function PaginaHorasExtras({
   ]);
 
   const erro = primeiroErro(equipes, horasExtras);
-  const linhas = horasExtras.dados;
-
-  const semJanelaConfigurada = linhas.length > 0 && linhas.every((l) => !l.temJanelaDefinida);
 
   return (
     <div className="space-y-5">
@@ -55,28 +50,11 @@ export default async function PaginaHorasExtras({
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      {semJanelaConfigurada && podeAdministrar(contexto) && (
-        <Card className="border-amber-500/20 p-4 text-sm text-amber-200/90">
-          Nenhuma janela de expediente está configurada — nem padrão da empresa, nem por
-          colaborador. Sem isso, não é possível calcular hora extra.{" "}
-          <Link
-            href="/painel/administracao?aba=empresa"
-            className="font-medium underline underline-offset-2 hover:text-amber-100"
-          >
-            Configurar o expediente padrão
-          </Link>
-          .
-        </Card>
-      )}
-
-      {linhas.length === 0 ? (
-        <EstadoVazio
-          titulo="Nenhum registro no período"
-          descricao="Assim que houver atividade das estações classificada por hora, a comparação com a janela de expediente aparece aqui."
-        />
-      ) : (
-        <TabelaHorasExtras linhas={linhas} mostrarEquipe={!escopo.equipeId} />
-      )}
+      <SecaoHorasExtras
+        linhas={horasExtras.dados}
+        mostrarEquipe={!escopo.equipeId}
+        admin={podeAdministrar(contexto)}
+      />
     </div>
   );
 }
