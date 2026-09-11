@@ -6,6 +6,7 @@ import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
+import { LinhaDoTempoDia } from "@/components/painel/linha-do-tempo-dia";
 import { TabelaDias, type LinhaDia } from "@/components/painel/tabela-dias";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -18,6 +19,7 @@ import {
   buscarDistribuicao,
   buscarKpisComparados,
   buscarKpisEscala,
+  buscarLinhaDoTempo,
   buscarRelatorioDiario,
   buscarSerie,
 } from "@/lib/consultas";
@@ -62,7 +64,7 @@ export default async function PaginaDetalhePessoa({
     dispositivoId: null,
   };
 
-  const [kpis, escala, serie, distribuicao, diario] = await Promise.all([
+  const [kpis, escala, serie, distribuicao, diario, linhaTempo] = await Promise.all([
     comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
       atual: KPIS_VAZIOS,
       anterior: KPIS_VAZIOS,
@@ -77,9 +79,10 @@ export default async function PaginaDetalhePessoa({
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 10), []),
     comFalha(buscarRelatorioDiario(supabase, periodo, escopo) as Promise<LinhaDia[]>, []),
+    comFalha(buscarLinhaDoTempo(supabase, periodo, id), []),
   ]);
 
-  const erro = primeiroErro(kpis, escala, serie, distribuicao, diario);
+  const erro = primeiroErro(kpis, escala, serie, distribuicao, diario, linhaTempo);
 
   return (
     <div className="space-y-5">
@@ -104,6 +107,8 @@ export default async function PaginaDetalhePessoa({
         rotuloComparacao={rotuloComparacao(periodo)}
         escala={escala.dados}
       />
+
+      <LinhaDoTempoDia segmentos={linhaTempo.dados} fuso={fuso} />
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
         <div className="min-w-0 xl:col-span-3">

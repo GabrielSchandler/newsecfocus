@@ -19,6 +19,7 @@ import type {
   Escopo,
   EventoEstacao,
   FatiaDistribuicao,
+  SegmentoLinha,
   Kpis,
   KpisComparados,
   KpisEscala,
@@ -196,6 +197,27 @@ export async function buscarDiarioEstacao(
     momento: e.momento,
     versao: e.versao ?? null,
   })) as EventoEstacao[];
+}
+
+/**
+ * Linha do tempo do dia de UMA pessoa (ou estação): segmentos de estado
+ * — produtivo/neutro/improdutivo/ocioso/bloqueado — para desenhar a faixa. Os
+ * buracos entre segmentos são a máquina desligada e ficam por conta do desenho.
+ */
+export async function buscarLinhaDoTempo(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  colaboradorId?: string | null,
+  dispositivoId?: string | null,
+): Promise<SegmentoLinha[]> {
+  const { data, error } = await supabase.rpc("painel_linha_do_tempo", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_colaborador: colaboradorId ?? null,
+    p_dispositivo: dispositivoId ?? null,
+  });
+  if (error) throw error;
+  return (data ?? []) as SegmentoLinha[];
 }
 
 export async function buscarUsuariosAcesso(

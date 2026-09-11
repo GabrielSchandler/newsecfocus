@@ -118,6 +118,24 @@ export interface EventoEstacao {
   versao: string | null;
 }
 
+/** Estados possíveis de um minuto na linha do tempo do dia. */
+export type EstadoLinha =
+  | "PRODUTIVO"
+  | "NEUTRO"
+  | "IMPRODUTIVO"
+  | "SEM"
+  | "OCIOSO"
+  | "BLOQUEADO";
+
+/** Um trecho contíguo de mesmo estado na linha do tempo (do banco). */
+export interface SegmentoLinha {
+  dia: string; // YYYY-MM-DD no fuso da empresa
+  inicio: string; // ISO
+  fim: string; // ISO
+  estado: EstadoLinha;
+  minutos: number;
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;
