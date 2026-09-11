@@ -127,6 +127,11 @@ internal static class Program
         // porque o evento de energia chega à sessão do usuário.
         SystemEvents_HookEnergia(buffer, logGeral);
 
+        // Bloqueio e desbloqueio de tela. Também chega à sessão do usuário, não
+        // ao serviço. Diferente de suspensão: aqui a máquina continua ligada e o
+        // coletor segue vivo — por isso o registro sobe no próximo lote normal.
+        SystemEvents_HookSessao(buffer, logGeral);
+
         Application.ApplicationExit += (_, _) =>
         {
             cts.Cancel();
@@ -173,6 +178,31 @@ internal static class Program
                 case Microsoft.Win32.PowerModes.Resume:
                     buffer.InserirEvento(TiposEvento.Retomada, DateTimeOffset.UtcNow, VersaoAtual());
                     log.LogInformation("Máquina retomada.");
+                    break;
+            }
+        };
+    }
+
+    /// <summary>
+    /// Tela bloqueada e destravada (Win+L, bloqueio por inatividade, troca de
+    /// usuário). Vira o marco "bloqueou a tela" na linha do tempo da estação —
+    /// o gestor consegue ver que a máquina ficou aberta mas travada, em vez de
+    /// confundir isso com ociosidade comum.
+    /// </summary>
+    private static void SystemEvents_HookSessao(BufferTelemetria buffer, ILogger log)
+    {
+        Microsoft.Win32.SystemEvents.SessionSwitch += (_, e) =>
+        {
+            switch (e.Reason)
+            {
+                case Microsoft.Win32.SessionSwitchReason.SessionLock:
+                    buffer.InserirEvento(TiposEvento.Bloqueada, DateTimeOffset.UtcNow, VersaoAtual());
+                    log.LogInformation("Tela bloqueada — registrado no diário de bordo.");
+                    break;
+
+                case Microsoft.Win32.SessionSwitchReason.SessionUnlock:
+                    buffer.InserirEvento(TiposEvento.Desbloqueada, DateTimeOffset.UtcNow, VersaoAtual());
+                    log.LogInformation("Tela desbloqueada.");
                     break;
             }
         };

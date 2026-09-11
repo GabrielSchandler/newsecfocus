@@ -2,11 +2,14 @@ import { MonitorSmartphone } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AvisoErro, CabecalhoPagina, EstadoVazio } from "@/components/painel/cabecalho";
 import { TabelaDispositivos } from "@/components/painel/tabela-dispositivos";
+import { DiarioEstacao } from "@/components/painel/diario-estacao";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha } from "@/lib/carregar";
-import { buscarDispositivos } from "@/lib/consultas";
+import { buscarDispositivos, buscarDiarioEstacao } from "@/lib/consultas";
 import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
+
+const DIAS_DIARIO = 14;
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +25,11 @@ export default async function PaginaDispositivos({
   if (!contexto) redirect("/entrar");
 
   const { escopo } = lerFiltros(params, contexto);
-  const resultado = await comFalha(
-    buscarDispositivos(supabase, orgEfetiva(contexto, escopo)),
-    [],
-  );
+  const orgId = orgEfetiva(contexto, escopo);
+  const [resultado, diario] = await Promise.all([
+    comFalha(buscarDispositivos(supabase, orgId), []),
+    comFalha(buscarDiarioEstacao(supabase, orgId, DIAS_DIARIO), []),
+  ]);
   const dispositivos = resultado.dados;
   const online = dispositivos.filter((d) => d.status_online).length;
   const limite = contexto.empresa.maxDispositivos;
@@ -77,7 +81,11 @@ export default async function PaginaDispositivos({
           descricao="Instale o agente numa máquina Windows com o código de instalação da empresa. Ela aparece aqui assim que a instalação termina."
         />
       ) : (
-        <TabelaDispositivos linhas={dispositivos} />
+        <>
+          <TabelaDispositivos linhas={dispositivos} />
+          {diario.erro && <AvisoErro mensagem={diario.erro} />}
+          <DiarioEstacao eventos={diario.dados} dias={DIAS_DIARIO} />
+        </>
       )}
     </div>
   );

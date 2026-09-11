@@ -17,6 +17,7 @@ import type {
   EmpresaCliente,
   Equipe,
   Escopo,
+  EventoEstacao,
   FatiaDistribuicao,
   Kpis,
   KpisComparados,
@@ -161,6 +162,40 @@ export async function buscarDispositivos(
   const { data, error } = await consulta;
   if (error) throw error;
   return (data ?? []) as Dispositivo[];
+}
+
+/**
+ * Linha do tempo da estação: ligar, suspender, bloquear, desligar etc.
+ *
+ * Janela fixa (últimos N dias) de propósito: a tela de Dispositivos não carrega
+ * o filtro global de período, e o diário é curto — o que interessa é "o que
+ * aconteceu com as máquinas ultimamente".
+ */
+export async function buscarDiarioEstacao(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+  dias = 14,
+  dispositivoId?: string | null,
+): Promise<EventoEstacao[]> {
+  const fim = new Date();
+  const inicio = new Date(fim.getTime() - dias * 24 * 60 * 60 * 1000);
+
+  const { data, error } = await supabase.rpc("painel_diario_estacao", {
+    p_inicio: inicio.toISOString(),
+    p_fim: fim.toISOString(),
+    p_org: orgId ?? null,
+    p_dispositivo: dispositivoId ?? null,
+  });
+  if (error) throw error;
+
+  return (data ?? []).map((e: any) => ({
+    id: Number(e.id),
+    dispositivoId: e.device_id,
+    maquina: e.machine_name,
+    tipo: e.tipo,
+    momento: e.momento,
+    versao: e.versao ?? null,
+  })) as EventoEstacao[];
 }
 
 export async function buscarUsuariosAcesso(

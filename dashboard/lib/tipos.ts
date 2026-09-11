@@ -98,6 +98,26 @@ export interface Dispositivo {
   agent_version: string | null;
 }
 
+/** Marcos do ciclo de vida da estação — espelha o enum tipo_evento_estacao. */
+export type TipoEventoEstacao =
+  | "AGENTE_INICIADO"
+  | "AGENTE_PARADO"
+  | "SUSPENSA"
+  | "RETOMADA"
+  | "DESLIGANDO"
+  | "BLOQUEADA"
+  | "DESBLOQUEADA";
+
+/** Uma linha da linha do tempo da estação (tela de Dispositivos). */
+export interface EventoEstacao {
+  id: number;
+  dispositivoId: string;
+  maquina: string;
+  tipo: TipoEventoEstacao;
+  momento: string; // ISO
+  versao: string | null;
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;

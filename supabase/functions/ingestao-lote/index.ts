@@ -57,6 +57,7 @@ interface LoteEntrada {
 /** Espelha o enum tipo_evento_estacao. Tipo desconhecido é descartado. */
 const TIPOS_EVENTO = new Set([
   "AGENTE_INICIADO", "AGENTE_PARADO", "SUSPENSA", "RETOMADA", "DESLIGANDO",
+  "BLOQUEADA", "DESBLOQUEADA",
 ]);
 
 const LIMITE_LOTE = 500; // Trava de segurança contra payload gigante.

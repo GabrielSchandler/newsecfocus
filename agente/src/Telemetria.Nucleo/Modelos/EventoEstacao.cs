@@ -41,4 +41,6 @@ public static class TiposEvento
     public const string Suspensa = "SUSPENSA";
     public const string Retomada = "RETOMADA";
     public const string Desligando = "DESLIGANDO";
+    public const string Bloqueada = "BLOQUEADA";      // usuário travou a sessão (Win+L, tempo ocioso)
+    public const string Desbloqueada = "DESBLOQUEADA"; // voltou a destravar
 }
