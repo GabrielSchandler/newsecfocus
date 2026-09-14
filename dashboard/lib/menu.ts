@@ -38,9 +38,18 @@ export interface ItemNavegacao {
  * A seleção é deliberada, não "os quatro primeiros do menu": no celular o
  * gestor abre para ver como está o time agora, não para exportar relatório.
  */
-export const ABAS_CELULAR: IconeMenu[] = ["visao", "pessoas", "equipes", "horasExtras"];
+export const ABAS_CELULAR: IconeMenu[] = ["visao", "pessoas", "equipes"];
 
-/** Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece. */
+/**
+ * Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece.
+ *
+ * Menu enxuto de propósito (set./2026): o produto se concentra em três olhares —
+ * Visão geral, Equipes e Pessoas — cada um com tudo dentro, em abas. As antigas
+ * telas soltas (Aplicativos, Horas extras, Dispositivos, Registros) viraram abas
+ * desses olhares: Aplicativos/Horas extras em todos, a estação dentro da Pessoa.
+ * Menos telas, sem informação repetida. As rotas antigas seguem existindo para
+ * links diretos, apenas saíram da navegação.
+ */
 export function itensDoMenu(opcoes: {
   podeAdministrar: boolean;
   adminPlataforma: boolean;
@@ -49,10 +58,6 @@ export function itensDoMenu(opcoes: {
     { href: "/painel", rotulo: "Visão geral", icone: "visao" },
     { href: "/painel/equipes", rotulo: "Equipes", icone: "equipes" },
     { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas" },
-    { href: "/painel/aplicativos", rotulo: "Aplicativos", icone: "aplicativos" },
-    { href: "/painel/dispositivos", rotulo: "Dispositivos", icone: "dispositivos" },
-    { href: "/painel/horas-extras", rotulo: "Horas extras", icone: "horasExtras" },
-    { href: "/painel/registros", rotulo: "Registros", icone: "registros" },
     { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios" },
   ];
 

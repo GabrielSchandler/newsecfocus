@@ -35,7 +35,7 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts: [
       { name: "Visão geral", url: "/painel" },
       { name: "Pessoas", url: "/painel/pessoas" },
-      { name: "Horas extras", url: "/painel/horas-extras" },
+      { name: "Equipes", url: "/painel/equipes" },
     ],
   };
 }

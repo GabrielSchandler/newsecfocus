@@ -4,25 +4,51 @@ import { BarraFiltros } from "@/components/painel/barra-filtros";
 import { BentoKpis } from "@/components/painel/bento-kpis";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
+import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
+import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
+import { SecaoDispersao } from "@/components/painel/secao-dispersao";
+import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
+import { SecaoPresenca } from "@/components/painel/secao-presenca";
+import { SecaoRitmo } from "@/components/painel/secao-ritmo";
 import { TabelaColaboradores } from "@/components/painel/tabela-colaboradores";
 import { criarClienteServidor } from "@/lib/supabase/server";
-import { carregarContexto } from "@/lib/sessao";
+import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, paramsDoRecorte, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
   KPIS_ESCALA_VAZIO,
   KPIS_VAZIOS,
+  buscarDispersao,
   buscarDistribuicao,
+  buscarDominios,
+  buscarHorasExtras,
   buscarKpisComparados,
   buscarKpisEscala,
+  buscarPresenca,
   buscarRankingColaboradores,
+  buscarRitmo,
   buscarSerie,
 } from "@/lib/consultas";
 import type { Escopo } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
+
+const ABAS: AbaPainel[] = [
+  { chave: "resumo", rotulo: "Resumo" },
+  { chave: "pessoas", rotulo: "Pessoas" },
+  { chave: "aplicativos", rotulo: "Aplicativos" },
+  { chave: "presenca", rotulo: "Presença" },
+  { chave: "ritmo", rotulo: "Ritmo" },
+  { chave: "horas", rotulo: "Horas extras" },
+];
+
+const KPIS_COMPARADOS_VAZIO = {
+  atual: KPIS_VAZIOS,
+  anterior: KPIS_VAZIOS,
+  variacao: { minutosAtivos: null, indice: null, minutosProdutivos: null, interacoes: null },
+};
 
 export default async function PaginaDetalheEquipe({
   params,
@@ -49,8 +75,8 @@ export default async function PaginaDetalheEquipe({
   const { periodo, escopo: recorteAtual } = lerFiltros(busca, contexto);
   const fuso = contexto.empresa.fuso;
   const recorte = paramsDoRecorte(busca);
+  const admin = podeAdministrar(contexto);
 
-  // O escopo desta tela é a equipe da URL, não o que estiver na query string.
   const escopo: Escopo = {
     orgId: recorteAtual.orgId,
     equipeId: id,
@@ -58,35 +84,22 @@ export default async function PaginaDetalheEquipe({
     dispositivoId: null,
   };
 
-  const [kpis, escala, serie, distribuicao, pessoas] = await Promise.all([
-    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
-      atual: KPIS_VAZIOS,
-      anterior: KPIS_VAZIOS,
-      variacao: {
-        minutosAtivos: null,
-        indice: null,
-        minutosProdutivos: null,
-        interacoes: null,
-      },
-    }),
-    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
-    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
-    comFalha(buscarRankingColaboradores(supabase, periodo, id, 100, escopo.orgId), []),
-  ]);
+  const abaBruta = busca.visao;
+  const escolhida = Array.isArray(abaBruta) ? abaBruta[0] : abaBruta;
+  const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "resumo";
 
-  const erro = primeiroErro(kpis, escala, serie, distribuicao, pessoas);
+  const [kpis, escala] = await Promise.all([
+    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), KPIS_COMPARADOS_VAZIO),
+    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
+  ]);
 
   return (
     <div className="space-y-5">
       <CabecalhoPagina
         titulo={equipe.nome}
-        descricao={equipe.descricao ?? `${pessoas.dados.length} pessoas · ${periodo.rotulo}`}
+        descricao={equipe.descricao ?? periodo.rotulo}
         icone={
-          <span
-            className="h-3 w-3 rounded-full"
-            style={{ background: equipe.cor ?? "#22d3ee" }}
-          />
+          <span className="h-3 w-3 rounded-full" style={{ background: equipe.cor ?? "#22d3ee" }} />
         }
         voltarPara={{ href: `/painel/equipes${recorte}`, rotulo: "Equipes" }}
         acoes={
@@ -100,7 +113,7 @@ export default async function PaginaDetalheEquipe({
 
       <BarraFiltros periodo={periodo} escopo={escopo} fuso={fuso} campos={[]} />
 
-      {erro && <AvisoErro mensagem={erro} />}
+      {kpis.erro && <AvisoErro mensagem={kpis.erro} />}
 
       <BentoKpis
         dados={kpis.dados}
@@ -108,6 +121,39 @@ export default async function PaginaDetalheEquipe({
         escala={escala.dados}
       />
 
+      <AbasPainel abas={ABAS} ativa={aba} />
+
+      {aba === "resumo" && (
+        <ResumoEquipe supabase={supabase} periodo={periodo} escopo={escopo} fuso={fuso} />
+      )}
+      {aba === "pessoas" && (
+        <PessoasEquipe supabase={supabase} periodo={periodo} escopo={escopo} equipeId={id} recorte={recorte} />
+      )}
+      {aba === "aplicativos" && (
+        <AplicativosEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+      )}
+      {aba === "presenca" && (
+        <PresencaEquipe supabase={supabase} periodo={periodo} escopo={escopo} />
+      )}
+      {aba === "ritmo" && <RitmoEquipe supabase={supabase} periodo={periodo} escopo={escopo} />}
+      {aba === "horas" && (
+        <HorasEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+      )}
+    </div>
+  );
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+async function ResumoEquipe({ supabase, periodo, escopo, fuso }: any) {
+  const [serie, distribuicao] = await Promise.all([
+    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
+    comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
+  ]);
+  const erro = primeiroErro(serie, distribuicao);
+  return (
+    <div className="space-y-5">
+      {erro && <AvisoErro mensagem={erro} />}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
         <div className="min-w-0 xl:col-span-3">
           <GraficoArea
@@ -122,14 +168,71 @@ export default async function PaginaDetalheEquipe({
           <GraficoDonut dados={distribuicao.dados} titulo="Ferramentas da equipe" />
         </div>
       </div>
-
-      <section className="space-y-3">
-        <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <Users className="h-4 w-4 text-cyan-400" />
-          Pessoas da equipe
-        </h3>
-        <TabelaColaboradores linhas={pessoas.dados} recorte={recorte} mostrarEquipe={false} />
-      </section>
     </div>
+  );
+}
+
+async function PessoasEquipe({ supabase, periodo, escopo, equipeId, recorte }: any) {
+  const pessoas = await comFalha(
+    buscarRankingColaboradores(supabase, periodo, equipeId, 100, escopo.orgId),
+    [],
+  );
+  return (
+    <>
+      {pessoas.erro && <AvisoErro mensagem={pessoas.erro} />}
+      <TabelaColaboradores linhas={pessoas.dados} recorte={recorte} mostrarEquipe={false} />
+    </>
+  );
+}
+
+async function AplicativosEquipe({ supabase, periodo, escopo, admin }: any) {
+  const [distribuicao, dominios] = await Promise.all([
+    comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
+    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
+  ]);
+  return (
+    <>
+      {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
+      <SecaoAplicativos
+        apps={distribuicao.dados}
+        categorias={[]}
+        admin={admin}
+        dominios={dominios.dados}
+      />
+    </>
+  );
+}
+
+async function PresencaEquipe({ supabase, periodo, escopo }: any) {
+  const presenca = await comFalha(buscarPresenca(supabase, periodo, escopo), []);
+  return (
+    <>
+      {presenca.erro && <AvisoErro mensagem={presenca.erro} />}
+      <SecaoPresenca linhas={presenca.dados} mostrarPessoa={false} />
+    </>
+  );
+}
+
+async function RitmoEquipe({ supabase, periodo, escopo }: any) {
+  const [ritmo, dispersao] = await Promise.all([
+    comFalha(buscarRitmo(supabase, periodo, escopo), []),
+    comFalha(buscarDispersao(supabase, periodo, escopo), []),
+  ]);
+  return (
+    <>
+      {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
+      <SecaoRitmo dados={ritmo.dados} />
+      <SecaoDispersao linhas={dispersao.dados} />
+    </>
+  );
+}
+
+async function HorasEquipe({ supabase, periodo, escopo, admin }: any) {
+  const horas = await comFalha(buscarHorasExtras(supabase, periodo, escopo), []);
+  return (
+    <>
+      {horas.erro && <AvisoErro mensagem={horas.erro} />}
+      <SecaoHorasExtras linhas={horas.dados} mostrarEquipe={false} admin={admin} />
+    </>
   );
 }

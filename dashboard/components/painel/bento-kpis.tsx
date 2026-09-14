@@ -416,7 +416,7 @@ function ComposicaoTempo({
                   Fora da escala:
                 </dt>
                 <dd className="text-amber-300">
-                  <Link href="/painel/horas-extras" className="hover:underline">
+                  <Link href="/painel?visao=horas" className="hover:underline">
                     {formatarHoras(escala.minutosAtivosExtra)}
                   </Link>
                 </dd>

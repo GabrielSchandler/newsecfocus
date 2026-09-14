@@ -3,30 +3,57 @@ import { notFound, redirect } from "next/navigation";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
 import { BentoKpis } from "@/components/painel/bento-kpis";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
-import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
+import { AvisoErro, CabecalhoPagina, EstadoVazio } from "@/components/painel/cabecalho";
+import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { LinhaDoTempoDia } from "@/components/painel/linha-do-tempo-dia";
+import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
+import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
+import { SecaoPresenca } from "@/components/painel/secao-presenca";
+import { SecaoRitmo } from "@/components/painel/secao-ritmo";
+import { DiarioEstacao } from "@/components/painel/diario-estacao";
+import { TabelaDispositivos } from "@/components/painel/tabela-dispositivos";
 import { TabelaDias, type LinhaDia } from "@/components/painel/tabela-dias";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteServidor } from "@/lib/supabase/server";
-import { carregarContexto } from "@/lib/sessao";
+import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, paramsDoRecorte, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
 import {
   KPIS_ESCALA_VAZIO,
   KPIS_VAZIOS,
+  buscarDiarioEstacao,
   buscarDistribuicao,
+  buscarDominios,
+  buscarEstacoesColaborador,
+  buscarHorasExtras,
   buscarKpisComparados,
   buscarKpisEscala,
   buscarLinhaDoTempo,
+  buscarPresenca,
   buscarRelatorioDiario,
+  buscarRitmo,
   buscarSerie,
 } from "@/lib/consultas";
 import { formatarHorasCurto } from "@/lib/formato";
 import type { Escopo } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
+
+const ABAS: AbaPainel[] = [
+  { chave: "resumo", rotulo: "Resumo" },
+  { chave: "aplicativos", rotulo: "Aplicativos" },
+  { chave: "ritmo", rotulo: "Ritmo" },
+  { chave: "horas", rotulo: "Horas extras" },
+  { chave: "estacao", rotulo: "Estação" },
+];
+
+const KPIS_COMPARADOS_VAZIO = {
+  atual: KPIS_VAZIOS,
+  anterior: KPIS_VAZIOS,
+  variacao: { minutosAtivos: null, indice: null, minutosProdutivos: null, interacoes: null },
+};
 
 export default async function PaginaDetalhePessoa({
   params,
@@ -56,6 +83,7 @@ export default async function PaginaDetalhePessoa({
   const { periodo, escopo: recorteAtual } = lerFiltros(busca, contexto);
   const fuso = contexto.empresa.fuso;
   const recorte = paramsDoRecorte(busca);
+  const admin = podeAdministrar(contexto);
 
   const escopo: Escopo = {
     orgId: recorteAtual.orgId,
@@ -64,25 +92,15 @@ export default async function PaginaDetalhePessoa({
     dispositivoId: null,
   };
 
-  const [kpis, escala, serie, distribuicao, diario, linhaTempo] = await Promise.all([
-    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), {
-      atual: KPIS_VAZIOS,
-      anterior: KPIS_VAZIOS,
-      variacao: {
-        minutosAtivos: null,
-        indice: null,
-        minutosProdutivos: null,
-        interacoes: null,
-      },
-    }),
-    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
-    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 10), []),
-    comFalha(buscarRelatorioDiario(supabase, periodo, escopo) as Promise<LinhaDia[]>, []),
-    comFalha(buscarLinhaDoTempo(supabase, periodo, id), []),
-  ]);
+  const abaBruta = busca.visao;
+  const escolhida = Array.isArray(abaBruta) ? abaBruta[0] : abaBruta;
+  const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "resumo";
 
-  const erro = primeiroErro(kpis, escala, serie, distribuicao, diario, linhaTempo);
+  // Resumo executivo (KPIs) sempre no topo.
+  const [kpis, escala] = await Promise.all([
+    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), KPIS_COMPARADOS_VAZIO),
+    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
+  ]);
 
   return (
     <div className="space-y-5">
@@ -100,13 +118,60 @@ export default async function PaginaDetalhePessoa({
 
       <BarraFiltros periodo={periodo} escopo={escopo} fuso={fuso} campos={[]} />
 
-      {erro && <AvisoErro mensagem={erro} />}
+      {kpis.erro && <AvisoErro mensagem={kpis.erro} />}
 
       <BentoKpis
         dados={kpis.dados}
         rotuloComparacao={rotuloComparacao(periodo)}
         escala={escala.dados}
       />
+
+      <AbasPainel abas={ABAS} ativa={aba} />
+
+      {aba === "resumo" && (
+        <ResumoPessoa
+          supabase={supabase}
+          periodo={periodo}
+          escopo={escopo}
+          fuso={fuso}
+          pessoa={pessoa}
+          jornadaPadrao={contexto.empresa.jornadaPadraoMinutos}
+        />
+      )}
+
+      {aba === "aplicativos" && (
+        <AplicativosPessoa supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+      )}
+
+      {aba === "ritmo" && <RitmoPessoa supabase={supabase} periodo={periodo} escopo={escopo} />}
+
+      {aba === "horas" && (
+        <HorasPessoa supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+      )}
+
+      {aba === "estacao" && (
+        <EstacaoPessoa supabase={supabase} colaboradorId={id} orgId={escopo.orgId} />
+      )}
+    </div>
+  );
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+async function ResumoPessoa({ supabase, periodo, escopo, fuso, pessoa, jornadaPadrao }: any) {
+  const [linhaTempo, serie, distribuicao, presenca, diario] = await Promise.all([
+    comFalha(buscarLinhaDoTempo(supabase, periodo, escopo.colaboradorId), []),
+    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
+    comFalha(buscarDistribuicao(supabase, periodo, escopo, 10), []),
+    comFalha(buscarPresenca(supabase, periodo, escopo), []),
+    comFalha(buscarRelatorioDiario(supabase, periodo, escopo) as Promise<LinhaDia[]>, []),
+  ]);
+
+  const erro = primeiroErro(linhaTempo, serie, distribuicao, presenca, diario);
+
+  return (
+    <div className="space-y-5">
+      {erro && <AvisoErro mensagem={erro} />}
 
       <LinhaDoTempoDia segmentos={linhaTempo.dados} fuso={fuso} />
 
@@ -125,20 +190,86 @@ export default async function PaginaDetalhePessoa({
         </div>
       </div>
 
+      {presenca.dados.length > 0 && <SecaoPresenca linhas={presenca.dados} mostrarPessoa={false} />}
+
       <section className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-sm font-medium text-slate-200">Dia a dia</h3>
           <Badge variante="neutro">
-            jornada de{" "}
-            {formatarHorasCurto(
-              pessoa.jornada_minutos_dia ?? contexto.empresa.jornadaPadraoMinutos,
-            )}
-            /dia
+            jornada de {formatarHorasCurto(pessoa.jornada_minutos_dia ?? jornadaPadrao)}/dia
             {pessoa.jornada_minutos_dia === null && " (padrão da empresa)"}
           </Badge>
         </div>
         <TabelaDias linhas={diario.dados} fuso={fuso} />
       </section>
+    </div>
+  );
+}
+
+async function AplicativosPessoa({ supabase, periodo, escopo, admin }: any) {
+  const [distribuicao, dominios] = await Promise.all([
+    comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
+    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
+  ]);
+  return (
+    <>
+      {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
+      <SecaoAplicativos
+        apps={distribuicao.dados}
+        categorias={[]}
+        admin={admin}
+        dominios={dominios.dados}
+      />
+    </>
+  );
+}
+
+async function RitmoPessoa({ supabase, periodo, escopo }: any) {
+  const ritmo = await comFalha(buscarRitmo(supabase, periodo, escopo), []);
+  return (
+    <>
+      {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
+      <SecaoRitmo dados={ritmo.dados} />
+    </>
+  );
+}
+
+async function HorasPessoa({ supabase, periodo, escopo, admin }: any) {
+  const horas = await comFalha(buscarHorasExtras(supabase, periodo, escopo), []);
+  return (
+    <>
+      {horas.erro && <AvisoErro mensagem={horas.erro} />}
+      <SecaoHorasExtras linhas={horas.dados} mostrarEquipe={false} admin={admin} />
+    </>
+  );
+}
+
+async function EstacaoPessoa({ supabase, colaboradorId, orgId }: any) {
+  const estacoes = await comFalha(buscarEstacoesColaborador(supabase, colaboradorId), []);
+  const principal = estacoes.dados[0];
+  const diario = principal
+    ? await comFalha(buscarDiarioEstacao(supabase, orgId, 14, principal.id), [])
+    : { dados: [], erro: null };
+
+  if (estacoes.dados.length === 0) {
+    return (
+      <EstadoVazio
+        titulo="Nenhuma estação vinculada"
+        descricao="Assim que houver atividade registrada, a estação usada por esta pessoa aparece aqui, com versão do agente, status e o diário de liga/bloqueia/desliga."
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {estacoes.erro && <AvisoErro mensagem={estacoes.erro} />}
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-slate-200">
+          {estacoes.dados.length === 1 ? "Estação desta pessoa" : "Estações desta pessoa"}
+        </h3>
+        <TabelaDispositivos linhas={estacoes.dados} />
+      </div>
+      {diario.dados.length > 0 && <DiarioEstacao eventos={diario.dados} dias={14} />}
     </div>
   );
 }

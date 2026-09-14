@@ -352,6 +352,35 @@ export async function buscarDispersao(
   })) as LinhaDispersao[];
 }
 
+/**
+ * Estações usadas por um colaborador. Como cada máquina corporativa é de uso
+ * exclusivo, isto costuma trazer uma estação só — é o que permitiu fundir a
+ * antiga tela de Dispositivos dentro da Pessoa. Descobre os device_id pelos
+ * resumos diários (poucas linhas, já agregadas) e busca os dados das estações.
+ */
+export async function buscarEstacoesColaborador(
+  supabase: SupabaseClient,
+  colaboradorId: string,
+): Promise<Dispositivo[]> {
+  const { data: resumos, error: erroResumo } = await supabase
+    .from("resumo_diario")
+    .select("device_id")
+    .eq("employee_id", colaboradorId)
+    .limit(500);
+  if (erroResumo) throw erroResumo;
+
+  const ids = [...new Set((resumos ?? []).map((r: any) => r.device_id))].filter(Boolean);
+  if (ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("devices")
+    .select("id, machine_name, os_user, status_online, last_sync_at, agent_version")
+    .in("id", ids)
+    .order("last_sync_at", { ascending: false, nullsFirst: false });
+  if (error) throw error;
+  return (data ?? []) as Dispositivo[];
+}
+
 export async function buscarUsuariosAcesso(
   supabase: SupabaseClient,
   orgId?: string | null,
