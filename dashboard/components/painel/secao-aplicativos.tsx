@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { Globe } from "lucide-react";
 import { GraficoDonut } from "./grafico-donut";
 import { TabelaAplicativos } from "./tabela-aplicativos";
 import { EstadoVazio } from "./cabecalho";
 import { CORES_TIPO, ROTULOS_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
-import type { Categoria, FatiaDistribuicao } from "@/lib/tipos";
+import type { Categoria, FatiaDistribuicao, LinhaDominio } from "@/lib/tipos";
 
 /**
  * Bloco "Aplicativos e sites" reaproveitável: rosca do topo, quebra por
@@ -15,10 +16,13 @@ export function SecaoAplicativos({
   apps,
   categorias,
   admin,
+  dominios = [],
 }: {
   apps: FatiaDistribuicao[];
   categorias: Categoria[];
   admin: boolean;
+  /** Sites mais usados; quando vazio, o bloco de sites não aparece. */
+  dominios?: LinhaDominio[];
 }) {
   if (apps.length === 0) {
     return (
@@ -91,6 +95,32 @@ export function SecaoAplicativos({
           </dl>
         </div>
       </div>
+
+      {dominios.length > 0 && (
+        <div className="rounded-xl2 border border-borda vidro p-5">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-cyan-400" />
+            <h3 className="text-sm font-medium text-slate-200">Sites mais usados</h3>
+          </div>
+          <p className="text-xs text-slate-500">tempo em cada domínio no período</p>
+          <ul className="mt-3 divide-y divide-slate-800/70">
+            {dominios.slice(0, 15).map((d) => (
+              <li key={d.dominio} className="flex items-center gap-3 py-2 text-sm">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ background: CORES_TIPO[d.tipo ?? "SEM"] }}
+                  title={d.tipo ? ROTULOS_TIPO[d.tipo] : "Sem categoria"}
+                />
+                <span className="min-w-0 flex-1 truncate text-slate-200">{d.dominio}</span>
+                {d.pessoas > 1 && (
+                  <span className="shrink-0 text-xs text-slate-600">{d.pessoas} pessoas</span>
+                )}
+                <span className="shrink-0 tabular-nums text-slate-400">{formatarHoras(d.minutos)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <TabelaAplicativos linhas={apps} />
     </div>

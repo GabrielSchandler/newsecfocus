@@ -161,6 +161,37 @@ export interface PontoRitmo {
   minutosRegistrados: number;
 }
 
+/** Evolução de uma pessoa: período atual vs. período anterior. */
+export interface LinhaEvolucao {
+  colaboradorId: string;
+  colaborador: string;
+  equipe: string | null;
+  indiceAtual: number | null;
+  indiceAnterior: number | null;
+  ativosAtual: number;
+  ativosAnterior: number;
+  diasAtual: number;
+  diasAnterior: number;
+}
+
+/** Um site (domínio) no ranking de uso. */
+export interface LinhaDominio {
+  dominio: string;
+  tipo: TipoCategoria | null;
+  minutos: number;
+  pessoas: number;
+}
+
+/** Dispersão de uma pessoa: trocas de aplicativo por hora ativa. */
+export interface LinhaDispersao {
+  colaboradorId: string;
+  colaborador: string;
+  equipe: string | null;
+  trocas: number;
+  minutosAtivos: number;
+  trocasPorHora: number;
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;

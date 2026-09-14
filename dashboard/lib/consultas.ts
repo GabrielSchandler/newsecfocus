@@ -19,6 +19,9 @@ import type {
   Escopo,
   EventoEstacao,
   FatiaDistribuicao,
+  LinhaDispersao,
+  LinhaDominio,
+  LinhaEvolucao,
   LinhaPresenca,
   PontoRitmo,
   SegmentoLinha,
@@ -272,6 +275,81 @@ export async function buscarRitmo(
     minutosProdutivos: num(r.minutos_produtivos),
     minutosRegistrados: num(r.minutos_registrados),
   })) as PontoRitmo[];
+}
+
+/** Evolução por pessoa: período atual vs. período anterior de mesma duração. */
+export async function buscarEvolucao(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<LinhaEvolucao[]> {
+  const { data, error } = await supabase.rpc("painel_evolucao", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipe: r.equipe,
+    indiceAtual: numOuNulo(r.indice_atual),
+    indiceAnterior: numOuNulo(r.indice_anterior),
+    ativosAtual: num(r.minutos_ativos_atual),
+    ativosAnterior: num(r.minutos_ativos_anterior),
+    diasAtual: num(r.dias_atual),
+    diasAnterior: num(r.dias_anterior),
+  })) as LinhaEvolucao[];
+}
+
+/** Sites (domínios) mais usados no recorte. */
+export async function buscarDominios(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+  limite = 20,
+): Promise<LinhaDominio[]> {
+  const { data, error } = await supabase.rpc("painel_dominios", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+    p_limite: limite,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    dominio: r.dominio,
+    tipo: r.tipo ?? null,
+    minutos: num(r.minutos),
+    pessoas: num(r.pessoas),
+  })) as LinhaDominio[];
+}
+
+/** Dispersão por pessoa: trocas de aplicativo por hora ativa. */
+export async function buscarDispersao(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<LinhaDispersao[]> {
+  const { data, error } = await supabase.rpc("painel_dispersao", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipe: r.equipe,
+    trocas: num(r.trocas),
+    minutosAtivos: num(r.minutos_ativos),
+    trocasPorHora: num(r.trocas_por_hora),
+  })) as LinhaDispersao[];
 }
 
 export async function buscarUsuariosAcesso(

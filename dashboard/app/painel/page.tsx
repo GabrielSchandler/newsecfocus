@@ -9,6 +9,8 @@ import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoBarras } from "@/components/painel/grafico-barras";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
+import { SecaoDispersao } from "@/components/painel/secao-dispersao";
+import { SecaoEvolucao } from "@/components/painel/secao-evolucao";
 import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
 import { SecaoPresenca } from "@/components/painel/secao-presenca";
 import { SecaoRitmo } from "@/components/painel/secao-ritmo";
@@ -23,8 +25,11 @@ import {
   buscarCategorias,
   buscarColaboradores,
   buscarDispositivos,
+  buscarDispersao,
   buscarDistribuicao,
+  buscarDominios,
   buscarEquipes,
+  buscarEvolucao,
   buscarHorasExtras,
   buscarKpisComparados,
   buscarKpisEscala,
@@ -179,13 +184,14 @@ async function SecaoResumo({
   categorias,
   admin,
 }: any) {
-  const [serie, distribuicao, rankingEquipes] = await Promise.all([
+  const [serie, distribuicao, rankingEquipes, evolucao] = await Promise.all([
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
     comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []),
+    comFalha(buscarEvolucao(supabase, periodo, escopo), []),
   ]);
 
-  const erro = primeiroErro(serie, distribuicao, rankingEquipes);
+  const erro = primeiroErro(serie, distribuicao, rankingEquipes, evolucao);
 
   // Comparar equipes só faz sentido quando o recorte não é de uma equipe só.
   const mostrarComparativo =
@@ -227,16 +233,26 @@ async function SecaoResumo({
           }))}
         />
       )}
+
+      <SecaoEvolucao linhas={evolucao.dados} />
     </div>
   );
 }
 
 async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admin }: any) {
-  const distribuicao = await comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []);
+  const [distribuicao, dominios] = await Promise.all([
+    comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
+    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
+  ]);
   return (
     <>
       {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
-      <SecaoAplicativos apps={distribuicao.dados} categorias={categorias} admin={admin} />
+      <SecaoAplicativos
+        apps={distribuicao.dados}
+        categorias={categorias}
+        admin={admin}
+        dominios={dominios.dados}
+      />
     </>
   );
 }
@@ -252,11 +268,15 @@ async function SecaoPresencaAba({ supabase, periodo, escopo }: any) {
 }
 
 async function SecaoRitmoAba({ supabase, periodo, escopo }: any) {
-  const ritmo = await comFalha(buscarRitmo(supabase, periodo, escopo), []);
+  const [ritmo, dispersao] = await Promise.all([
+    comFalha(buscarRitmo(supabase, periodo, escopo), []),
+    comFalha(buscarDispersao(supabase, periodo, escopo), []),
+  ]);
   return (
     <>
       {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
       <SecaoRitmo dados={ritmo.dados} />
+      <SecaoDispersao linhas={dispersao.dados} />
     </>
   );
 }

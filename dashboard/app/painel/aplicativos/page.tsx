@@ -12,6 +12,7 @@ import {
   buscarCategorias,
   buscarColaboradores,
   buscarDistribuicao,
+  buscarDominios,
   buscarEquipes,
 } from "@/lib/consultas";
 
@@ -32,13 +33,14 @@ export default async function PaginaAplicativos({
   const org = orgEfetiva(contexto, escopo);
   const admin = podeAdministrar(contexto);
 
-  const [equipes, colaboradores, distribuicao, categorias] = await Promise.all([
+  const [equipes, colaboradores, distribuicao, categorias, dominios] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
     admin
       ? comFalha(buscarCategorias(supabase, org), [])
       : Promise.resolve({ dados: [], erro: null }),
+    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
   ]);
 
   const erro = primeiroErro(equipes, colaboradores, distribuicao);
@@ -63,7 +65,12 @@ export default async function PaginaAplicativos({
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      <SecaoAplicativos apps={distribuicao.dados} categorias={categorias.dados} admin={admin} />
+      <SecaoAplicativos
+        apps={distribuicao.dados}
+        categorias={categorias.dados}
+        admin={admin}
+        dominios={dominios.dados}
+      />
     </div>
   );
 }
