@@ -10,6 +10,8 @@ import { GraficoBarras } from "@/components/painel/grafico-barras";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
 import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
+import { SecaoPresenca } from "@/components/painel/secao-presenca";
+import { SecaoRitmo } from "@/components/painel/secao-ritmo";
 import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
@@ -26,7 +28,9 @@ import {
   buscarHorasExtras,
   buscarKpisComparados,
   buscarKpisEscala,
+  buscarPresenca,
   buscarRankingEquipes,
+  buscarRitmo,
   buscarSerie,
   buscarTempoReal,
 } from "@/lib/consultas";
@@ -37,6 +41,8 @@ export const dynamic = "force-dynamic";
 const ABAS: AbaPainel[] = [
   { chave: "resumo", rotulo: "Resumo" },
   { chave: "aplicativos", rotulo: "Aplicativos" },
+  { chave: "presenca", rotulo: "Presença" },
+  { chave: "ritmo", rotulo: "Ritmo" },
   { chave: "horas", rotulo: "Horas extras" },
   { chave: "tempo", rotulo: "Tempo real" },
 ];
@@ -139,6 +145,14 @@ export default async function PaginaVisaoGeral({
         />
       )}
 
+      {aba === "presenca" && (
+        <SecaoPresencaAba supabase={supabase} periodo={periodo} escopo={escopo} />
+      )}
+
+      {aba === "ritmo" && (
+        <SecaoRitmoAba supabase={supabase} periodo={periodo} escopo={escopo} />
+      )}
+
       {aba === "horas" && (
         <SecaoHorasAba
           supabase={supabase}
@@ -223,6 +237,26 @@ async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admi
     <>
       {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
       <SecaoAplicativos apps={distribuicao.dados} categorias={categorias} admin={admin} />
+    </>
+  );
+}
+
+async function SecaoPresencaAba({ supabase, periodo, escopo }: any) {
+  const presenca = await comFalha(buscarPresenca(supabase, periodo, escopo), []);
+  return (
+    <>
+      {presenca.erro && <AvisoErro mensagem={presenca.erro} />}
+      <SecaoPresenca linhas={presenca.dados} mostrarPessoa={!escopo.equipeId} />
+    </>
+  );
+}
+
+async function SecaoRitmoAba({ supabase, periodo, escopo }: any) {
+  const ritmo = await comFalha(buscarRitmo(supabase, periodo, escopo), []);
+  return (
+    <>
+      {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
+      <SecaoRitmo dados={ritmo.dados} />
     </>
   );
 }

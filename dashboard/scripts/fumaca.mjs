@@ -96,6 +96,8 @@ const ROTAS = [
   ["/painel?preset=mes", "Visão geral — mês"],
   ["/painel?preset=geral", "Visão geral — todo o período"],
   ["/painel?visao=aplicativos", "Visão geral — aba Aplicativos"],
+  ["/painel?visao=presenca", "Visão geral — aba Presença"],
+  ["/painel?visao=ritmo", "Visão geral — aba Ritmo"],
   ["/painel?visao=horas", "Visão geral — aba Horas extras"],
   ["/painel?visao=tempo", "Visão geral — aba Tempo real"],
   ["/painel/equipes", "Equipes"],

@@ -136,6 +136,31 @@ export interface SegmentoLinha {
   minutos: number;
 }
 
+/** Presença e pontualidade de uma pessoa no período. */
+export interface LinhaPresenca {
+  colaboradorId: string;
+  colaborador: string;
+  equipeId: string | null;
+  equipe: string | null;
+  diasPresentes: number;
+  diasUteis: number;
+  faltas: number;
+  /** Minuto do dia (0..1439) no fuso da empresa; null quando não há sinal. */
+  chegadaMedia: number | null;
+  saidaMedia: number | null;
+  chegadaCedo: number | null;
+  saidaTarde: number | null;
+}
+
+/** Um ponto do ritmo: uma célula (dia da semana × hora). */
+export interface PontoRitmo {
+  diaSemana: number; // 1=segunda ... 7=domingo
+  hora: number; // 0..23
+  minutosAtivos: number;
+  minutosProdutivos: number;
+  minutosRegistrados: number;
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;

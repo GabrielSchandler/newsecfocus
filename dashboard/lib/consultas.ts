@@ -19,6 +19,8 @@ import type {
   Escopo,
   EventoEstacao,
   FatiaDistribuicao,
+  LinhaPresenca,
+  PontoRitmo,
   SegmentoLinha,
   Kpis,
   KpisComparados,
@@ -218,6 +220,58 @@ export async function buscarLinhaDoTempo(
   });
   if (error) throw error;
   return (data ?? []) as SegmentoLinha[];
+}
+
+/** Presença e pontualidade por pessoa no recorte. */
+export async function buscarPresenca(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<LinhaPresenca[]> {
+  const { data, error } = await supabase.rpc("painel_presenca", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    diasPresentes: num(r.dias_presentes),
+    diasUteis: num(r.dias_uteis),
+    faltas: num(r.faltas),
+    chegadaMedia: numOuNulo(r.chegada_media),
+    saidaMedia: numOuNulo(r.saida_media),
+    chegadaCedo: numOuNulo(r.chegada_cedo),
+    saidaTarde: numOuNulo(r.saida_tarde),
+  })) as LinhaPresenca[];
+}
+
+/** Ritmo por hora do dia e dia da semana (curva + mapa de calor). */
+export async function buscarRitmo(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  escopo: Escopo,
+): Promise<PontoRitmo[]> {
+  const { data, error } = await supabase.rpc("painel_ritmo_horario", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    diaSemana: num(r.dia_semana),
+    hora: num(r.hora),
+    minutosAtivos: num(r.minutos_ativos),
+    minutosProdutivos: num(r.minutos_produtivos),
+    minutosRegistrados: num(r.minutos_registrados),
+  })) as PontoRitmo[];
 }
 
 export async function buscarUsuariosAcesso(
