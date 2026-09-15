@@ -243,6 +243,20 @@ export interface ResumoProdutividade {
   };
 }
 
+/** Uma linha da escala de expediente (um dia da semana de um alvo). */
+export interface LinhaEscala {
+  escopo: "EMPRESA" | "EQUIPE" | "PESSOA";
+  equipeId: string | null;
+  colaboradorId: string | null;
+  /** isodow: 1 = segunda … 7 = domingo. */
+  diaSemana: number;
+  trabalha: boolean;
+  inicio: string;
+  fim: string;
+  intervaloInicio: string | null;
+  intervaloFim: string | null;
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;

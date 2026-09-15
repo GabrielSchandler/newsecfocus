@@ -22,6 +22,7 @@ import type {
   LinhaDispersao,
   LinhaDominio,
   LinhaEvolucao,
+  LinhaEscala,
   LinhaPresenca,
   LinhaProdutividade,
   PontoRitmo,
@@ -432,6 +433,33 @@ export async function buscarDiaExpedienteAnterior(
   });
   if (error) throw error;
   return (data as string | null) ?? null;
+}
+
+/** Todas as escalas da empresa (os três escopos), para a tela de configuração. */
+export async function buscarEscalas(
+  supabase: SupabaseClient,
+  orgId?: string | null,
+): Promise<LinhaEscala[]> {
+  let consulta = supabase
+    .from("escalas_expediente")
+    .select("escopo, equipe_id, colaborador_id, dia_semana, trabalha, inicio, fim, intervalo_inicio, intervalo_fim")
+    .order("dia_semana");
+  if (orgId) consulta = consulta.eq("org_id", orgId);
+
+  const { data, error } = await consulta;
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    escopo: r.escopo,
+    equipeId: r.equipe_id,
+    colaboradorId: r.colaborador_id,
+    diaSemana: num(r.dia_semana),
+    trabalha: !!r.trabalha,
+    // O Postgres devolve time como "08:00:00"; a tela usa "08:00".
+    inicio: String(r.inicio ?? "08:00").slice(0, 5),
+    fim: String(r.fim ?? "18:00").slice(0, 5),
+    intervaloInicio: r.intervalo_inicio ? String(r.intervalo_inicio).slice(0, 5) : null,
+    intervaloFim: r.intervalo_fim ? String(r.intervalo_fim).slice(0, 5) : null,
+  })) as LinhaEscala[];
 }
 
 export async function buscarUsuariosAcesso(

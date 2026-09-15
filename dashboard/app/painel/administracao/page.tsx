@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
 import { PainelAgente } from "./formulario-agente";
+import { PainelExpediente } from "./expediente";
 import { PainelUsuarios } from "./usuarios";
 import {
   PainelClassificacao,
@@ -19,6 +20,7 @@ import {
   buscarCategorias,
   buscarColaboradores,
   buscarEquipes,
+  buscarEscalas,
   buscarMapeamentos,
   buscarUsuariosAcesso,
 } from "@/lib/consultas";
@@ -31,6 +33,7 @@ export const dynamic = "force-dynamic";
 const ABAS = [
   { chave: "equipes", rotulo: "Equipes" },
   { chave: "pessoas", rotulo: "Colaboradores" },
+  { chave: "expediente", rotulo: "Expediente" },
   { chave: "usuarios", rotulo: "Acessos" },
   { chave: "classificacao", rotulo: "Classificação" },
   { chave: "agente", rotulo: "Agente" },
@@ -57,7 +60,7 @@ export default async function PaginaAdministracao({
 
   const org = contexto.empresa.id;
 
-  const [equipes, colaboradores, categorias, mapeamentos, catalogo, organizacao, usuarios] = await Promise.all([
+  const [equipes, colaboradores, categorias, mapeamentos, catalogo, organizacao, usuarios, escalas] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarCategorias(supabase, org), []),
@@ -77,6 +80,7 @@ export default async function PaginaAdministracao({
       null as ConfiguracaoAgente | null,
     ),
     comFalha(buscarUsuariosAcesso(supabase, org), []),
+    comFalha(buscarEscalas(supabase, org), []),
   ]);
 
   const erro = primeiroErro(equipes, colaboradores, categorias, mapeamentos, catalogo);
@@ -126,6 +130,14 @@ export default async function PaginaAdministracao({
           colaboradores={colaboradores.dados}
           equipes={equipes.dados}
           jornadaPadrao={contexto.empresa.jornadaPadraoMinutos}
+        />
+      )}
+
+      {aba === "expediente" && (
+        <PainelExpediente
+          equipes={equipes.dados}
+          colaboradores={colaboradores.dados}
+          escalas={escalas.dados}
         />
       )}
 

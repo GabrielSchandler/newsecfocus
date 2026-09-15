@@ -106,25 +106,12 @@ export function PainelAgente({
         <form action={enviar} className="space-y-5">
           <section>
             <h3 className="text-sm font-medium text-slate-200">Coleta</h3>
-            <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Campo rotulo="Início da coleta" dica="vazio nos dois = 24 horas">
-                <Input
-                  name="agente_janela_inicio"
-                  placeholder="08:00"
-                  maxLength={5}
-                  defaultValue={config.agente_janela_inicio ?? ""}
-                  disabled={somenteLeitura}
-                />
-              </Campo>
-              <Campo rotulo="Fim da coleta">
-                <Input
-                  name="agente_janela_fim"
-                  placeholder="18:00"
-                  maxLength={5}
-                  defaultValue={config.agente_janela_fim ?? ""}
-                  disabled={somenteLeitura}
-                />
-              </Campo>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              O agente coleta o tempo todo em que a máquina está ligada. Quem define o que é
+              expediente é a escala, em Administração &rsaquo; Expediente — e é contra ela que o
+              índice é calculado.
+            </p>
+            <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Campo rotulo="Ocioso após (segundos)" dica="sem teclado nem mouse">
                 <Input
                   type="number"

@@ -422,17 +422,9 @@ export async function salvarConfiguracaoAgente(
     return FALHA("Sem permissão para alterar a configuração do agente.");
   }
 
-  const horario = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
-  const inicio = texto(dados, "agente_janela_inicio");
-  const fim = texto(dados, "agente_janela_fim");
-
-  if ((inicio && !horario.test(inicio)) || (fim && !horario.test(fim))) {
-    return FALHA("Horário inválido. Use HH:MM, por exemplo 08:00.");
-  }
-  if ((inicio && !fim) || (!inicio && fim)) {
-    return FALHA("Preencha os dois horários da janela, ou deixe ambos vazios para 24 horas.");
-  }
-
+  // Janela de coleta saiu do produto: o agente coleta enquanto a máquina estiver
+  // ligada, e quem recorta o que conta é a escala de expediente. Gravamos NULL
+  // para que a frota volte a coletar 24 horas na próxima sincronização.
   const ocioso = inteiro(dados, "agente_segundos_ocioso", 180);
   if (ocioso < 30 || ocioso > 3600) {
     return FALHA("O tempo até marcar como ocioso precisa ficar entre 30 e 3600 segundos.");
@@ -461,8 +453,8 @@ export async function salvarConfiguracaoAgente(
     .update({
       sync_interval_minutes: sincronizacao,
       agente_segundos_ocioso: ocioso,
-      agente_janela_inicio: inicio,
-      agente_janela_fim: fim,
+      agente_janela_inicio: null,
+      agente_janela_fim: null,
       agente_extrair_dominio: dados.get("agente_extrair_dominio") === "on",
       agente_mostrar_bandeja: dados.get("agente_mostrar_bandeja") === "on",
       agente_redigir_numeros: dados.get("agente_redigir_numeros") === "on",
