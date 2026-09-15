@@ -3,14 +3,20 @@ import { redirect } from "next/navigation";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina, EstadoVazio } from "@/components/painel/cabecalho";
-import { GraficoBarras } from "@/components/painel/grafico-barras";
-import { TabelaEquipes } from "@/components/painel/tabela-equipes";
+import { ResumoExpediente } from "@/components/painel/resumo-expediente";
+import { TabelaEquipesMedia } from "@/components/painel/tabela-equipes-media";
 import { Badge } from "@/components/ui/badge";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha } from "@/lib/carregar";
-import { lerFiltros, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
-import { buscarRankingEquipes } from "@/lib/consultas";
+import { lerFiltros, orgEfetiva, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
+import { buscarProdutividade } from "@/lib/consultas";
+import {
+  agregarProdutividade,
+  agruparPorEquipe,
+  janelaAtual,
+  janelaComparativo,
+} from "@/lib/produtividade";
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +33,28 @@ export default async function PaginaEquipes({
 
   const { periodo, escopo } = lerFiltros(params, contexto);
   const recorte = paramsDoRecorte(params);
+  const fuso = contexto.empresa.fuso;
+  const org = orgEfetiva(contexto, escopo);
 
-  const ranking = await comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []);
-  const equipes = ranking.dados;
+  const janela = janelaAtual(periodo);
+  const comparativo = await comFalha(janelaComparativo(supabase, periodo, fuso, org), null);
+
+  const [produtividade, anterior] = await Promise.all([
+    comFalha(buscarProdutividade(supabase, janela, escopo), []),
+    comparativo.dados
+      ? comFalha(buscarProdutividade(supabase, comparativo.dados, escopo), [])
+      : Promise.resolve({ dados: [], erro: null }),
+  ]);
+
+  const grupos = agruparPorEquipe(produtividade.dados);
+  const resumo = agregarProdutividade(produtividade.dados);
+  const resumoAnterior = comparativo.dados ? agregarProdutividade(anterior.dados) : null;
 
   return (
     <div className="space-y-5">
       <CabecalhoPagina
         titulo="Equipes"
-        descricao={`${equipes.length} ${equipes.length === 1 ? "equipe" : "equipes"} · ${periodo.rotulo}`}
+        descricao={`${grupos.length} ${grupos.length === 1 ? "equipe" : "equipes"} · ${periodo.rotulo}`}
         icone={<Users className="h-5 w-5 text-cyan-400" />}
         acoes={
           <BotaoExportar
@@ -46,37 +65,35 @@ export default async function PaginaEquipes({
         }
       />
 
-      <BarraFiltros periodo={periodo} escopo={escopo} fuso={contexto.empresa.fuso} campos={[]} />
+      <BarraFiltros periodo={periodo} escopo={escopo} fuso={fuso} campos={[]} />
 
-      {ranking.erro && <AvisoErro mensagem={ranking.erro} />}
+      {produtividade.erro && <AvisoErro mensagem={produtividade.erro} />}
 
-      {equipes.length === 0 ? (
+      {/* O número da empresa inteira, para dar régua ao que vem abaixo. */}
+      <ResumoExpediente
+        resumo={resumo}
+        anterior={resumoAnterior}
+        rotuloComparacao={comparativo.dados?.rotulo ?? null}
+      />
+
+      {grupos.length === 0 ? (
         <EstadoVazio
-          titulo="Nenhuma equipe cadastrada"
+          titulo="Nenhuma equipe com expediente"
           descricao="Crie as equipes em Administração e vincule os colaboradores. Sem equipe, o painel só consegue comparar pessoas individualmente."
         />
       ) : (
         <>
-          <GraficoBarras
-            titulo="Comparativo entre equipes"
-            subtitulo="tempo ativo por categoria no período"
-            dados={equipes.map((e) => ({
-              id: e.equipeId,
-              nome: e.equipe,
-              produtivo: e.minutosProdutivos,
-              neutro: e.minutosNeutros,
-              improdutivo: e.minutosImprodutivos,
-              indice: e.indice,
-            }))}
-          />
+          <TabelaEquipesMedia grupos={grupos} recorte={recorte} />
 
-          <TabelaEquipes linhas={equipes} recorte={recorte} />
-
-          <p className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+          <p className="flex flex-wrap items-center gap-2 text-xs leading-relaxed text-slate-600">
             <Badge variante="neutro">como ler</Badge>
-            Aderência compara o tempo ativo com a jornada esperada das pessoas da equipe.
-            Índice é o tempo produtivo sobre o tempo classificado — aplicativos sem categoria
-            não entram na conta.
+            <span className="min-w-0 flex-1">
+              Cada equipe entra pela <strong>média das suas pessoas</strong>, e cada pessoa pesa
+              igual — por isso uma equipe de 3 é comparável com uma de 10. O índice é o tempo
+              produtivo sobre o <strong>expediente</strong>: máquina desligada, tela bloqueada e
+              ociosidade puxam para baixo. Clique numa equipe para ver os mesmos indicadores
+              filtrados nela.
+            </span>
           </p>
         </>
       )}

@@ -23,6 +23,7 @@ import type {
   LinhaDominio,
   LinhaEvolucao,
   LinhaPresenca,
+  LinhaProdutividade,
   PontoRitmo,
   SegmentoLinha,
   Kpis,
@@ -379,6 +380,58 @@ export async function buscarEstacoesColaborador(
     .order("last_sync_at", { ascending: false, nullsFirst: false });
   if (error) throw error;
   return (data ?? []) as Dispositivo[];
+}
+
+/**
+ * Produtividade contra o expediente, uma linha por pessoa. Recebe a janela
+ * explícita (e não o Periodo) porque a mesma consulta serve para o período atual
+ * e para a janela de comparação alinhada no relógio.
+ */
+export async function buscarProdutividade(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  escopo: Escopo,
+): Promise<LinhaProdutividade[]> {
+  const { data, error } = await supabase.rpc("painel_produtividade", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    minutosExpediente: num(r.minutos_expediente),
+    minutosRegistrados: num(r.minutos_registrados),
+    minutosProdutivos: num(r.minutos_produtivos),
+    minutosNeutros: num(r.minutos_neutros),
+    minutosImprodutivos: num(r.minutos_improdutivos),
+    minutosSemClassificar: num(r.minutos_sem_classificar),
+    minutosOciosos: num(r.minutos_ociosos),
+    minutosBloqueado: num(r.minutos_bloqueado),
+    minutosDesligado: num(r.minutos_desligado),
+    diasComExpediente: num(r.dias_com_expediente),
+    indice: numOuNulo(r.indice),
+    aderencia: numOuNulo(r.aderencia),
+  })) as LinhaProdutividade[];
+}
+
+/** Último dia antes de `dia` em que a empresa tem expediente (para o "vs ontem"). */
+export async function buscarDiaExpedienteAnterior(
+  supabase: SupabaseClient,
+  orgId: string | null,
+  dia: string,
+): Promise<string | null> {
+  const { data, error } = await supabase.rpc("dia_expediente_anterior", {
+    p_org: orgId,
+    p_dia: dia,
+  });
+  if (error) throw error;
+  return (data as string | null) ?? null;
 }
 
 export async function buscarUsuariosAcesso(

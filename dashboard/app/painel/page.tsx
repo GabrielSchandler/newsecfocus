@@ -1,10 +1,10 @@
 import { LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
-import { BentoKpis } from "@/components/painel/bento-kpis";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { CabecalhoPagina, AvisoErro } from "@/components/painel/cabecalho";
 import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
+import { ResumoExpediente } from "@/components/painel/resumo-expediente";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoBarras } from "@/components/painel/grafico-barras";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
@@ -18,10 +18,13 @@ import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, orgEfetiva, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
 import {
-  KPIS_ESCALA_VAZIO,
-  KPIS_VAZIOS,
+  agregarProdutividade,
+  janelaAtual,
+  janelaComparativo,
+} from "@/lib/produtividade";
+import {
   buscarCategorias,
   buscarColaboradores,
   buscarDispositivos,
@@ -31,8 +34,7 @@ import {
   buscarEquipes,
   buscarEvolucao,
   buscarHorasExtras,
-  buscarKpisComparados,
-  buscarKpisEscala,
+  buscarProdutividade,
   buscarPresenca,
   buscarRankingEquipes,
   buscarRitmo,
@@ -51,17 +53,6 @@ const ABAS: AbaPainel[] = [
   { chave: "horas", rotulo: "Horas extras" },
   { chave: "tempo", rotulo: "Tempo real" },
 ];
-
-const KPIS_COMPARADOS_VAZIO = {
-  atual: KPIS_VAZIOS,
-  anterior: KPIS_VAZIOS,
-  variacao: {
-    minutosAtivos: null,
-    indice: null,
-    minutosProdutivos: null,
-    interacoes: null,
-  },
-};
 
 export default async function PaginaVisaoGeral({
   searchParams,
@@ -85,13 +76,24 @@ export default async function PaginaVisaoGeral({
 
   // Filtros e resumo executivo carregam sempre; o corpo de cada aba carrega só
   // o que ela precisa — a tela abre mais leve e cada aba puxa o seu.
-  const [equipes, colaboradores, dispositivos, kpis, escala] = await Promise.all([
+  // A janela atual para no relógio: somar o futuro do dia inflaria o expediente.
+  // A de comparação é o período anterior cortado no mesmo ponto — e, no preset
+  // de dia, o último dia COM expediente (segunda compara com sexta).
+  const janela = janelaAtual(periodo);
+  const comparativo = await comFalha(janelaComparativo(supabase, periodo, fuso, org), null);
+
+  const [equipes, colaboradores, dispositivos, produtividade, anterior] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
     comFalha(buscarColaboradores(supabase, null, org), []),
     comFalha(buscarDispositivos(supabase, org), []),
-    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), KPIS_COMPARADOS_VAZIO),
-    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
+    comFalha(buscarProdutividade(supabase, janela, escopo), []),
+    comparativo.dados
+      ? comFalha(buscarProdutividade(supabase, comparativo.dados, escopo), [])
+      : Promise.resolve({ dados: [], erro: null }),
   ]);
+
+  const resumo = agregarProdutividade(produtividade.dados);
+  const resumoAnterior = comparativo.dados ? agregarProdutividade(anterior.dados) : null;
 
   const precisaCategorias = admin && (aba === "resumo" || aba === "aplicativos");
   const categorias = precisaCategorias
@@ -118,13 +120,13 @@ export default async function PaginaVisaoGeral({
         travarEquipe={!!contexto.equipeEscopo}
       />
 
-      {kpis.erro && <AvisoErro mensagem={kpis.erro} />}
+      {produtividade.erro && <AvisoErro mensagem={produtividade.erro} />}
 
       {/* Resumo executivo: sempre visível, é o que a pessoa abre o app para ver. */}
-      <BentoKpis
-        dados={kpis.dados}
-        rotuloComparacao={rotuloComparacao(periodo)}
-        escala={escala.dados}
+      <ResumoExpediente
+        resumo={resumo}
+        anterior={resumoAnterior}
+        rotuloComparacao={comparativo.dados?.rotulo ?? null}
       />
 
       <AbasPainel abas={ABAS} ativa={aba} />
@@ -174,7 +176,6 @@ export default async function PaginaVisaoGeral({
   );
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 async function SecaoResumo({
   supabase,

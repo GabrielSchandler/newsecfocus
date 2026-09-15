@@ -1,10 +1,10 @@
 import { Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
-import { BentoKpis } from "@/components/painel/bento-kpis";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
 import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
+import { ResumoExpediente } from "@/components/painel/resumo-expediente";
 import { GraficoArea } from "@/components/painel/grafico-area";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
@@ -16,16 +16,18 @@ import { TabelaColaboradores } from "@/components/painel/tabela-colaboradores";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, paramsDoRecorte, rotuloComparacao, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
 import {
-  KPIS_ESCALA_VAZIO,
-  KPIS_VAZIOS,
+  agregarProdutividade,
+  janelaAtual,
+  janelaComparativo,
+} from "@/lib/produtividade";
+import {
   buscarDispersao,
   buscarDistribuicao,
   buscarDominios,
   buscarHorasExtras,
-  buscarKpisComparados,
-  buscarKpisEscala,
+  buscarProdutividade,
   buscarPresenca,
   buscarRankingColaboradores,
   buscarRitmo,
@@ -44,11 +46,6 @@ const ABAS: AbaPainel[] = [
   { chave: "horas", rotulo: "Horas extras" },
 ];
 
-const KPIS_COMPARADOS_VAZIO = {
-  atual: KPIS_VAZIOS,
-  anterior: KPIS_VAZIOS,
-  variacao: { minutosAtivos: null, indice: null, minutosProdutivos: null, interacoes: null },
-};
 
 export default async function PaginaDetalheEquipe({
   params,
@@ -88,10 +85,23 @@ export default async function PaginaDetalheEquipe({
   const escolhida = Array.isArray(abaBruta) ? abaBruta[0] : abaBruta;
   const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "resumo";
 
-  const [kpis, escala] = await Promise.all([
-    comFalha(buscarKpisComparados(supabase, periodo, escopo, fuso), KPIS_COMPARADOS_VAZIO),
-    comFalha(buscarKpisEscala(supabase, periodo, escopo), KPIS_ESCALA_VAZIO),
+  // Mesma régua da Visão geral: janela atual cortada no relógio e comparação
+  // com o período anterior no mesmo ponto.
+  const janela = janelaAtual(periodo);
+  const comparativo = await comFalha(
+    janelaComparativo(supabase, periodo, fuso, escopo.orgId),
+    null,
+  );
+
+  const [produtividade, anterior] = await Promise.all([
+    comFalha(buscarProdutividade(supabase, janela, escopo), []),
+    comparativo.dados
+      ? comFalha(buscarProdutividade(supabase, comparativo.dados, escopo), [])
+      : Promise.resolve({ dados: [], erro: null }),
   ]);
+
+  const resumo = agregarProdutividade(produtividade.dados);
+  const resumoAnterior = comparativo.dados ? agregarProdutividade(anterior.dados) : null;
 
   return (
     <div className="space-y-5">
@@ -113,12 +123,12 @@ export default async function PaginaDetalheEquipe({
 
       <BarraFiltros periodo={periodo} escopo={escopo} fuso={fuso} campos={[]} />
 
-      {kpis.erro && <AvisoErro mensagem={kpis.erro} />}
+      {produtividade.erro && <AvisoErro mensagem={produtividade.erro} />}
 
-      <BentoKpis
-        dados={kpis.dados}
-        rotuloComparacao={rotuloComparacao(periodo)}
-        escala={escala.dados}
+      <ResumoExpediente
+        resumo={resumo}
+        anterior={resumoAnterior}
+        rotuloComparacao={comparativo.dados?.rotulo ?? null}
       />
 
       <AbasPainel abas={ABAS} ativa={aba} />
@@ -143,7 +153,6 @@ export default async function PaginaDetalheEquipe({
   );
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 async function ResumoEquipe({ supabase, periodo, escopo, fuso }: any) {
   const [serie, distribuicao] = await Promise.all([

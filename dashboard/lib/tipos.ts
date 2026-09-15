@@ -192,6 +192,57 @@ export interface LinhaDispersao {
   trocasPorHora: number;
 }
 
+/**
+ * Produtividade de uma pessoa medida contra o EXPEDIENTE dela.
+ * Índice = produtivo ÷ expediente decorrido. Desligado, bloqueado e ocioso
+ * puxam para baixo, porque são expediente que não virou entrega.
+ */
+export interface LinhaProdutividade {
+  colaboradorId: string;
+  colaborador: string;
+  equipeId: string | null;
+  equipe: string | null;
+  minutosExpediente: number;
+  minutosRegistrados: number;
+  minutosProdutivos: number;
+  minutosNeutros: number;
+  minutosImprodutivos: number;
+  minutosSemClassificar: number;
+  minutosOciosos: number;
+  minutosBloqueado: number;
+  minutosDesligado: number;
+  diasComExpediente: number;
+  indice: number | null;
+  aderencia: number | null;
+}
+
+/** Como o expediente foi ocupado, em % (as sete fatias somam ~100). */
+export interface ComposicaoExpediente {
+  produtivo: number;
+  neutro: number;
+  improdutivo: number;
+  semClassificar: number;
+  ocioso: number;
+  bloqueado: number;
+  desligado: number;
+}
+
+/** Agregado de um recorte: média SIMPLES dos % das pessoas. */
+export interface ResumoProdutividade {
+  pessoas: number;
+  indiceMedio: number | null;
+  aderenciaMedia: number | null;
+  composicao: ComposicaoExpediente;
+  totais: {
+    expediente: number;
+    registrados: number;
+    produtivos: number;
+    ociosos: number;
+    bloqueado: number;
+    desligado: number;
+  };
+}
+
 /** Quem entra no painel — diferente de Colaborador, que é quem é acompanhado. */
 export interface UsuarioAcesso {
   id: string;
