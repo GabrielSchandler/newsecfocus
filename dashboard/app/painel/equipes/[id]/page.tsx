@@ -12,7 +12,7 @@ import { SecaoDispersao } from "@/components/painel/secao-dispersao";
 import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
 import { SecaoPresenca } from "@/components/painel/secao-presenca";
 import { SecaoRitmo } from "@/components/painel/secao-ritmo";
-import { TabelaColaboradores } from "@/components/painel/tabela-colaboradores";
+import { TabelaPessoasProdutividade } from "@/components/painel/tabela-pessoas-produtividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
@@ -29,7 +29,6 @@ import {
   buscarHorasExtras,
   buscarProdutividade,
   buscarPresenca,
-  buscarRankingColaboradores,
   buscarRitmo,
   buscarSerie,
 } from "@/lib/consultas";
@@ -137,7 +136,7 @@ export default async function PaginaDetalheEquipe({
         <ResumoEquipe supabase={supabase} periodo={periodo} escopo={escopo} fuso={fuso} />
       )}
       {aba === "pessoas" && (
-        <PessoasEquipe supabase={supabase} periodo={periodo} escopo={escopo} equipeId={id} recorte={recorte} />
+        <PessoasEquipe supabase={supabase} periodo={periodo} escopo={escopo} recorte={recorte} />
       )}
       {aba === "aplicativos" && (
         <AplicativosEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
@@ -181,15 +180,17 @@ async function ResumoEquipe({ supabase, periodo, escopo, fuso }: any) {
   );
 }
 
-async function PessoasEquipe({ supabase, periodo, escopo, equipeId, recorte }: any) {
-  const pessoas = await comFalha(
-    buscarRankingColaboradores(supabase, periodo, equipeId, 100, escopo.orgId),
-    [],
-  );
+async function PessoasEquipe({ supabase, periodo, escopo, recorte }: any) {
+  // Mesma planilha da tela de Pessoas, já filtrada pela equipe do escopo.
+  const pessoas = await comFalha(buscarProdutividade(supabase, janelaAtual(periodo), escopo), []);
   return (
     <>
       {pessoas.erro && <AvisoErro mensagem={pessoas.erro} />}
-      <TabelaColaboradores linhas={pessoas.dados} recorte={recorte} mostrarEquipe={false} />
+      <TabelaPessoasProdutividade
+        linhas={pessoas.dados}
+        recorte={recorte}
+        mostrarEquipe={false}
+      />
     </>
   );
 }

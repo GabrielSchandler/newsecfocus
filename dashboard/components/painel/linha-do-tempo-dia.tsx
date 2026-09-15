@@ -80,7 +80,7 @@ export function LinhaDoTempoDia({
 }) {
   const fmt = useMemo(() => fmtHora(fuso), [fuso]);
 
-  const { dias, janelaIni, janelaFim, resumo, totalMin } = useMemo(() => {
+  const { dias, janelaIni, janelaFim, resumo, totalMin, desligadoMin } = useMemo(() => {
     const fmtLocal = fmtHora(fuso);
     const porDia = new Map<string, { estado: Estado; ini: number; fim: number }[]>();
     const resumo: Record<string, number> = {};
@@ -109,8 +109,13 @@ export function LinhaDoTempoDia({
       .sort((a, b) => (a[0] < b[0] ? 1 : -1)) // mais recente primeiro
       .slice(0, MAX_DIAS);
 
-    const totalMin = Object.values(resumo).reduce((s, n) => s + n, 0);
-    return { dias, janelaIni, janelaFim, resumo, totalMin };
+    const comDado = Object.values(resumo).reduce((s, n) => s + n, 0);
+    // "Desligado" não vem do banco: é o buraco entre os segmentos. Aqui ele é
+    // medido exatamente como o desenho o mostra — a janela de cada dia menos o
+    // que tem dado —, para a legenda bater com a faixa.
+    const desligadoMin = Math.max(0, dias.length * (janelaFim - janelaIni) - comDado);
+    const totalMin = comDado + desligadoMin;
+    return { dias, janelaIni, janelaFim, resumo, totalMin, desligadoMin };
   }, [segmentos, fuso]);
 
   const vazio = segmentos.length === 0;
@@ -133,24 +138,25 @@ export function LinhaDoTempoDia({
       {/* Legenda + resumo do período no mesmo lugar. */}
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
         {ORDEM.map((e) => {
-          const min = e === "DESLIGADO" ? 0 : resumo[e] ?? 0;
-          if (e === "DESLIGADO") {
-            return (
-              <span key={e} className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-slate-700 bg-slate-900" />
-                {ROTULOS[e]}
-              </span>
-            );
-          }
+          const min = e === "DESLIGADO" ? desligadoMin : resumo[e] ?? 0;
+          const pct = totalMin > 0 ? (min / totalMin) * 100 : 0;
           return (
             <span key={e} className="flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: CORES[e] }} />
+              <span
+                className={
+                  e === "DESLIGADO"
+                    ? "h-2.5 w-2.5 shrink-0 rounded-sm border border-slate-700 bg-slate-900"
+                    : "h-2.5 w-2.5 shrink-0 rounded-sm"
+                }
+                style={e === "DESLIGADO" ? undefined : { background: CORES[e] }}
+              />
               {ROTULOS[e]}
-              {min > 0 && (
-                <span className="tabular-nums text-slate-600">
-                  {Math.floor(min / 60)}h{String(min % 60).padStart(2, "0")}
-                </span>
-              )}
+              <span className="tabular-nums text-slate-500">
+                {Math.floor(min / 60)}h{String(Math.round(min % 60)).padStart(2, "0")}
+              </span>
+              <span className="tabular-nums text-slate-600">
+                ({pct.toFixed(1).replace(".", ",")}%)
+              </span>
             </span>
           );
         })}
