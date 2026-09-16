@@ -6,7 +6,6 @@ import { CabecalhoPagina, AvisoErro } from "@/components/painel/cabecalho";
 import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
 import { ResumoExpediente } from "@/components/painel/resumo-expediente";
 import { GraficoArea } from "@/components/painel/grafico-area";
-import { GraficoBarras } from "@/components/painel/grafico-barras";
 import { GraficoDonut } from "@/components/painel/grafico-donut";
 import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
 import { SecaoDispersao } from "@/components/painel/secao-dispersao";
@@ -36,7 +35,6 @@ import {
   buscarHorasExtras,
   buscarProdutividade,
   buscarPresenca,
-  buscarRankingEquipes,
   buscarRitmo,
   buscarSerie,
   buscarTempoReal,
@@ -187,18 +185,13 @@ async function SecaoResumo({
   categorias,
   admin,
 }: any) {
-  const [serie, distribuicao, rankingEquipes, evolucao] = await Promise.all([
+  const [serie, distribuicao, evolucao] = await Promise.all([
     comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
-    comFalha(buscarRankingEquipes(supabase, periodo, escopo.orgId), []),
     comFalha(buscarEvolucao(supabase, periodo, escopo), []),
   ]);
 
-  const erro = primeiroErro(serie, distribuicao, rankingEquipes, evolucao);
-
-  // Comparar equipes só faz sentido quando o recorte não é de uma equipe só.
-  const mostrarComparativo =
-    !escopo.equipeId && !escopo.colaboradorId && rankingEquipes.dados.length > 1;
+  const erro = primeiroErro(serie, distribuicao, evolucao);
 
   return (
     <div className="space-y-5">
@@ -221,21 +214,6 @@ async function SecaoResumo({
           />
         </div>
       </div>
-
-      {mostrarComparativo && (
-        <GraficoBarras
-          titulo="Comparativo entre equipes"
-          subtitulo="tempo ativo por categoria no período"
-          dados={rankingEquipes.dados.map((e: any) => ({
-            id: e.equipeId,
-            nome: e.equipe,
-            produtivo: e.minutosProdutivos,
-            neutro: e.minutosNeutros,
-            improdutivo: e.minutosImprodutivos,
-            indice: e.indice,
-          }))}
-        />
-      )}
 
       <SecaoEvolucao linhas={evolucao.dados} />
     </div>

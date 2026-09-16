@@ -52,7 +52,7 @@ export default async function PaginaAplicativo({
           pessoas.dados.length === 1 ? "pessoa" : "pessoas"
         } · ${periodo.rotulo}`}
         icone={<AppWindow className="h-5 w-5 text-cyan-400" />}
-        voltarPara={{ href: `/painel/aplicativos${recorte}`, rotulo: "Aplicativos" }}
+        voltarPara={{ href: `/painel?visao=aplicativos&${recorte.replace("?", "")}`, rotulo: "Aplicativos" }}
       />
 
       <BarraFiltros
