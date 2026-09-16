@@ -17,12 +17,15 @@ export function SecaoAplicativos({
   categorias,
   admin,
   dominios = [],
+  recorte = "",
 }: {
   apps: FatiaDistribuicao[];
   categorias: Categoria[];
   admin: boolean;
   /** Sites mais usados; quando vazio, o bloco de sites não aparece. */
   dominios?: LinhaDominio[];
+  /** Filtros atuais, repassados ao abrir a visão de um aplicativo. */
+  recorte?: string;
 }) {
   if (apps.length === 0) {
     return (
@@ -111,7 +114,12 @@ export function SecaoAplicativos({
                   style={{ background: CORES_TIPO[d.tipo ?? "SEM"] }}
                   title={d.tipo ? ROTULOS_TIPO[d.tipo] : "Sem categoria"}
                 />
-                <span className="min-w-0 flex-1 truncate text-slate-200">{d.dominio}</span>
+                <Link
+                  href={"/painel/aplicativos/" + encodeURIComponent(d.dominio) + recorte}
+                  className="min-w-0 flex-1 truncate text-slate-200 hover:text-cyan-300"
+                >
+                  {d.dominio}
+                </Link>
                 {d.pessoas > 1 && (
                   <span className="shrink-0 text-xs text-slate-600">{d.pessoas} pessoas</span>
                 )}
@@ -122,7 +130,7 @@ export function SecaoAplicativos({
         </div>
       )}
 
-      <TabelaAplicativos linhas={apps} />
+      <TabelaAplicativos linhas={apps} recorte={recorte} />
     </div>
   );
 }

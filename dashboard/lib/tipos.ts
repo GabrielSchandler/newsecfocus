@@ -243,6 +243,22 @@ export interface ResumoProdutividade {
   };
 }
 
+/** Quem usa um aplicativo/site, na visão por aplicativo. */
+export interface LinhaAppPessoa {
+  colaboradorId: string;
+  colaborador: string;
+  equipeId: string | null;
+  equipe: string | null;
+  minutos: number;
+  dias: number;
+}
+
+/** Um ponto do uso de um aplicativo no tempo (hora ou dia). */
+export interface PontoAppSerie {
+  balde: string; // ISO
+  minutos: number;
+}
+
 /** Uma linha da escala de expediente (um dia da semana de um alvo). */
 export interface LinhaEscala {
   escopo: "EMPRESA" | "EQUIPE" | "PESSOA";

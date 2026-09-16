@@ -150,7 +150,7 @@ export default async function PaginaDetalhePessoa({
       )}
 
       {aba === "aplicativos" && (
-        <AplicativosPessoa supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+        <AplicativosPessoa supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} recorte={recorte} />
       )}
 
       {aba === "ritmo" && <RitmoPessoa supabase={supabase} periodo={periodo} escopo={escopo} />}
@@ -215,7 +215,7 @@ async function ResumoPessoa({ supabase, periodo, escopo, fuso, pessoa, jornadaPa
   );
 }
 
-async function AplicativosPessoa({ supabase, periodo, escopo, admin }: any) {
+async function AplicativosPessoa({ supabase, periodo, escopo, admin, recorte }: any) {
   const [distribuicao, dominios] = await Promise.all([
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
     comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
@@ -228,6 +228,7 @@ async function AplicativosPessoa({ supabase, periodo, escopo, admin }: any) {
         categorias={[]}
         admin={admin}
         dominios={dominios.dados}
+        recorte={recorte}
       />
     </>
   );

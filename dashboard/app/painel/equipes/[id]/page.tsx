@@ -139,7 +139,7 @@ export default async function PaginaDetalheEquipe({
         <PessoasEquipe supabase={supabase} periodo={periodo} escopo={escopo} recorte={recorte} />
       )}
       {aba === "aplicativos" && (
-        <AplicativosEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
+        <AplicativosEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} recorte={recorte} />
       )}
       {aba === "presenca" && (
         <PresencaEquipe supabase={supabase} periodo={periodo} escopo={escopo} />
@@ -195,7 +195,7 @@ async function PessoasEquipe({ supabase, periodo, escopo, recorte }: any) {
   );
 }
 
-async function AplicativosEquipe({ supabase, periodo, escopo, admin }: any) {
+async function AplicativosEquipe({ supabase, periodo, escopo, admin, recorte }: any) {
   const [distribuicao, dominios] = await Promise.all([
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
     comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
@@ -208,6 +208,7 @@ async function AplicativosEquipe({ supabase, periodo, escopo, admin }: any) {
         categorias={[]}
         admin={admin}
         dominios={dominios.dados}
+        recorte={recorte}
       />
     </>
   );

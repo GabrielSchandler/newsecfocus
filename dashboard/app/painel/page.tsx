@@ -18,7 +18,7 @@ import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
 import {
   agregarProdutividade,
   janelaAtual,
@@ -66,6 +66,7 @@ export default async function PaginaVisaoGeral({
   if (!contexto) redirect("/entrar");
 
   const { periodo, escopo } = lerFiltros(params, contexto);
+  const recorte = paramsDoRecorte(params);
   const fuso = contexto.empresa.fuso;
   const org = orgEfetiva(contexto, escopo);
   const admin = podeAdministrar(contexto);
@@ -149,6 +150,7 @@ export default async function PaginaVisaoGeral({
           escopo={escopo}
           categorias={categorias.dados}
           admin={admin}
+          recorte={recorte}
         />
       )}
 
@@ -240,7 +242,7 @@ async function SecaoResumo({
   );
 }
 
-async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admin }: any) {
+async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admin, recorte }: any) {
   const [distribuicao, dominios] = await Promise.all([
     comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
     comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
@@ -253,6 +255,7 @@ async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admi
         categorias={categorias}
         admin={admin}
         dominios={dominios.dados}
+        recorte={recorte}
       />
     </>
   );

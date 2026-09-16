@@ -22,9 +22,11 @@ import type {
   LinhaDispersao,
   LinhaDominio,
   LinhaEvolucao,
+  LinhaAppPessoa,
   LinhaEscala,
   LinhaPresenca,
   LinhaProdutividade,
+  PontoAppSerie,
   PontoRitmo,
   SegmentoLinha,
   Kpis,
@@ -460,6 +462,58 @@ export async function buscarEscalas(
     intervaloInicio: r.intervalo_inicio ? String(r.intervalo_inicio).slice(0, 5) : null,
     intervaloFim: r.intervalo_fim ? String(r.intervalo_fim).slice(0, 5) : null,
   })) as LinhaEscala[];
+}
+
+/** Quem usa um aplicativo/site no recorte. */
+export async function buscarAppPessoas(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  alvo: string,
+  escopo: Escopo,
+): Promise<LinhaAppPessoa[]> {
+  const { data, error } = await supabase.rpc("painel_app_pessoas", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_alvo: alvo,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    minutos: num(r.minutos),
+    dias: num(r.dias),
+  })) as LinhaAppPessoa[];
+}
+
+/**
+ * Uso do aplicativo no tempo. Com o filtro de um dia, a série sai por HORA;
+ * nos demais períodos, por dia — que é o que o gestor pediu ao clicar no app.
+ */
+export async function buscarAppSerie(
+  supabase: SupabaseClient,
+  periodo: Periodo,
+  alvo: string,
+  escopo: Escopo,
+): Promise<PontoAppSerie[]> {
+  const { data, error } = await supabase.rpc("painel_app_serie", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_alvo: alvo,
+    p_por_hora: periodo.preset === "dia",
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    balde: r.balde,
+    minutos: num(r.minutos),
+  })) as PontoAppSerie[];
 }
 
 export async function buscarUsuariosAcesso(

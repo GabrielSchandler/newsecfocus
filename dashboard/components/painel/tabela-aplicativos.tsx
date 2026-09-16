@@ -1,12 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { Tabela, CelulaBarra, type ColunaTabela } from "./tabela";
 import { Badge } from "@/components/ui/badge";
 import { ROTULOS_TIPO, formatarHoras, formatarPorcentagem } from "@/lib/formato";
 import type { FatiaDistribuicao } from "@/lib/tipos";
 
 /** Uso por aplicativo/site. Colunas montadas no cliente (ver TabelaEquipes). */
-export function TabelaAplicativos({ linhas }: { linhas: FatiaDistribuicao[] }) {
+export function TabelaAplicativos({
+  linhas,
+  recorte = "",
+}: {
+  linhas: FatiaDistribuicao[];
+  /** Filtros atuais, repassados ao abrir a visão do aplicativo. */
+  recorte?: string;
+}) {
   const total = linhas.reduce((s, a) => s + a.minutos, 0);
   const maior = Math.max(1, ...linhas.map((a) => a.minutos));
 
@@ -19,7 +27,12 @@ export function TabelaAplicativos({ linhas }: { linhas: FatiaDistribuicao[] }) {
       render: (l) => (
         <span className="flex min-w-0 items-center gap-2">
           <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: l.cor }} />
-          <span className="truncate font-medium text-slate-100">{l.nome}</span>
+          <Link
+            href={"/painel/aplicativos/" + encodeURIComponent(l.nome) + recorte}
+            className="truncate font-medium text-slate-100 hover:text-cyan-300"
+          >
+            {l.nome}
+          </Link>
         </span>
       ),
     },

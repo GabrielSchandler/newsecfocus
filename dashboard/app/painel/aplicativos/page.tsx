@@ -7,7 +7,7 @@ import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
+import { lerFiltros, orgEfetiva, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
 import {
   buscarCategorias,
   buscarColaboradores,
@@ -30,6 +30,7 @@ export default async function PaginaAplicativos({
   if (!contexto) redirect("/entrar");
 
   const { periodo, escopo } = lerFiltros(params, contexto);
+  const recorte = paramsDoRecorte(params);
   const org = orgEfetiva(contexto, escopo);
   const admin = podeAdministrar(contexto);
 
@@ -70,6 +71,7 @@ export default async function PaginaAplicativos({
         categorias={categorias.dados}
         admin={admin}
         dominios={dominios.dados}
+        recorte={recorte}
       />
     </div>
   );
