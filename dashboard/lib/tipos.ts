@@ -195,54 +195,226 @@ export interface LinhaDispersao {
 }
 
 /**
- * Produtividade de uma pessoa medida contra o EXPEDIENTE dela.
- * Índice = produtivo ÷ expediente decorrido. Desligado, bloqueado e ocioso
- * puxam para baixo, porque são expediente que não virou entrega.
+ * Minutos de expediente de um recorte, todos sobre a MESMA janela e escala.
+ * produtivos + neutros + improdutivos + semClassificar = ativos;
+ * ativos + ociosos + bloqueado = registrados; registrados + semDados = expediente.
+ * ativosFora é o tempo ativo fora da escala e fica de fora dessas somas.
+ */
+export interface MinutosExpediente {
+  expediente: number;
+  registrados: number;
+  ativos: number;
+  produtivos: number;
+  neutros: number;
+  improdutivos: number;
+  semClassificar: number;
+  ociosos: number;
+  bloqueado: number;
+  semDados: number;
+  ativosFora: number;
+  /** Minutos em que mais de uma estação da pessoa mandou registro. */
+  sobrepostos: number;
+}
+
+/** As sete fatias do expediente, na ordem da barra e da legenda. */
+export type FatiaExpediente =
+  | "produtivos"
+  | "neutros"
+  | "improdutivos"
+  | "semClassificar"
+  | "ociosos"
+  | "bloqueado"
+  | "semDados";
+
+/**
+ * Métricas de expediente de uma pessoa (fonte única: painel_produtividade_diaria).
+ * Índice = produtivo ÷ expediente decorrido. NULL quando não há expediente.
  */
 export interface LinhaProdutividade {
   colaboradorId: string;
   colaborador: string;
   equipeId: string | null;
   equipe: string | null;
+  minutos: MinutosExpediente;
+  diasComExpediente: number;
+  diasComRegistro: number;
+  /** Algum corte de escala caiu no meio de um bloco: parte do tempo foi rateada. */
+  aproximado: boolean;
+  indice: number | null;
+  /** Registrado dentro do expediente ÷ expediente. */
+  cobertura: number | null;
+}
+
+/** A mesma medida, por pessoa e por dia. */
+export interface LinhaProdutividadeDia {
+  colaboradorId: string;
+  colaborador: string;
+  equipeId: string | null;
+  equipe: string | null;
+  dia: string;
+  trabalha: boolean;
+  escalaInicio: string | null;
+  escalaFim: string | null;
+  intervaloInicio: string | null;
+  intervaloFim: string | null;
+  minutos: MinutosExpediente;
+  aproximado: boolean;
+  indice: number | null;
+  cobertura: number | null;
+}
+
+/** Agregado de um recorte. */
+export interface ResumoProdutividade {
+  /** Pessoas com expediente previsto no recorte. */
+  pessoas: number;
+  pessoasComRegistro: number;
+  /** Média SIMPLES do índice de cada pessoa — cada pessoa pesa igual. */
+  indiceMedio: number | null;
+  /** Média simples da cobertura de cada pessoa. */
+  coberturaMedia: number | null;
+  /** Razão dos totais: minutos registrados ÷ minutos de expediente. */
+  cobertura: number | null;
+  /** Somas de minutos do recorte (base da barra de composição, em horas). */
+  minutos: MinutosExpediente;
+  aproximado: boolean;
+  pessoasComSobreposicao: number;
+}
+
+/** Um ponto da evolução do índice: um dia, semana ou mês com expediente. */
+export interface PontoProdutividade {
+  /** Início do balde, YYYY-MM-DD no fuso da empresa. */
+  balde: string;
+  pessoas: number;
+  indice: number | null;
+  cobertura: number | null;
+}
+
+/** Uma linha da lista de pessoas (paginada no banco). */
+export interface LinhaPessoa {
+  colaboradorId: string;
+  nome: string;
+  osUser: string;
+  cargo: string | null;
+  email: string | null;
+  equipeId: string | null;
+  equipe: string | null;
+  ativo: boolean;
+  perfilCompleto: boolean;
+  minutosExpediente: number | null;
+  minutosAtivos: number | null;
+  minutosAtivosFora: number | null;
+  indice: number | null;
+  cobertura: number | null;
+  aproximado: boolean;
+  ultimoRegistro: string | null;
+}
+
+export interface ContagemPessoas {
+  cadastradas: number;
+  comRegistro: number;
+  semRegistro: number;
+  pendentes: number;
+  semEquipe: number;
+  inativas: number;
+}
+
+export type FiltroAplicativos = "todos" | "aplicativos" | "sites" | "sem";
+
+/** Um aplicativo ou site usado no período. */
+export interface LinhaAplicativo {
+  alvo: string;
+  ehSite: boolean;
+  /** Categoria efetiva na consolidação. NULL = sem classificação. */
+  tipo: TipoCategoria | null;
+  mapeamentoId: string | null;
+  categoriaId: string | null;
+  categoriaNome: string | null;
+  /** O alvo tem regra própria? Por domínio ou por processo. */
+  regraPor: "dominio" | "processo" | null;
+  minutos: number;
+  pessoas: number;
+  dias: number;
+}
+
+export interface ResumoAplicativos {
+  identificados: number;
+  classificados: number;
+  semClassificacao: number;
+  aplicativos: number;
+  sites: number;
+  qtdPorTipo: Record<TipoCategoria, number>;
+  minutosTotal: number;
+  minutosPorTipo: Record<TipoCategoria | "SEM", number>;
+}
+
+/** Jornada de uma pessoa no período. */
+export interface LinhaJornada {
+  colaboradorId: string;
+  colaborador: string;
+  equipeId: string | null;
+  equipe: string | null;
+  escala: string;
+  diasComExpediente: number;
+  diasComRegistro: number;
   minutosExpediente: number;
   minutosRegistrados: number;
-  minutosProdutivos: number;
-  minutosNeutros: number;
-  minutosImprodutivos: number;
-  minutosSemClassificar: number;
-  minutosOciosos: number;
-  minutosBloqueado: number;
-  minutosDesligado: number;
-  diasComExpediente: number;
-  indice: number | null;
-  aderencia: number | null;
+  minutosAtivosFora: number;
+  cobertura: number | null;
+  /** Minuto do dia (0..1439), média dos dias com registro. */
+  primeiroRegistroMedio: number | null;
+  ultimoRegistroMedio: number | null;
+  /** Algum dia só tinha o resumo de 15 min (dado cru fora da retenção). */
+  horariosPorBloco: boolean;
+  aproximado: boolean;
 }
 
-/** Como o expediente foi ocupado, em % (as sete fatias somam ~100). */
-export interface ComposicaoExpediente {
-  produtivo: number;
-  neutro: number;
-  improdutivo: number;
-  semClassificar: number;
-  ocioso: number;
-  bloqueado: number;
-  desligado: number;
+/** Um dia de jornada de uma pessoa, para o comparativo visual. */
+export interface JornadaDia {
+  colaboradorId: string;
+  colaborador: string;
+  equipe: string | null;
+  trabalha: boolean;
+  escalaInicio: string | null;
+  escalaFim: string | null;
+  intervaloInicio: string | null;
+  intervaloFim: string | null;
+  minutosExpediente: number;
+  minutosRegistrados: number;
+  minutosAtivosFora: number;
+  primeiroRegistro: string | null;
+  ultimoRegistro: string | null;
+  /** Blocos de 15 min: [minuto do dia, minutos registrados, minutos ativos]. */
+  blocos: [number, number, number][];
 }
 
-/** Agregado de um recorte: média SIMPLES dos % das pessoas. */
-export interface ResumoProdutividade {
-  pessoas: number;
-  indiceMedio: number | null;
-  aderenciaMedia: number | null;
-  composicao: ComposicaoExpediente;
-  totais: {
-    expediente: number;
-    registrados: number;
-    produtivos: number;
-    ociosos: number;
-    bloqueado: number;
-    desligado: number;
-  };
+/** Minutos seguidos do mesmo aplicativo e estado. */
+export interface Sessao {
+  inicio: string;
+  fim: string;
+  alvo: string;
+  tipo: TipoCategoria | null;
+  estado: "ATIVO" | "OCIOSO" | "BLOQUEADO";
+  minutos: number;
+  maquina: string | null;
+}
+
+export type SituacaoEstacao = "RECENTE" | "ATRASADA" | "SEM_ENVIO";
+
+export interface Estacao {
+  id: string;
+  maquina: string;
+  usuarioWindows: string | null;
+  versao: string | null;
+  ultimoEnvio: string | null;
+  ultimoRegistro: string | null;
+  minutosSemEnvio: number | null;
+  limiarMinutos: number;
+  situacao: SituacaoEstacao;
+  colaboradorId: string | null;
+  colaborador: string | null;
+  equipeId: string | null;
+  equipe: string | null;
+  emExpedienteAgora: boolean;
 }
 
 /** Quem usa um aplicativo/site, na visão por aplicativo. */
@@ -535,19 +707,19 @@ export type TipoRelatorio = "diario" | "colaboradores" | "equipes" | "aplicativo
 
 export const RELATORIOS: Record<TipoRelatorio, { titulo: string; descricao: string }> = {
   diario: {
-    titulo: "Dia a dia por colaborador",
-    descricao: "Uma linha por pessoa e por dia, com horas, índice e expediente.",
+    titulo: "Diário por pessoa",
+    descricao: "Uma linha por pessoa e por dia: escala, expediente, uso e índice.",
   },
   colaboradores: {
-    titulo: "Consolidado por colaborador",
-    descricao: "Uma linha por pessoa no período, com aderência à jornada.",
+    titulo: "Consolidado por pessoa",
+    descricao: "Uma linha por pessoa no período, com cobertura e fora da escala.",
   },
   equipes: {
     titulo: "Consolidado por equipe",
-    descricao: "Comparativo entre equipes no período.",
+    descricao: "Uma linha por equipe: índice médio por pessoa e horas somadas.",
   },
   aplicativos: {
-    titulo: "Uso de aplicativos e sites",
-    descricao: "Tempo por ferramenta, com a categoria de produtividade.",
+    titulo: "Aplicativos e sites",
+    descricao: "Tempo de uso por aplicativo ou site, com a categoria efetiva.",
   },
 };

@@ -49,7 +49,7 @@ function Mensagem({ estado }: { estado: ResultadoAcaoPlanilha | null }) {
     <span
       className={cn(
         "flex items-center gap-1.5 text-xs",
-        estado.ok ? "text-emerald-300" : "text-rose-300",
+        estado.ok ? "text-emerald-700" : "text-rose-700",
       )}
     >
       {estado.ok ? (
@@ -138,7 +138,7 @@ export function PlanilhaEditavel<T>({
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-slate-200">{titulo}</h3>
+            <h3 className="text-sm font-medium text-slate-800">{titulo}</h3>
             {descricao && (
               <p className="mt-1 text-xs leading-relaxed text-slate-500">{descricao}</p>
             )}
@@ -192,7 +192,7 @@ export function PlanilhaEditavel<T>({
                     <th className="w-10" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/70">
+                <tbody className="divide-y divide-slate-100">
                   {linhas.map((l) => {
                     const id = chave(l);
                     const aberto = aberta === id;
@@ -200,8 +200,8 @@ export function PlanilhaEditavel<T>({
                       <React.Fragment key={id}>
                         <tr
                           className={cn(
-                            "cursor-pointer transition-colors hover:bg-slate-800/30",
-                            aberto && "bg-slate-800/40",
+                            "cursor-pointer transition-colors hover:bg-slate-50",
+                            aberto && "bg-slate-50",
                           )}
                           onClick={() => alternar(id)}
                         >
@@ -223,7 +223,7 @@ export function PlanilhaEditavel<T>({
                           </td>
                         </tr>
                         {aberto && (
-                          <tr className="bg-slate-900/40">
+                          <tr className="bg-slate-50">
                             <td colSpan={colunas.length + 1} className="px-4 pb-4">
                               <Editor
                                 acao={acao}
@@ -243,7 +243,7 @@ export function PlanilhaEditavel<T>({
             </div>
 
             {/* Celular: cartões que abrem no lugar. */}
-            <ul className="divide-y divide-slate-800/70 md:hidden">
+            <ul className="divide-y divide-slate-100 md:hidden">
               {linhas.map((l) => {
                 const id = chave(l);
                 const aberto = aberta === id;
@@ -256,7 +256,7 @@ export function PlanilhaEditavel<T>({
                       className="flex w-full items-center justify-between gap-3 text-left"
                       onClick={() => alternar(id)}
                     >
-                      <span className="min-w-0 font-medium text-slate-100">
+                      <span className="min-w-0 font-medium text-slate-900">
                         {principal.render(l)}
                       </span>
                       <ChevronDown
@@ -271,7 +271,7 @@ export function PlanilhaEditavel<T>({
                         {resto.map((c) => (
                           <div key={c.chave} className="min-w-0">
                             <dt className="text-xs text-slate-500">{c.rotulo}</dt>
-                            <dd className="truncate text-sm text-slate-300">{c.render(l)}</dd>
+                            <dd className="truncate text-sm text-slate-700">{c.render(l)}</dd>
                           </div>
                         ))}
                       </dl>

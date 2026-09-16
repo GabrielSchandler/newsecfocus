@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { Check, Loader2, Pencil, Plus, Trash2, TriangleAlert, X } from "lucide-react";
@@ -55,7 +56,7 @@ function Mensagem({ estado }: { estado: ResultadoAcao | null }) {
     <p
       role="status"
       className={`flex items-center gap-1.5 text-xs ${
-        estado.ok ? "text-emerald-400" : "text-rose-400"
+        estado.ok ? "text-emerald-700" : "text-rose-700"
       }`}
     >
       {estado.ok ? <Check className="h-3.5 w-3.5" /> : <TriangleAlert className="h-3.5 w-3.5" />}
@@ -82,7 +83,7 @@ function BotaoExcluir({
         type="button"
         onClick={() => setConfirmando(true)}
         aria-label="Excluir"
-        className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
+        className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-rose-500/10 hover:text-rose-700"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -92,15 +93,15 @@ function BotaoExcluir({
   return (
     <form action={enviar} className="flex items-center gap-1.5">
       <input type="hidden" name="id" value={id} />
-      <span className="text-xs text-slate-400">{confirmacao}</span>
-      <Button type="submit" tamanho="sm" variante="contorno" className="text-rose-300">
+      <span className="text-xs text-slate-600">{confirmacao}</span>
+      <Button type="submit" tamanho="sm" variante="contorno" className="text-rose-700">
         Excluir
       </Button>
       <button
         type="button"
         onClick={() => setConfirmando(false)}
         aria-label="Cancelar"
-        className="rounded-md p-1.5 text-slate-500 hover:text-slate-300"
+        className="rounded-md p-1.5 text-slate-500 hover:text-slate-700"
       >
         <X className="h-3.5 w-3.5" />
       </button>
@@ -117,7 +118,7 @@ export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
   return (
     <PlanilhaEditavel<Equipe>
       titulo="Equipes"
-      descricao="Clique numa equipe para editar na própria linha. O horário de trabalho dela fica em Expediente — é lá que o índice e a aderência da equipe são definidos."
+      descricao="Clique numa equipe para editar na própria linha. O horário de trabalho dela fica em Escalas — é contra ele que o tempo produtivo e a cobertura da equipe são calculados."
       rotuloNovo="Nova equipe"
       linhas={equipes}
       chave={(e) => e.id}
@@ -131,9 +132,9 @@ export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
             <span className="flex min-w-0 items-center gap-2">
               <span
                 className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ background: e.cor ?? "#22d3ee" }}
+                style={{ background: e.cor ?? "#1f9fb2" }}
               />
-              <span className="truncate font-medium text-slate-100">{e.nome}</span>
+              <span className="truncate font-medium text-slate-900">{e.nome}</span>
             </span>
           ),
         },
@@ -141,13 +142,13 @@ export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
           chave: "descricao",
           rotulo: "Descrição",
           ocultarMobile: true,
-          render: (e) => <span className="text-slate-400">{e.descricao ?? "—"}</span>,
+          render: (e) => <span className="text-slate-600">{e.descricao ?? "—"}</span>,
         },
         {
           chave: "pessoas",
           rotulo: "Pessoas",
           alinhar: "direita",
-          render: (e) => <span className="tabular-nums text-slate-300">{e.total_pessoas ?? 0}</span>,
+          render: (e) => <span className="tabular-nums text-slate-700">{e.total_pessoas ?? 0}</span>,
         },
       ]}
       editor={(e) => (
@@ -183,7 +184,7 @@ function CamposEquipe({ equipe }: { equipe: Equipe | null }) {
         />
       </Campo>
       <Campo rotulo="Cor" dica="usada nos gráficos">
-        <Input type="color" name="cor" defaultValue={equipe?.cor ?? "#22d3ee"} className="h-10 p-1" />
+        <Input type="color" name="cor" defaultValue={equipe?.cor ?? "#1f9fb2"} className="h-10 p-1" />
       </Campo>
     </div>
   );
@@ -215,7 +216,7 @@ export function PainelColaboradores({
   return (
     <PlanilhaEditavel<Colaborador>
       titulo="Colaboradores"
-      descricao="As pessoas aparecem sozinhas minutos depois da instalação, com o nome digitado no instalador — ou, se ninguém digitou, com o usuário do Windows. Clique numa linha para ajustar nome, cargo e equipe. O horário de trabalho fica em Expediente."
+      descricao="As pessoas aparecem sozinhas minutos depois da instalação, com o nome digitado no instalador — ou, se ninguém digitou, com o usuário do Windows. Clique numa linha para ajustar nome, cargo e equipe. O horário de trabalho fica em Escalas."
       linhas={filtrados}
       chave={(c) => c.id}
       acao={salvarColaborador}
@@ -238,7 +239,7 @@ export function PainelColaboradores({
           rotulo: "Pessoa",
           render: (c) => (
             <span className="min-w-0">
-              <span className="block truncate font-medium text-slate-100">
+              <span className="block truncate font-medium text-slate-900">
                 {c.nome ?? c.os_user}
               </span>
               <span className="block truncate text-xs text-slate-500">{c.os_user}</span>
@@ -249,14 +250,14 @@ export function PainelColaboradores({
           chave: "cargo",
           rotulo: "Cargo",
           ocultarMobile: true,
-          render: (c) => <span className="text-slate-400">{c.cargo ?? "—"}</span>,
+          render: (c) => <span className="text-slate-600">{c.cargo ?? "—"}</span>,
         },
         {
           chave: "equipe",
           rotulo: "Equipe",
           render: (c) =>
             c.equipe_nome ? (
-              <span className="text-slate-300">{c.equipe_nome}</span>
+              <span className="text-slate-700">{c.equipe_nome}</span>
             ) : (
               <Badge variante="ocioso">sem equipe</Badge>
             ),
@@ -293,7 +294,7 @@ function CamposColaborador({
     <>
       <input type="hidden" name="id" value={colaborador.id} />
       <input type="hidden" name="team_id" value={equipeId} />
-      {/* O expediente mudou de lugar (aba Expediente). Estes campos viajam
+      {/* O expediente mudou de lugar (aba Escalas). Estes campos viajam
           ocultos para que salvar aqui não apague o horário de quem já tinha. */}
       <input
         type="hidden"
@@ -330,12 +331,12 @@ function CamposColaborador({
         </Campo>
       </div>
 
-      <label className="flex items-center gap-2 text-xs text-slate-400">
+      <label className="flex items-center gap-2 text-xs text-slate-600">
         <input
           type="checkbox"
           name="ativo"
           defaultChecked={colaborador.ativo}
-          className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
+          className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-700"
         />
         Ativo
       </label>
@@ -359,7 +360,7 @@ export function PainelClassificacao({
   return (
     <div className="space-y-4">
       <Card className="border-cyan-500/20 p-5">
-        <h3 className="text-sm font-medium text-slate-200">Como o índice é calculado</h3>
+        <h3 className="text-sm font-medium text-slate-800">Como o índice é calculado</h3>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">
           Cada aplicativo ou site é ligado a uma categoria, e a categoria diz se aquele tempo é
           produtivo, neutro ou improdutivo. O índice é o tempo produtivo dividido pelo tempo
@@ -382,7 +383,7 @@ function BotaoCatalogoPadrao() {
 
   return (
     <Card className="p-5">
-      <h3 className="text-sm font-medium text-slate-200">Catálogo padrão</h3>
+      <h3 className="text-sm font-medium text-slate-800">Catálogo padrão</h3>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
         Repõe as categorias e as regras que acompanham o sistema — pacote Office, ferramentas
         de gestão, comunicação, redes sociais, streaming e compras. Nada do que você já
@@ -438,7 +439,7 @@ function CatalogoApps({
   return (
     <Card className="p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-slate-200">Aplicativos e sites detectados</h3>
+        <h3 className="text-sm font-medium text-slate-800">Aplicativos e sites detectados</h3>
         {pendentes > 0 && <Badge variante="ocioso">{pendentes} aguardando classificação</Badge>}
       </div>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -447,7 +448,7 @@ function CatalogoApps({
       </p>
 
       {categorias.length === 0 ? (
-        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-200/90">
+        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-800/90">
           Crie ao menos uma categoria (ou aplique o catálogo padrão acima) antes de classificar.
         </p>
       ) : catalogo.linhas.length === 0 ? (
@@ -468,7 +469,7 @@ function CatalogoApps({
               aria-label="Buscar no catálogo"
               className="min-w-[220px] flex-1"
             />
-            <label className="flex items-center gap-2 text-xs text-slate-400">
+            <label className="flex items-center gap-2 text-xs text-slate-600">
               <input
                 type="checkbox"
                 checked={soPendentes}
@@ -476,7 +477,7 @@ function CatalogoApps({
                   setSoPendentes(e.target.checked);
                   setMostrando(POR_PAGINA);
                 }}
-                className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
+                className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-700"
               />
               Só o que falta classificar
             </label>
@@ -487,7 +488,7 @@ function CatalogoApps({
               Nenhum resultado para esse filtro.
             </p>
           ) : (
-            <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
+            <ul className="mt-4 divide-y divide-slate-100 border-t border-borda">
               {visiveis.map((app) => (
                 <LinhaCatalogo
                   key={`${app.ehProcesso}:${app.alvo}`}
@@ -538,7 +539,7 @@ function LinhaCatalogo({ app, categorias }: { app: LinhaCatalogoApp; categorias:
         <input type="hidden" name="category_id" value={categoriaId} />
 
         <div className="min-w-0 flex-1">
-          <span className="block truncate font-mono text-sm text-slate-200">{app.alvo}</span>
+          <span className="block truncate font-mono text-sm text-slate-800">{app.alvo}</span>
           <span className="block text-xs text-slate-500">
             {app.ehProcesso ? "programa" : "site"} · {formatarHorasCurto(app.minutosTotais)} no
             total · visto até {formatarDataCurta(app.ultimoVisto)}
@@ -575,7 +576,7 @@ function FormularioCategoria({ categorias }: { categorias: Categoria[] }) {
 
   return (
     <Card className="p-5">
-      <h3 className="text-sm font-medium text-slate-200">Categorias</h3>
+      <h3 className="text-sm font-medium text-slate-800">Categorias</h3>
 
       <form action={enviar} className="mt-4 space-y-3">
         <input type="hidden" name="type" value={tipo} />
@@ -596,7 +597,7 @@ function FormularioCategoria({ categorias }: { categorias: Categoria[] }) {
             />
           </Campo>
           <Campo rotulo="Cor">
-            <Input type="color" name="color" defaultValue="#22d3ee" className="h-10 p-1" />
+            <Input type="color" name="color" defaultValue="#1f9fb2" className="h-10 p-1" />
           </Campo>
           <div className="flex items-end">
             <BotaoEnviar>
@@ -609,14 +610,14 @@ function FormularioCategoria({ categorias }: { categorias: Categoria[] }) {
       </form>
 
       {categorias.length > 0 && (
-        <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
+        <ul className="mt-4 divide-y divide-slate-100 border-t border-borda">
           {categorias.map((c) => (
             <li key={c.id} className="flex items-center gap-3 py-3">
               <span
                 className="h-2.5 w-2.5 shrink-0 rounded-full"
                 style={{ background: c.color ?? "#475569" }}
               />
-              <span className="flex-1 truncate text-sm text-slate-200">{c.name}</span>
+              <span className="flex-1 truncate text-sm text-slate-800">{c.name}</span>
               <Badge
                 variante={
                   c.type === "PRODUCTIVE" ? "ativo" : c.type === "NEUTRAL" ? "roxo" : "offline"
@@ -645,13 +646,13 @@ function FormularioMapeamento({
 
   return (
     <Card className="p-5">
-      <h3 className="text-sm font-medium text-slate-200">Regras de aplicativo e site</h3>
+      <h3 className="text-sm font-medium text-slate-800">Regras de aplicativo e site</h3>
       <p className="mt-1 text-xs text-slate-500">
         Use o processo (excel.exe) ou o domínio (youtube.com) — um por regra.
       </p>
 
       {categorias.length === 0 ? (
-        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-200/90">
+        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-800/90">
           Crie ao menos uma categoria antes de cadastrar regras.
         </p>
       ) : (
@@ -687,10 +688,10 @@ function FormularioMapeamento({
       )}
 
       {mapeamentos.length > 0 && (
-        <ul className="mt-4 divide-y divide-slate-800/70 border-t border-borda">
+        <ul className="mt-4 divide-y divide-slate-100 border-t border-borda">
           {mapeamentos.map((m) => (
             <li key={m.id} className="flex items-center gap-3 py-3">
-              <span className="flex-1 truncate font-mono text-xs text-slate-300">
+              <span className="flex-1 truncate font-mono text-xs text-slate-700">
                 {m.process_name ?? m.domain}
               </span>
               <Badge
@@ -730,18 +731,25 @@ const FUSOS = [
   "America/Noronha",
 ];
 
+/** PROFISSIONAL → Profissional; EM_TESTE → Em teste. */
+function rotuloEnum(valor: string | null | undefined) {
+  if (!valor) return "—";
+  const t = valor.replace(/_/g, " ").toLowerCase();
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 export function PainelEmpresa({
   contexto,
   intervaloSync,
+  contatoEmail,
 }: {
   contexto: ContextoSessao;
   intervaloSync: number | null;
+  contatoEmail: string | null;
 }) {
   const [estado, enviar] = useFormState(salvarEmpresa, null);
   const [fuso, setFuso] = useState(contexto.empresa.fuso);
   const somenteLeitura = contexto.papel !== "OWNER";
-  const jornadaJaDefinida =
-    !!contexto.empresa.jornadaPadraoHoraInicio && !!contexto.empresa.jornadaPadraoHoraFim;
 
   return (
     <div className="space-y-4">
@@ -751,15 +759,24 @@ export function PainelEmpresa({
     />
 
     <Card className="p-5">
-      <h3 className="text-sm font-medium text-slate-200">Dados da empresa</h3>
+      <h3 className="text-sm font-medium text-slate-800">Dados da empresa</h3>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
         O fuso define a virada do dia em todo o painel e nos relatórios. A retenção é por quanto
         tempo a atividade minuto a minuto fica guardada — os resumos agregados são permanentes,
-        então reduzir a retenção não apaga o histórico gerencial.
+        então reduzir a retenção não apaga o histórico gerencial. O horário de trabalho fica em{" "}
+        <Link href="/painel/administracao?aba=escalas" className="font-medium text-acao hover:underline">
+          Escalas
+        </Link>
+        .
       </p>
 
       <form action={enviar} className="mt-4 space-y-4">
         <input type="hidden" name="fuso" value={fuso} />
+        {/* Jornada e janela da empresa não alimentam mais nenhum número — o
+            expediente vem das escalas. Viajam ocultos para salvar não apagá-los. */}
+        <input type="hidden" name="jornada_padrao_minutos" value={contexto.empresa.jornadaPadraoMinutos} />
+        <input type="hidden" name="jornada_padrao_hora_inicio" value={contexto.empresa.jornadaPadraoHoraInicio ?? ""} />
+        <input type="hidden" name="jornada_padrao_hora_fim" value={contexto.empresa.jornadaPadraoHoraFim ?? ""} />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Campo rotulo="Nome">
@@ -771,7 +788,12 @@ export function PainelEmpresa({
             />
           </Campo>
           <Campo rotulo="E-mail de contato">
-            <Input type="email" name="contato_email" disabled={somenteLeitura} />
+            <Input
+              type="email"
+              name="contato_email"
+              defaultValue={contatoEmail ?? ""}
+              disabled={somenteLeitura}
+            />
           </Campo>
           <Campo rotulo="Fuso horário">
             <Select
@@ -781,44 +803,7 @@ export function PainelEmpresa({
               opcoes={FUSOS.map((f) => ({ valor: f, rotulo: f.replace("America/", "") }))}
             />
           </Campo>
-          <Campo
-            rotulo="Jornada padrão (min/dia)"
-            dica={`${formatarHorasCurto(contexto.empresa.jornadaPadraoMinutos)} — vale para quem não tem exceção`}
-          >
-            <Input
-              type="number"
-              name="jornada_padrao_minutos"
-              min={60}
-              max={1440}
-              step={30}
-              defaultValue={contexto.empresa.jornadaPadraoMinutos}
-              disabled={somenteLeitura}
-            />
-          </Campo>
-          <Campo
-            rotulo="Início do expediente"
-            dica={
-              jornadaJaDefinida
-                ? "janela padrão da empresa"
-                : "vazio = sem controle de horas extras por padrão"
-            }
-          >
-            <Input
-              type="time"
-              name="jornada_padrao_hora_inicio"
-              defaultValue={contexto.empresa.jornadaPadraoHoraInicio ?? ""}
-              disabled={somenteLeitura}
-            />
-          </Campo>
-          <Campo rotulo="Fim do expediente" dica="atividade fora disso conta como hora extra">
-            <Input
-              type="time"
-              name="jornada_padrao_hora_fim"
-              defaultValue={contexto.empresa.jornadaPadraoHoraFim ?? ""}
-              disabled={somenteLeitura}
-            />
-          </Campo>
-          <Campo rotulo="Retenção (dias)" dica="entre 7 e 3650">
+<Campo rotulo="Retenção (dias)" dica="entre 7 e 3650">
             <Input
               type="number"
               name="retencao_dias"
@@ -846,19 +831,19 @@ export function PainelEmpresa({
         <dl className="grid grid-cols-2 gap-3 border-t border-borda pt-4 sm:grid-cols-4">
           <div>
             <dt className="text-xs text-slate-500">Plano</dt>
-            <dd className="text-sm text-slate-200">{contexto.empresa.plano}</dd>
+            <dd className="text-sm text-slate-800">{rotuloEnum(contexto.empresa.plano)}</dd>
           </div>
           <div>
             <dt className="text-xs text-slate-500">Situação</dt>
-            <dd className="text-sm text-slate-200">{contexto.empresa.status}</dd>
+            <dd className="text-sm text-slate-800">{rotuloEnum(contexto.empresa.status)}</dd>
           </div>
           <div>
             <dt className="text-xs text-slate-500">Limite de estações</dt>
-            <dd className="text-sm text-slate-200">{contexto.empresa.maxDispositivos}</dd>
+            <dd className="text-sm text-slate-800">{contexto.empresa.maxDispositivos}</dd>
           </div>
           <div>
             <dt className="text-xs text-slate-500">Identificador</dt>
-            <dd className="truncate font-mono text-xs text-slate-400">
+            <dd className="truncate font-mono text-xs text-slate-600">
               {contexto.empresa.slug}
             </dd>
           </div>

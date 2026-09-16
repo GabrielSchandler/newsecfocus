@@ -55,7 +55,7 @@ export function FormularioLogin() {
       />
 
       {erro && (
-        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-700">
           {erro}
         </p>
       )}
@@ -75,7 +75,7 @@ export function FormularioLogin() {
       </Button>
 
       <p className="text-center text-xs text-slate-500">
-        <Link href="/entrar/recuperar" className="transition-colors hover:text-cyan-300">
+        <Link href="/entrar/recuperar" className="transition-colors hover:text-cyan-700">
           Esqueci minha senha
         </Link>
       </p>
@@ -102,7 +102,7 @@ function Campo({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-medium text-slate-400">{rotulo}</span>
+      <span className="mb-1.5 block text-xs font-medium text-slate-600">{rotulo}</span>
       <span className="relative block">
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
           {icone}
@@ -114,7 +114,7 @@ function Campo({
           onChange={(e) => aoMudar(e.target.value)}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          className="w-full rounded-lg border border-borda bg-fundo-suave py-2.5 pl-10 pr-3 text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 hover:border-slate-600 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20"
+          className="w-full rounded-lg border border-borda bg-fundo-suave py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20"
         />
       </span>
     </label>

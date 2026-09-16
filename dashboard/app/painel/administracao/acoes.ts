@@ -11,7 +11,7 @@
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { SINCRONIZACAO_PADRAO_MINUTOS } from "@/lib/agente";
-import { carregarContexto } from "@/lib/sessao";
+import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 
 export interface ResultadoAcao {
   ok: boolean;
@@ -48,6 +48,8 @@ export async function salvarEquipe(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const nome = texto(dados, "nome");
   if (!nome) return FALHA("Informe o nome da equipe.");
@@ -138,6 +140,8 @@ export async function salvarCategoria(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const nome = texto(dados, "name");
   const tipo = texto(dados, "type");
@@ -175,6 +179,8 @@ export async function excluirCategoria(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const id = texto(dados, "id");
   if (!id) return FALHA("Categoria não informada.");
@@ -198,6 +204,8 @@ export async function salvarMapeamento(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const processo = texto(dados, "process_name");
   const dominio = texto(dados, "domain");
@@ -241,6 +249,8 @@ export async function excluirMapeamento(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const id = texto(dados, "id");
   if (!id) return FALHA("Regra não informada.");
@@ -267,6 +277,8 @@ export async function classificarApp(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const alvo = texto(dados, "alvo");
   const ehProcesso = dados.get("eh_processo") === "true";
@@ -306,6 +318,8 @@ export async function aplicarCatalogoPadrao(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const { data, error } = await supabase.rpc("aplicar_classificacao_padrao", {
     p_org: contexto.empresa.id,
@@ -332,6 +346,8 @@ export async function salvarEmpresa(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   if (contexto.papel !== "OWNER") {
     return FALHA("Só o proprietário da conta altera os dados da empresa.");
@@ -392,6 +408,8 @@ export async function girarCodigoInstalacao(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const { data, error } = await supabase.rpc("girar_codigo_instalacao", {
     p_org: contexto.empresa.id,
@@ -414,6 +432,8 @@ export async function definirCodigoInstalacao(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const bruto = (texto(dados, "codigo") ?? "").replace(/\D/g, "");
   if (bruto.length !== 12) return FALHA("O código precisa ter 12 dígitos.");
@@ -444,6 +464,8 @@ export async function salvarConfiguracaoAgente(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
   if (!contexto.papel || !["OWNER", "MANAGER"].includes(contexto.papel)) {
     return FALHA("Sem permissão para alterar a configuração do agente.");
   }

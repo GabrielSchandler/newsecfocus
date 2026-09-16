@@ -48,7 +48,7 @@ function Mensagem({ estado }: { estado: ResultadoAcao | null }) {
   return (
     <p
       role="status"
-      className={`flex items-center gap-1.5 text-xs ${estado.ok ? "text-emerald-400" : "text-rose-400"}`}
+      className={`flex items-center gap-1.5 text-xs ${estado.ok ? "text-emerald-700" : "text-rose-700"}`}
     >
       {estado.ok ? <Check className="h-3.5 w-3.5" /> : <TriangleAlert className="h-3.5 w-3.5" />}
       {estado.mensagem}
@@ -78,8 +78,8 @@ export function FormularioNovaEmpresa() {
 
   return (
     <Card className="p-5">
-      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
-        <Plus className="h-4 w-4 text-cyan-400" />
+      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-800">
+        <Plus className="h-4 w-4 text-cyan-700" />
         Nova empresa cliente
       </h3>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -118,11 +118,11 @@ export function FormularioNovaEmpresa() {
 
         {estado?.chaveMatricula && (
           <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600">
               Chave de matrícula — vai no appsettings.json do agente nas estações do cliente:
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <code className="min-w-0 flex-1 truncate rounded bg-fundo-suave px-2 py-1.5 font-mono text-xs text-cyan-200">
+              <code className="min-w-0 flex-1 truncate rounded bg-fundo-suave px-2 py-1.5 font-mono text-xs text-cyan-800">
                 {estado.chaveMatricula}
               </code>
               <Button type="button" variante="contorno" tamanho="sm" onClick={copiarChave}>
@@ -152,8 +152,8 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
       valorOrdenacao: (e) => e.nome,
       render: (e) => (
         <span className="block min-w-0">
-          <span className="block truncate font-medium text-slate-100">{e.nome}</span>
-          <span className="block truncate font-mono text-xs text-slate-600">{e.slug}</span>
+          <span className="block truncate font-medium text-slate-900">{e.nome}</span>
+          <span className="block truncate font-mono text-xs text-slate-500">{e.slug}</span>
         </span>
       ),
     },
@@ -168,7 +168,7 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
       rotulo: "Plano",
       ocultarMobile: true,
       valorOrdenacao: (e) => e.plano,
-      render: (e) => <span className="text-slate-400">{e.plano}</span>,
+      render: (e) => <span className="text-slate-600">{e.plano}</span>,
     },
     {
       chave: "estacoes",
@@ -178,9 +178,9 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
       render: (e) => {
         const cheio = e.maxDispositivos > 0 && e.dispositivos >= e.maxDispositivos;
         return (
-          <span className={`tabular-nums ${cheio ? "text-rose-400" : "text-slate-300"}`}>
+          <span className={`tabular-nums ${cheio ? "text-rose-700" : "text-slate-700"}`}>
             {e.dispositivos}/{e.maxDispositivos}
-            <span className="ml-1.5 text-xs text-slate-600">{e.dispositivosOnline} on</span>
+            <span className="ml-1.5 text-xs text-slate-500">{e.dispositivosOnline} on</span>
           </span>
         );
       },
@@ -191,7 +191,7 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
       alinhar: "direita",
       ocultarMobile: true,
       valorOrdenacao: (e) => e.usuarios,
-      render: (e) => <span className="tabular-nums text-slate-400">{e.usuarios}</span>,
+      render: (e) => <span className="tabular-nums text-slate-600">{e.usuarios}</span>,
     },
     {
       chave: "sync",
@@ -199,7 +199,7 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
       alinhar: "direita",
       valorOrdenacao: (e) => e.ultimaSincronizacao ?? "",
       render: (e) => (
-        <span className="text-slate-400">{tempoRelativo(e.ultimaSincronizacao)}</span>
+        <span className="text-slate-600">{tempoRelativo(e.ultimaSincronizacao)}</span>
       ),
     },
     {
@@ -210,7 +210,7 @@ export function TabelaEmpresas({ empresas }: { empresas: EmpresaCliente[] }) {
         <button
           type="button"
           onClick={() => setEditando(e)}
-          className="rounded-md border border-borda px-2 py-1 text-xs text-slate-300 transition-colors hover:bg-slate-800/60"
+          className="rounded-md border border-borda px-2 py-1 text-xs text-slate-700 transition-colors hover:bg-slate-100"
         >
           Gerenciar
         </button>
@@ -250,7 +250,7 @@ function FormularioConta({
     <Card className="border-cyan-500/20 p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-medium text-slate-100">{empresa.nome}</h3>
+          <h3 className="text-sm font-medium text-slate-900">{empresa.nome}</h3>
           <p className="text-xs text-slate-500">
             {empresa.dispositivos} estações · {empresa.usuarios} usuários
           </p>
@@ -284,7 +284,7 @@ function FormularioConta({
         </div>
 
         {(status === "SUSPENSA" || status === "CANCELADA") && (
-          <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-200/90">
+          <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-800/90">
             Nessa situação os agentes param de coletar na próxima sincronização. Os dados já
             recebidos continuam visíveis para o cliente.
           </p>

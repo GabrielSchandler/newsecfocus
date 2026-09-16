@@ -2,25 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Propriedade custom animável usada pela borda em gradiente giratório (Glow Card). */
-@property --angulo {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
 :root {
   --fonte-sans: "Inter", system-ui, sans-serif;
   --fonte-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background-color: #090d16;
-  color: #e2e8f0;
+  background-color: #f3f5f8;
+  color: #1e293b;
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   /* Sem isto, cada toque num link pinta um retângulo cinza no Android —
@@ -28,6 +21,11 @@ body {
   -webkit-tap-highlight-color: transparent;
   /* Impede o "puxar além do fim" arrastar a página inteira no iOS. */
   overscroll-behavior-y: none;
+}
+
+/* Números de indicador e de tabela alinham na coluna quando têm a mesma largura. */
+.numeros-tabulares {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------------------------------------------------------------------------
@@ -75,55 +73,40 @@ body {
   }
 }
 
-/* Malha de brilho radial ao fundo — clima "futuristic enterprise". */
-.fundo-aurora {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-.fundo-aurora::before,
-.fundo-aurora::after {
-  content: "";
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(120px);
-  opacity: 0.35;
-}
-.fundo-aurora::before {
-  width: 520px;
-  height: 520px;
-  top: -140px;
-  left: -80px;
-  background: radial-gradient(circle, #22d3ee, transparent 70%);
-}
-.fundo-aurora::after {
-  width: 620px;
-  height: 620px;
-  bottom: -220px;
-  right: -120px;
-  background: radial-gradient(circle, #a78bfa, transparent 70%);
+/* Superfície padrão de cartão. O nome vem do tema escuro, quando era vidro
+   fosco; hoje é branco com uma sombra quase imperceptível. A borda fica na
+   classe (border-borda) e o bloco mora em @layer components para que um
+   border-rose-500/30 passado a um cartão de erro ganhe desta regra. */
+@layer components {
+  .vidro {
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
 }
 
-/* Vidro fosco (glassmorphism) reutilizável. */
-.vidro {
-  background: linear-gradient(180deg, rgba(15, 21, 36, 0.75), rgba(9, 13, 22, 0.65));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
+/* Fatia "sem dados": listrada para não ser lida como mais uma categoria de
+   uso. É ausência de informação, não um jeito de gastar o expediente. */
+.listrado-sem-dados {
+  background-color: #f1f4f8;
+  background-image: repeating-linear-gradient(
+    135deg,
+    #d5dce5 0,
+    #d5dce5 1.5px,
+    transparent 1.5px,
+    transparent 6px
+  );
 }
 
 /* Barra de rolagem discreta. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 8px;
 }

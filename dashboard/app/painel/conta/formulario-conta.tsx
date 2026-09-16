@@ -63,8 +63,8 @@ function FormularioNome({ nomeAtual }: { nomeAtual: string | null }) {
 
   return (
     <Card className="p-5">
-      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
-        <User className="h-4 w-4 text-cyan-400" />
+      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-800">
+        <User className="h-4 w-4 text-cyan-700" />
         Nome de exibição
       </h3>
       <form onSubmit={aoEnviar} className="mt-4 space-y-4">
@@ -129,8 +129,8 @@ function FormularioSenha() {
 
   return (
     <Card className="p-5">
-      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
-        <Lock className="h-4 w-4 text-cyan-400" />
+      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-800">
+        <Lock className="h-4 w-4 text-cyan-700" />
         Trocar senha
       </h3>
       <form onSubmit={aoEnviar} className="mt-4 space-y-4">
@@ -171,7 +171,7 @@ function Mensagem({ aviso }: { aviso: Aviso }) {
   return (
     <p
       role="status"
-      className={`flex items-center gap-1.5 text-xs ${aviso.ok ? "text-emerald-400" : "text-rose-400"}`}
+      className={`flex items-center gap-1.5 text-xs ${aviso.ok ? "text-emerald-700" : "text-rose-700"}`}
     >
       {aviso.ok ? <Check className="h-3.5 w-3.5" /> : <TriangleAlert className="h-3.5 w-3.5" />}
       {aviso.texto}

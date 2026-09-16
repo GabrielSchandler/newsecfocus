@@ -73,15 +73,15 @@ export function FormularioRedefinir() {
     return (
       <div className="space-y-3 text-center">
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/15">
-          <TriangleAlert className="h-5 w-5 text-amber-400" />
+          <TriangleAlert className="h-5 w-5 text-amber-700" />
         </div>
-        <p className="text-sm text-slate-200">Este link não vale mais.</p>
+        <p className="text-sm text-slate-800">Este link não vale mais.</p>
         <p className="text-xs leading-relaxed text-slate-500">
           Links de recuperação expiram em uma hora e só podem ser usados uma vez.
         </p>
         <Link
           href="/entrar/recuperar"
-          className="inline-block text-xs font-medium text-cyan-300 underline hover:text-cyan-200"
+          className="inline-block text-xs font-medium text-cyan-700 underline hover:text-cyan-800"
         >
           Pedir um link novo
         </Link>
@@ -93,9 +93,9 @@ export function FormularioRedefinir() {
     return (
       <div className="space-y-3 text-center">
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/15">
-          <Check className="h-5 w-5 text-emerald-400" />
+          <Check className="h-5 w-5 text-emerald-700" />
         </div>
-        <p className="text-sm text-slate-200">Senha alterada.</p>
+        <p className="text-sm text-slate-800">Senha alterada.</p>
         <p className="text-xs text-slate-500">Levando você para o painel…</p>
       </div>
     );
@@ -115,7 +115,7 @@ export function FormularioRedefinir() {
       {erro && (
         <p
           role="alert"
-          className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300"
+          className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-700"
         >
           {erro}
         </p>
@@ -144,7 +144,7 @@ function CampoSenha({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm text-slate-400">{rotulo}</span>
+      <span className="mb-1.5 block text-sm text-slate-600">{rotulo}</span>
       <span className="relative block">
         <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
@@ -155,10 +155,10 @@ function CampoSenha({
           value={valor}
           onChange={(e) => aoMudar(e.target.value)}
           placeholder="••••••••"
-          className="w-full rounded-lg border border-borda bg-fundo-suave py-2.5 pl-10 pr-3 text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-600 hover:border-slate-600 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20"
+          className="w-full rounded-lg border border-borda bg-fundo-suave py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20"
         />
       </span>
-      {dica && <span className="mt-1 block text-xs text-slate-600">{dica}</span>}
+      {dica && <span className="mt-1 block text-xs text-slate-500">{dica}</span>}
     </label>
   );
 }

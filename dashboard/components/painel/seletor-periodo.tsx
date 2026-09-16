@@ -67,8 +67,8 @@ export function SeletorPeriodo({ periodo, fuso, aoMudar }: Props) {
               className={cn(
                 "rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
                 periodo.preset === p.valor
-                  ? "bg-cyan-500/15 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.25)]"
-                  : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200",
+                  ? "bg-acao-suave text-acao shadow-[inset_0_0_0_1px_rgba(27,94,143,0.25)]"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-800",
               )}
             >
               {p.rotulo}
@@ -88,7 +88,7 @@ export function SeletorPeriodo({ periodo, fuso, aoMudar }: Props) {
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
-            <span className="min-w-[9rem] px-2 text-center text-sm font-medium text-slate-200">
+            <span className="min-w-[9rem] px-2 text-center text-sm font-medium text-slate-800">
               {periodo.rotulo}
             </span>
 
@@ -105,7 +105,7 @@ export function SeletorPeriodo({ periodo, fuso, aoMudar }: Props) {
         )}
 
         {periodo.preset === "geral" && (
-          <span className="flex items-center gap-1.5 px-2 text-sm text-slate-400">
+          <span className="flex items-center gap-1.5 px-2 text-sm text-slate-600">
             <CalendarDays className="h-4 w-4 text-slate-500" />
             {periodo.rotulo}
           </span>

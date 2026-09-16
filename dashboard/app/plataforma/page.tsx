@@ -31,12 +31,12 @@ export default async function PaginaPlataforma() {
       <CabecalhoPagina
         titulo="Plataforma"
         descricao="Carteira de empresas clientes, planos e licenças."
-        icone={<Building2 className="h-5 w-5 text-cyan-400" />}
+        icone={<Building2 className="h-5 w-5 text-cyan-700" />}
       />
 
       <Card className="flex items-start gap-3 border-violet-500/20 p-4">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
-        <p className="text-xs leading-relaxed text-slate-400">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-violet-700" />
+        <p className="text-xs leading-relaxed text-slate-600">
           Esta área administra <strong>contas</strong>. Por desenho, a operação da plataforma não
           tem acesso de leitura à telemetria das empresas clientes — as políticas de segurança do
           banco liberam organizações, usuários e dispositivos, e nunca a atividade coletada. Os
@@ -76,7 +76,7 @@ function Indicador({
   return (
     <Card className="p-5">
       <p className="text-xs uppercase tracking-wide text-slate-500">{rotulo}</p>
-      <p className="mt-2 text-2xl font-semibold text-slate-100">{valor}</p>
+      <p className="mt-2 text-2xl font-semibold text-slate-900">{valor}</p>
       {detalhe && <p className="mt-1 text-xs text-slate-500">{detalhe}</p>}
     </Card>
   );

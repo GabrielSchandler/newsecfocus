@@ -65,7 +65,7 @@ export function TimelineAtividade({ inicial }: { inicial: LinhaTempoReal[] }) {
     <Card className="overflow-hidden">
       <div className="flex flex-col gap-3 border-b border-borda p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-medium text-slate-200">Atividade agora</h3>
+          <h3 className="text-sm font-medium text-slate-800">Atividade agora</h3>
           <p className="text-xs text-slate-500">
             {online} de {linhas.length} com sinal · atualizado {tempoRelativo(atualizadoEm)}
           </p>
@@ -90,28 +90,28 @@ export function TimelineAtividade({ inicial }: { inicial: LinhaTempoReal[] }) {
             : "Nenhum resultado para essa busca."}
         </p>
       ) : (
-        <ul className="divide-y divide-slate-800/70">
+        <ul className="divide-y divide-slate-100">
           {filtradas.map((l) => (
-            <li key={l.colaboradorId} className="flex items-start gap-3 p-4 transition-colors hover:bg-slate-800/20">
+            <li key={l.colaboradorId} className="flex items-start gap-3 p-4 transition-colors hover:bg-slate-50">
               <span className="mt-1.5">
                 <IndicadorLed estado={l.status} />
               </span>
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="truncate text-sm font-medium text-slate-100">
+                  <span className="truncate text-sm font-medium text-slate-900">
                     {l.colaborador}
                   </span>
                   <Badge variante="neutro">{l.equipe}</Badge>
                   {l.maquina && (
-                    <span className="hidden text-xs text-slate-600 sm:inline">{l.maquina}</span>
+                    <span className="hidden text-xs text-slate-500 sm:inline">{l.maquina}</span>
                   )}
                 </div>
 
-                <p className="mt-1 truncate text-xs text-slate-400">
+                <p className="mt-1 truncate text-xs text-slate-600">
                   {l.dominio ?? l.processo}
                   {l.tituloJanela && (
-                    <span className="text-slate-600"> · {l.tituloJanela}</span>
+                    <span className="text-slate-500"> · {l.tituloJanela}</span>
                   )}
                 </p>
               </div>
@@ -124,7 +124,7 @@ export function TimelineAtividade({ inicial }: { inicial: LinhaTempoReal[] }) {
                 >
                   {l.status}
                 </Badge>
-                <p className="mt-1 text-xs text-slate-600">{tempoRelativo(l.momento)}</p>
+                <p className="mt-1 text-xs text-slate-500">{tempoRelativo(l.momento)}</p>
               </div>
             </li>
           ))}

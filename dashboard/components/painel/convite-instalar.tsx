@@ -86,29 +86,29 @@ export function ConviteInstalar() {
   if (!visivel) return null;
 
   return (
-    <div className="flex items-start gap-3 rounded-xl2 border border-cyan-500/25 bg-cyan-500/[0.07] px-4 py-3 lg:hidden">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500">
-        <Download className="h-4 w-4 text-slate-950" />
+    <div className="flex items-start gap-3 rounded-xl2 border border-acao/20 bg-acao-suave px-4 py-3 lg:hidden">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-acao">
+        <Download className="h-4 w-4 text-white" />
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-100">Instalar o Focus no celular</p>
+        <p className="text-sm font-medium text-slate-900">Instalar o Focus no celular</p>
         {ehIos ? (
-          <p className="mt-1 flex flex-wrap items-center gap-1 text-xs leading-relaxed text-slate-400">
-            Toque em <Share className="inline h-3.5 w-3.5 text-cyan-300" /> e depois em
-            <span className="inline-flex items-center gap-1 text-slate-300">
+          <p className="mt-1 flex flex-wrap items-center gap-1 text-xs leading-relaxed text-slate-600">
+            Toque em <Share className="inline h-3.5 w-3.5 text-acao" /> e depois em
+            <span className="inline-flex items-center gap-1 text-slate-700">
               <SquarePlus className="h-3.5 w-3.5" /> Adicionar à Tela de Início
             </span>
           </p>
         ) : (
           <>
-            <p className="mt-0.5 text-xs text-slate-400">
+            <p className="mt-0.5 text-xs text-slate-600">
               Abre sem barra de navegador, direto da tela inicial.
             </p>
             <button
               type="button"
               onClick={instalar}
-              className="toque-afunda mt-2 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-slate-950"
+              className="toque-afunda mt-2 rounded-lg bg-acao px-3 py-1.5 text-xs font-semibold text-white"
             >
               Instalar
             </button>
@@ -120,7 +120,7 @@ export function ConviteInstalar() {
         type="button"
         onClick={dispensar}
         aria-label="Dispensar"
-        className="toque-afunda shrink-0 rounded-md p-1 text-slate-500 active:bg-slate-800/60"
+        className="toque-afunda shrink-0 rounded-md p-1 text-slate-500 active:bg-slate-100"
       >
         <X className="h-4 w-4" />
       </button>

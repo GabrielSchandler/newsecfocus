@@ -37,14 +37,14 @@ export function SeletorEmpresa({ empresas, empresaAtual }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Building2 className="hidden h-4 w-4 shrink-0 text-violet-400 sm:block" />
-      {/* No celular o seletor divide a barra com o nome da empresa, e antes
-          ficava tão largo que sobrava "Empresa Dem..." no título. Aqui ele
-          cede: só a operação da revenda o usa, e o nome importa mais. */}
+    <div className="min-w-0">
+      {/* Na barra do topo o seletor é o próprio nome da empresa: não há um
+          título separado ao lado disputando a largura, então ele pode crescer. */}
       <Select
         aria-label="Empresa em foco"
-        className="w-[7.5rem] sm:w-56"
+        className="w-[13rem] sm:w-[18rem]"
+        classeCampo="h-11 text-[15px] font-medium text-slate-900"
+        icone={<Building2 className="h-[18px] w-[18px]" />}
         valor={empresaAtual}
         aoMudar={trocar}
         opcoes={empresas.map((e) => ({

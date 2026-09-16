@@ -7,12 +7,12 @@ const variantesBadge = cva(
   {
     variants: {
       variante: {
-        neutro: "border-slate-700 bg-slate-800/60 text-slate-300",
-        ativo: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-        ocioso: "border-amber-500/30 bg-amber-500/10 text-amber-300",
-        offline: "border-rose-500/30 bg-rose-500/10 text-rose-300",
-        ciano: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
-        roxo: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+        neutro: "border-slate-200 bg-slate-100 text-slate-700",
+        ativo: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700",
+        ocioso: "border-amber-500/30 bg-amber-500/10 text-amber-700",
+        offline: "border-rose-500/30 bg-rose-500/10 text-rose-700",
+        ciano: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700",
+        roxo: "border-violet-500/30 bg-violet-500/10 text-violet-700",
       },
     },
     defaultVariants: { variante: "neutro" },

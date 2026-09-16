@@ -31,13 +31,13 @@ interface EstiloEvento {
 }
 
 const ESTILOS: Record<TipoEventoEstacao, EstiloEvento> = {
-  AGENTE_INICIADO: { rotulo: "Ligou", Icone: Power, cor: "text-emerald-400", ponto: "bg-emerald-400/15" },
-  RETOMADA: { rotulo: "Retomou", Icone: Sunrise, cor: "text-cyan-400", ponto: "bg-cyan-400/15" },
-  DESBLOQUEADA: { rotulo: "Desbloqueou", Icone: LockOpen, cor: "text-sky-400", ponto: "bg-sky-400/15" },
-  BLOQUEADA: { rotulo: "Bloqueou a tela", Icone: Lock, cor: "text-amber-400", ponto: "bg-amber-400/15" },
-  SUSPENSA: { rotulo: "Suspendeu / hibernou", Icone: Moon, cor: "text-violet-400", ponto: "bg-violet-400/15" },
-  DESLIGANDO: { rotulo: "Desligou", Icone: PowerOff, cor: "text-rose-400", ponto: "bg-rose-400/15" },
-  AGENTE_PARADO: { rotulo: "Agente encerrado", Icone: CircleStop, cor: "text-slate-400", ponto: "bg-slate-500/15" },
+  AGENTE_INICIADO: { rotulo: "Ligou", Icone: Power, cor: "text-emerald-700", ponto: "bg-emerald-400/15" },
+  RETOMADA: { rotulo: "Retomou", Icone: Sunrise, cor: "text-cyan-700", ponto: "bg-cyan-400/15" },
+  DESBLOQUEADA: { rotulo: "Desbloqueou", Icone: LockOpen, cor: "text-sky-700", ponto: "bg-sky-400/15" },
+  BLOQUEADA: { rotulo: "Bloqueou a tela", Icone: Lock, cor: "text-amber-700", ponto: "bg-amber-400/15" },
+  SUSPENSA: { rotulo: "Suspendeu / hibernou", Icone: Moon, cor: "text-violet-700", ponto: "bg-violet-400/15" },
+  DESLIGANDO: { rotulo: "Desligou", Icone: PowerOff, cor: "text-rose-700", ponto: "bg-rose-400/15" },
+  AGENTE_PARADO: { rotulo: "Agente encerrado", Icone: CircleStop, cor: "text-slate-600", ponto: "bg-slate-500/15" },
 };
 
 // Ordem dos filtros: o que o gestor mais procura primeiro.
@@ -103,11 +103,11 @@ export function DiarioEstacao({ eventos, dias }: { eventos: EventoEstacao[]; dia
   return (
     <div className="rounded-xl2 border border-borda vidro p-5">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800/60">
-          <History className="h-5 w-5 text-cyan-400" />
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+          <History className="h-5 w-5 text-cyan-700" />
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-medium text-slate-200">Linha do tempo das estações</h3>
+          <h3 className="text-sm font-medium text-slate-800">Linha do tempo das estações</h3>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             Quando cada máquina ligou, bloqueou a tela, hibernou e desligou nos últimos {dias} dias.
             É o diário de bordo — não entra em nenhum cálculo de produtividade.
@@ -127,12 +127,12 @@ export function DiarioEstacao({ eventos, dias }: { eventos: EventoEstacao[]; dia
                 onClick={() => alternar(tipo)}
                 className={`toque-afunda inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
                   on
-                    ? "border-borda bg-slate-800/60 text-slate-200"
-                    : "border-transparent bg-slate-900/40 text-slate-600"
+                    ? "border-borda bg-slate-100 text-slate-800"
+                    : "border-transparent bg-slate-50 text-slate-500"
                 }`}
                 aria-pressed={on}
               >
-                <Icone className={`h-3 w-3 ${on ? cor : "text-slate-600"}`} />
+                <Icone className={`h-3 w-3 ${on ? cor : "text-slate-500"}`} />
                 {rotulo}
               </button>
             );
@@ -158,7 +158,7 @@ export function DiarioEstacao({ eventos, dias }: { eventos: EventoEstacao[]; dia
                   return (
                     <li
                       key={e.id}
-                      className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-800/40"
+                      className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50"
                     >
                       <span className="w-11 shrink-0 font-mono text-xs text-slate-500">
                         {fmtHora.format(new Date(e.momento))}
@@ -166,7 +166,7 @@ export function DiarioEstacao({ eventos, dias }: { eventos: EventoEstacao[]; dia
                       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${ponto}`}>
                         <Icone className={`h-3.5 w-3.5 ${cor}`} />
                       </span>
-                      <span className="min-w-0 flex-1 text-sm text-slate-200">{rotulo}</span>
+                      <span className="min-w-0 flex-1 text-sm text-slate-800">{rotulo}</span>
                       <span className="truncate text-xs text-slate-500">{e.maquina}</span>
                     </li>
                   );

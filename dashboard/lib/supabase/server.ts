@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { cache } from "react";
+import { bancoLocalAtivo, criarClienteLocal } from "./local";
 
 /** Formato dos cookies que o Supabase pede para gravar na resposta. */
 type CookieParaDefinir = { name: string; value: string; options?: CookieOptions };
@@ -19,6 +20,15 @@ type CookieParaDefinir = { name: string; value: string; options?: CookieOptions 
  */
 export const criarClienteServidor = cache(async () => {
   const armazenamento = await cookies();
+
+  // Banco local de desenvolvimento (npm run dev:local). Em produção NODE_ENV
+  // nunca é "development" e este desvio não existe.
+  if (bancoLocalAtivo()) {
+    return criarClienteLocal({
+      base: process.env.FOCUS_BANCO_LOCAL!,
+      usuario: armazenamento.get("focus_local_usuario")?.value,
+    }) as unknown as ReturnType<typeof createServerClient>;
+  }
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

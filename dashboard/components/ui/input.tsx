@@ -7,12 +7,10 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
       <input
         ref={ref}
         className={cn(
-          "w-full rounded-lg border border-borda bg-fundo-suave px-3 py-2 text-sm text-slate-200 outline-none transition-colors",
-          "placeholder:text-slate-600 hover:border-slate-600",
-          "focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20",
+          "w-full rounded-lg border border-borda bg-fundo-suave px-3 py-2 text-sm text-slate-800 outline-none transition-colors",
+          "placeholder:text-slate-400 hover:border-slate-300",
+          "focus:border-acao/60 focus:ring-2 focus:ring-acao/15",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          // O ícone nativo do input date é escuro demais no tema; clareia.
-          "[&::-webkit-calendar-picker-indicator]:invert-[0.7]",
           className,
         )}
         {...props}
@@ -36,7 +34,7 @@ export function Campo({ rotulo, dica, children, className }: CampoProps) {
         {rotulo}
       </span>
       {children}
-      {dica && <span className="text-xs text-slate-600">{dica}</span>}
+      {dica && <span className="text-xs text-slate-500">{dica}</span>}
     </label>
   );
 }

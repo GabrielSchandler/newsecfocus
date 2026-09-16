@@ -95,28 +95,49 @@ const ROTAS = [
   ["/painel", "Visão geral"],
   ["/painel?preset=mes", "Visão geral — mês"],
   ["/painel?preset=geral", "Visão geral — todo o período"],
-  ["/painel?visao=aplicativos", "Visão geral — aba Aplicativos"],
-  ["/painel?visao=presenca", "Visão geral — aba Presença"],
+  ["/painel?visao=atividade", "Visão geral — aba Atividade"],
   ["/painel?visao=ritmo", "Visão geral — aba Ritmo"],
-  ["/painel?visao=horas", "Visão geral — aba Horas extras"],
-  ["/painel?visao=tempo", "Visão geral — aba Tempo real"],
+  ["/painel?visao=registros", "Visão geral — aba Últimos registros"],
   ["/painel/equipes", "Equipes"],
   ["/painel/pessoas", "Pessoas"],
-  ["/painel/aplicativos", "Aplicativos"],
+  ["/painel/pessoas?situacao=pendente", "Pessoas — cadastro pendente"],
+  ["/painel/aplicativos", "Aplicativos e sites"],
+  ["/painel/aplicativos?filtro=sem", "Aplicativos — sem classificação"],
+  ["/painel/jornada", "Jornada"],
+  ["/painel/jornada?preset=mes", "Jornada — mês"],
   ["/painel/dispositivos", "Dispositivos"],
-  ["/painel/horas-extras", "Horas extras"],
   ["/painel/registros", "Registros"],
   ["/painel/registros?estado=OCIOSO&pagina=2", "Registros — filtro e página 2"],
   ["/painel/relatorios", "Relatórios"],
   ["/painel/administracao", "Administração"],
+  ["/painel/administracao?aba=equipes", "Administração — equipes"],
   ["/painel/administracao?aba=pessoas", "Administração — pessoas"],
-  ["/painel/administracao?aba=usuarios", "Administração — acessos"],
+  ["/painel/administracao?aba=escalas", "Administração — escalas"],
+  ["/painel/administracao?aba=acessos", "Administração — acessos"],
   ["/painel/administracao?aba=classificacao", "Administração — classificação"],
   ["/painel/administracao?aba=agente", "Administração — agente"],
-  ["/painel/administracao?aba=empresa", "Administração — empresa"],
   ["/painel/conta", "Minha conta"],
   ["/plataforma", "Plataforma"],
 ];
+
+// Telas de detalhe: o primeiro link de cada lista vira rota testada, com as
+// abas. Empresa sem equipe, pessoa ou aplicativo simplesmente não as testa.
+async function primeiroLink(lista, prefixo) {
+  const r = await fetch(BASE + lista, { headers: { cookie }, redirect: "manual" });
+  const html = r.status === 200 ? await r.text() : "";
+  const achado = html.match(new RegExp(`href="(${prefixo}[^"?#]+)`));
+  return achado ? achado[1] : null;
+}
+const equipe = await primeiroLink("/painel/equipes", "/painel/equipes/");
+if (equipe) {
+  for (const aba of ["resumo", "pessoas", "aplicativos", "jornada", "ritmo"]) {
+    ROTAS.push([`${equipe}?visao=${aba}`, `Detalhe da equipe — ${aba}`]);
+  }
+}
+const pessoa = await primeiroLink("/painel/pessoas", "/painel/pessoas/");
+if (pessoa) ROTAS.push([pessoa, "Perfil da pessoa"]);
+const aplicativo = await primeiroLink("/painel/aplicativos", "/painel/aplicativos/");
+if (aplicativo) ROTAS.push([aplicativo, "Detalhe do aplicativo"]);
 
 // Marcas que o Next deixa no HTML quando a renderização falha.
 const MARCAS_DE_ERRO = [

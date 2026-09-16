@@ -20,6 +20,7 @@ export type IconeMenu =
   | "aplicativos"
   | "dispositivos"
   | "horasExtras"
+  | "jornada"
   | "registros"
   | "relatorios"
   | "administracao"
@@ -29,6 +30,8 @@ export interface ItemNavegacao {
   href: string;
   rotulo: string;
   icone: IconeMenu;
+  /** "gestao" desce para o pé da barra lateral, separado do que se consulta. */
+  grupo: "consulta" | "gestao";
 }
 
 /**
@@ -43,29 +46,32 @@ export const ABAS_CELULAR: IconeMenu[] = ["visao", "pessoas", "equipes"];
 /**
  * Monta o menu conforme o papel — o que a pessoa não pode acessar não aparece.
  *
- * Menu enxuto de propósito (set./2026): o produto se concentra em três olhares —
- * Visão geral, Equipes e Pessoas — cada um com tudo dentro, em abas. As antigas
- * telas soltas (Aplicativos, Horas extras, Dispositivos, Registros) viraram abas
- * desses olhares: Aplicativos/Horas extras em todos, a estação dentro da Pessoa.
- * Menos telas, sem informação repetida. As rotas antigas seguem existindo para
- * links diretos, apenas saíram da navegação.
+ * Menu enxuto de propósito (set./2026): três olhares — Visão geral, Equipes e
+ * Pessoas — mais dois assuntos que o gestor procura pelo nome: Aplicativos e
+ * sites, e Jornada (presença e horas extras). Esses dois chegaram a morar em
+ * abas da Visão geral, mas ali ficavam escondidos atrás da tela inicial; com a
+ * Visão geral virando um resumo de uma tela só (redesenho de 16/09/2026),
+ * voltaram a ter endereço próprio. Dispositivos e Registros seguem fora do
+ * menu, acessíveis pelos links de dentro das telas.
  */
 export function itensDoMenu(opcoes: {
   podeAdministrar: boolean;
   adminPlataforma: boolean;
 }): ItemNavegacao[] {
   const itens: ItemNavegacao[] = [
-    { href: "/painel", rotulo: "Visão geral", icone: "visao" },
-    { href: "/painel/equipes", rotulo: "Equipes", icone: "equipes" },
-    { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas" },
-    { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios" },
+    { href: "/painel", rotulo: "Visão geral", icone: "visao", grupo: "consulta" },
+    { href: "/painel/equipes", rotulo: "Equipes", icone: "equipes", grupo: "consulta" },
+    { href: "/painel/pessoas", rotulo: "Pessoas", icone: "pessoas", grupo: "consulta" },
+    { href: "/painel/aplicativos", rotulo: "Aplicativos e sites", icone: "aplicativos", grupo: "consulta" },
+    { href: "/painel/jornada", rotulo: "Jornada", icone: "jornada", grupo: "consulta" },
+    { href: "/painel/relatorios", rotulo: "Relatórios", icone: "relatorios", grupo: "consulta" },
   ];
 
   if (opcoes.podeAdministrar) {
-    itens.push({ href: "/painel/administracao", rotulo: "Administração", icone: "administracao" });
+    itens.push({ href: "/painel/administracao", rotulo: "Administração", icone: "administracao", grupo: "gestao" });
   }
   if (opcoes.adminPlataforma) {
-    itens.push({ href: "/plataforma", rotulo: "Plataforma", icone: "plataforma" });
+    itens.push({ href: "/plataforma", rotulo: "Plataforma", icone: "plataforma", grupo: "gestao" });
   }
 
   return itens;

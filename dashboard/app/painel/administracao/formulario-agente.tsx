@@ -25,7 +25,7 @@ function Mensagem({ estado }: { estado: ResultadoAcao | null }) {
     <p
       role="status"
       className={`flex items-center gap-1.5 text-xs ${
-        estado.ok ? "text-emerald-400" : "text-rose-400"
+        estado.ok ? "text-emerald-700" : "text-rose-700"
       }`}
     >
       {estado.ok ? <Check className="h-3.5 w-3.5" /> : <TriangleAlert className="h-3.5 w-3.5" />}
@@ -48,13 +48,13 @@ function Opcao({
   desabilitado: boolean;
 }) {
   return (
-    <label className="flex items-start gap-2.5 text-sm text-slate-300">
+    <label className="flex items-start gap-2.5 text-sm text-slate-700">
       <input
         type="checkbox"
         name={nome}
         defaultChecked={marcado}
         disabled={desabilitado}
-        className="mt-0.5 h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
+        className="mt-0.5 h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-700"
       />
       <span>
         {titulo}
@@ -93,7 +93,7 @@ export function PainelAgente({
   return (
     <div className="space-y-4">
       <Card className="border-cyan-500/20 p-5">
-        <h3 className="text-sm font-medium text-slate-200">Como isto chega nas máquinas</h3>
+        <h3 className="text-sm font-medium text-slate-800">Como isto chega nas máquinas</h3>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">
           O que você salvar aqui é entregue às estações na próxima sincronização — sem
           reinstalar nada e sem ninguém tocar nos computadores. Serve para ajustar{" "}
@@ -105,11 +105,11 @@ export function PainelAgente({
       <Card className="p-5">
         <form action={enviar} className="space-y-5">
           <section>
-            <h3 className="text-sm font-medium text-slate-200">Coleta</h3>
+            <h3 className="text-sm font-medium text-slate-800">Coleta</h3>
             <p className="mt-1 text-xs leading-relaxed text-slate-500">
               O agente coleta o tempo todo em que a máquina está ligada. Quem define o que é
-              expediente é a escala, em Administração &rsaquo; Expediente — e é contra ela que o
-              índice é calculado.
+              expediente é a escala, em Administração &rsaquo; Escalas — e é contra ela que o
+              tempo produtivo e a cobertura são calculados.
             </p>
             <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Campo rotulo="Ocioso após (segundos)" dica="sem teclado nem mouse">
@@ -140,7 +140,7 @@ export function PainelAgente({
           </section>
 
           <section className="border-t border-borda pt-4">
-            <h3 className="text-sm font-medium text-slate-200">Privacidade</h3>
+            <h3 className="text-sm font-medium text-slate-800">Privacidade</h3>
             <div className="mt-3 space-y-3">
               <Opcao
                 nome="agente_mostrar_bandeja"
@@ -175,14 +175,14 @@ export function PainelAgente({
                   rows={4}
                   disabled={somenteLeitura}
                   defaultValue={config.agente_processos_sigilosos.join("\n")}
-                  className="w-full rounded-lg border border-borda bg-fundo-suave px-3 py-2 font-mono text-xs text-slate-200 outline-none transition-colors hover:border-slate-600 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+                  className="w-full rounded-lg border border-borda bg-fundo-suave px-3 py-2 font-mono text-xs text-slate-800 outline-none transition-colors hover:border-slate-300 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
                 />
               </Campo>
             </div>
           </section>
 
           <section className="border-t border-borda pt-4">
-            <h3 className="text-sm font-medium text-slate-200">Envio</h3>
+            <h3 className="text-sm font-medium text-slate-800">Envio</h3>
             <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Campo rotulo="Registros por envio" dica="entre 10 e 500">
                 <Input
@@ -218,7 +218,7 @@ export function PainelAgente({
             <div className="flex flex-wrap items-center gap-3 border-t border-borda pt-4">
               <BotaoEnviar>Salvar e aplicar na frota</BotaoEnviar>
               <Mensagem estado={estado} />
-              <span className="text-xs text-slate-600">
+              <span className="text-xs text-slate-500">
                 chega nas estações em até {intervalo} minutos
               </span>
             </div>

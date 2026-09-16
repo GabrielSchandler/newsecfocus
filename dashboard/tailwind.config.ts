@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
+import animacoes from "tailwindcss-animate";
 
 const config: Config = {
-  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -10,20 +10,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Fundo profundo slate/zinc + acentos néon (cyan/sky/purple).
+        // Tema claro corporativo (set./2026). O painel era escuro com acentos
+        // néon e passava a impressão de protótipo; o cliente é gestor de
+        // empresa, que lê relatório em fundo claro. Os nomes dos tokens ficaram
+        // os mesmos para não reescrever cada tela — só o valor mudou.
         fundo: {
-          DEFAULT: "#090d16",
-          suave: "#0d121e",
-          cartao: "#0f1524",
+          DEFAULT: "#f3f5f8",
+          suave: "#ffffff",
+          cartao: "#ffffff",
         },
-        borda: "#1e293b",
-        neon: {
-          ciano: "#22d3ee",
-          ceu: "#38bdf8",
-          roxo: "#a78bfa",
-          verde: "#34d399",
-          ambar: "#fbbf24",
-          vermelho: "#fb7185",
+        borda: "#e2e7ee",
+        // Barra lateral: o único bloco escuro da tela, que ancora a navegação.
+        marinho: {
+          DEFAULT: "#13233a",
+          ativo: "#1d3a57",
+          borda: "#243752",
+          texto: "#c3cedb",
+        },
+        tinta: "#12213a",
+        // Cor de dado: tempo produtivo e barras de progresso.
+        marca: {
+          DEFAULT: "#1f9fb2",
+          escuro: "#16808f",
+          suave: "#e4f4f6",
+        },
+        // Cor de ação: botão principal, link e item selecionado.
+        acao: {
+          DEFAULT: "#1b5e8f",
+          escuro: "#154b73",
+          suave: "#e9f1f8",
         },
       },
       fontFamily: {
@@ -31,24 +46,19 @@ const config: Config = {
         mono: ["var(--fonte-mono)", "ui-monospace", "monospace"],
       },
       borderRadius: {
-        xl2: "1.25rem",
+        // Cantos contidos: arredondado demais lia como app de consumo.
+        xl2: "0.625rem",
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(34,211,238,0.08), 0 8px 40px -12px rgba(34,211,238,0.25)",
-        "glow-roxo": "0 0 0 1px rgba(167,139,250,0.10), 0 8px 40px -12px rgba(167,139,250,0.30)",
+        // Os nomes vêm do tema escuro; no claro viraram sombras discretas.
+        glow: "0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 3px rgba(16, 24, 40, 0.04)",
+        "glow-roxo": "0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 3px rgba(16, 24, 40, 0.04)",
+        menu: "0 12px 32px -8px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.06)",
       },
       keyframes: {
-        "borda-girar": {
-          "0%": { "--angulo": "0deg" },
-          "100%": { "--angulo": "360deg" },
-        },
         "pulso-led": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.35" },
-        },
-        "brilho-flutuante": {
-          "0%, 100%": { transform: "translateY(0) scale(1)", opacity: "0.5" },
-          "50%": { transform: "translateY(-12px) scale(1.05)", opacity: "0.8" },
         },
         "entrada-suave": {
           "0%": { opacity: "0", transform: "translateY(8px)" },
@@ -56,14 +66,14 @@ const config: Config = {
         },
       },
       animation: {
-        "borda-girar": "borda-girar 4s linear infinite",
         "pulso-led": "pulso-led 1.8s ease-in-out infinite",
-        "brilho-flutuante": "brilho-flutuante 9s ease-in-out infinite",
         "entrada-suave": "entrada-suave 0.4s ease-out both",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  // import e não require(): o Node 24 abre este .ts como módulo ES, onde
+  // require não existe, e a compilação do CSS caía no next dev.
+  plugins: [animacoes],
 };
 
 export default config;

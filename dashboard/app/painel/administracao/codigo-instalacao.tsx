@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import { Check, Copy, KeyRound, Loader2, Pencil, RefreshCw, TriangleAlert } from "lucide-react";
+import { Check, Copy, KeyRound, Loader2, Pencil, RefreshCw, TriangleAlert, Eye, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatarCodigoInstalacao } from "@/lib/formato";
@@ -28,6 +28,9 @@ export function CodigoInstalacao({
   const [editando, setEditando] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
+  // Oculto por padrão: a tela de administração é aberta em reunião e em
+  // compartilhamento de tela, e o código deixa qualquer máquina entrar na frota.
+  const [visivel, setVisivel] = useState(false);
 
   const formatado = formatarCodigoInstalacao(codigo);
 
@@ -44,8 +47,8 @@ export function CodigoInstalacao({
 
   return (
     <Card className="border-cyan-500/20 p-5">
-      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
-        <KeyRound className="h-4 w-4 text-cyan-400" />
+      <h3 className="flex items-center gap-2 text-sm font-medium text-slate-800">
+        <KeyRound className="h-4 w-4 text-cyan-700" />
         Código de instalação
       </h3>
       <p className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -55,16 +58,23 @@ export function CodigoInstalacao({
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <code className="select-all rounded-lg border border-borda bg-fundo-suave px-4 py-3 font-mono text-2xl tracking-[0.2em] text-cyan-200">
-          {formatado}
+        <code
+          aria-label={visivel ? "Código de instalação" : "Código de instalação oculto"}
+          className="select-all rounded-lg border border-borda bg-fundo-suave px-4 py-3 font-mono text-2xl tracking-[0.2em] text-cyan-800"
+        >
+          {visivel ? formatado : formatado.replace(/\d/g, "•")}
         </code>
+        <Button variante="contorno" tamanho="sm" onClick={() => setVisivel((v) => !v)} disabled={!codigo}>
+          {visivel ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          {visivel ? "Ocultar" : "Mostrar"}
+        </Button>
         <Button variante="contorno" tamanho="sm" onClick={copiar} disabled={!codigo}>
           {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           {copiado ? "Copiado" : "Copiar"}
         </Button>
       </div>
 
-      <p className="mt-3 text-xs text-slate-600">
+      <p className="mt-3 text-xs text-slate-500">
         Pode ser digitado com ou sem os hífens. Vale para quantas máquinas o plano permitir.
       </p>
 
@@ -77,7 +87,7 @@ export function CodigoInstalacao({
             <button
               type="button"
               onClick={() => setEditando(true)}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-cyan-300"
+              className="flex w-fit items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-cyan-700"
             >
               <Pencil className="h-3.5 w-3.5" />
               Escolher outro código
@@ -117,14 +127,14 @@ export function CodigoInstalacao({
             <button
               type="button"
               onClick={() => setConfirmando(true)}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-amber-300"
+              className="flex w-fit items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-amber-700"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Gerar um código aleatório
             </button>
           ) : (
             <form action={enviar} className="space-y-2">
-              <p className="flex items-start gap-2 text-xs leading-relaxed text-amber-200/90">
+              <p className="flex items-start gap-2 text-xs leading-relaxed text-amber-800/90">
                 <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 O código atual deixa de funcionar para instalações novas. As máquinas já
                 instaladas continuam normalmente — elas usam uma credencial própria desde a
@@ -177,7 +187,7 @@ function BotaoGirar() {
 function Mensagem({ estado }: { estado: ResultadoAcao | null }) {
   if (!estado) return null;
   return (
-    <span className={`text-xs ${estado.ok ? "text-emerald-400" : "text-rose-400"}`}>
+    <span className={`text-xs ${estado.ok ? "text-emerald-700" : "text-rose-700"}`}>
       {estado.mensagem}
     </span>
   );

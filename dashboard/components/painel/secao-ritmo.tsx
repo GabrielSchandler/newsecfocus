@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { Activity } from "lucide-react";
+import { Activity, CalendarRange } from "lucide-react";
+import { Secao } from "./kit";
 import { formatarHoras } from "@/lib/formato";
 import type { PontoRitmo } from "@/lib/tipos";
 
@@ -58,48 +59,51 @@ export function SecaoRitmo({ dados }: { dados: PontoRitmo[] }) {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl2 border border-borda vidro p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-cyan-400" />
-            <h3 className="text-sm font-medium text-slate-200">Ritmo por hora do dia</h3>
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-slate-500">
+      <Secao
+        icone={<Activity />}
+        titulo="Ritmo por hora do dia"
+        subtitulo="Tempo ativo somado em cada hora do período · a parte cheia é produtiva"
+        acao={
+          <div className="flex items-center gap-3 pt-1 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "#22d3ee" }} />
+              <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "#1f9fb2" }} />
               Produtivo
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-slate-700" />
+              <span className="h-2.5 w-2.5 rounded-sm bg-slate-200" />
               Ativo (demais)
             </span>
           </div>
-        </div>
+        }
+        corpoClassName="mt-2"
+      >
 
         {!temDado ? (
           <p className="mt-6 rounded-lg border border-dashed border-borda py-8 text-center text-xs text-slate-500">
             Sem atividade no período para calcular o ritmo.
           </p>
         ) : (
-          <div className="mt-4 flex items-end gap-1" style={{ height: 140 }}>
+          <div className="flex items-end gap-1" style={{ height: 140 }}>
             {Array.from({ length: hFim - hIni + 1 }, (_, i) => hIni + i).map((h) => {
               const v = horas[h];
               const altura = maxHora > 0 ? (v.ativo / maxHora) * 100 : 0;
               const pctProd = v.ativo > 0 ? (v.produtivo / v.ativo) * 100 : 0;
               return (
-                <div key={h} className="flex flex-1 flex-col items-center gap-1">
+                // h-full no invólucro: sem ele a altura em % da barra não tem
+                // referência e todas as horas colapsam no mesmo traço.
+                <div key={h} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
                   <div
-                    className="relative flex w-full items-end justify-center overflow-hidden rounded-t bg-slate-800/50"
+                    className="relative flex w-full items-end justify-center overflow-hidden rounded-t bg-slate-100"
                     style={{ height: `${Math.max(2, altura)}%`, minHeight: v.ativo > 0 ? 3 : 0 }}
                     title={`${hhLabel(h)} · ${formatarHoras(v.ativo)} ativos · ${formatarHoras(v.produtivo)} produtivos`}
                   >
-                    <div className="absolute inset-x-0 top-0 h-full bg-slate-700" />
+                    <div className="absolute inset-x-0 top-0 h-full bg-slate-200" />
                     <div
                       className="absolute inset-x-0 bottom-0"
-                      style={{ height: `${pctProd}%`, background: "#22d3ee" }}
+                      style={{ height: `${pctProd}%`, background: "#1f9fb2" }}
                     />
                   </div>
-                  <span className="text-[9px] tabular-nums text-slate-600">
+                  <span className="text-[9px] tabular-nums text-slate-500">
                     {h % 3 === 0 ? h : ""}
                   </span>
                 </div>
@@ -107,26 +111,27 @@ export function SecaoRitmo({ dados }: { dados: PontoRitmo[] }) {
             })}
           </div>
         )}
-      </section>
+      </Secao>
 
       {temDado && (
-        <section className="rounded-xl2 border border-borda vidro p-5">
-          <h3 className="text-sm font-medium text-slate-200">Mapa de calor — semana × hora</h3>
-          <p className="text-xs text-slate-500">tempo ativo; quanto mais claro, mais quente</p>
-
-          <div className="mt-4 overflow-x-auto">
+        <Secao
+          icone={<CalendarRange />}
+          titulo="Mapa de calor — dia da semana × hora"
+          subtitulo="Tempo ativo · quanto mais escura a célula, mais atividade"
+        >
+          <div className="overflow-x-auto">
             <div className="min-w-[520px]">
               {/* Régua de horas */}
               <div className="mb-1 flex pl-9">
                 {Array.from({ length: hFim - hIni + 1 }, (_, i) => hIni + i).map((h) => (
-                  <span key={h} className="flex-1 text-center text-[9px] tabular-nums text-slate-600">
+                  <span key={h} className="flex-1 text-center text-[9px] tabular-nums text-slate-500">
                     {h % 3 === 0 ? h : ""}
                   </span>
                 ))}
               </div>
               {DIAS.map((nome, dow) => (
-                <div key={nome} className="flex items-center">
-                  <span className="w-9 shrink-0 text-[10px] text-slate-500">{nome}</span>
+                <div key={nome} className="mb-0.5 flex items-center">
+                  <span className="w-9 shrink-0 text-[11px] text-slate-500">{nome}</span>
                   <div className="flex flex-1 gap-0.5">
                     {Array.from({ length: hFim - hIni + 1 }, (_, i) => hIni + i).map((h) => {
                       const v = mapa[dow][h];
@@ -134,13 +139,13 @@ export function SecaoRitmo({ dados }: { dados: PontoRitmo[] }) {
                       return (
                         <span
                           key={h}
-                          className="h-4 flex-1 rounded-[2px]"
+                          className="h-5 flex-1 rounded-[3px]"
                           style={{
                             // De transparente (frio) a ciano (quente).
                             background:
                               v === 0
-                                ? "rgba(148,163,184,0.06)"
-                                : `rgba(34,211,238,${0.12 + intensidade * 0.85})`,
+                                ? "rgba(148,163,184,0.10)"
+                                : `rgba(31,159,178,${0.12 + intensidade * 0.85})`,
                           }}
                           title={`${nome} ${hhLabel(h)} · ${formatarHoras(v)} ativos`}
                         />
@@ -151,7 +156,7 @@ export function SecaoRitmo({ dados }: { dados: PontoRitmo[] }) {
               ))}
             </div>
           </div>
-        </section>
+        </Secao>
       )}
     </div>
   );

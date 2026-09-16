@@ -1,56 +1,62 @@
-import { LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
-import { BarraFiltros } from "@/components/painel/barra-filtros";
-import { BotaoExportar } from "@/components/painel/botao-exportar";
-import { CabecalhoPagina, AvisoErro } from "@/components/painel/cabecalho";
+import { AvisoErro } from "@/components/painel/cabecalho";
 import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
-import { ResumoExpediente } from "@/components/painel/resumo-expediente";
+import { ResumoVisaoGeral } from "@/components/painel/visao-geral";
 import { GraficoArea } from "@/components/painel/grafico-area";
-import { GraficoDonut } from "@/components/painel/grafico-donut";
-import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
 import { SecaoDispersao } from "@/components/painel/secao-dispersao";
-import { SecaoEvolucao } from "@/components/painel/secao-evolucao";
-import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
-import { SecaoPresenca } from "@/components/painel/secao-presenca";
 import { SecaoRitmo } from "@/components/painel/secao-ritmo";
 import { TimelineAtividade } from "@/components/painel/timeline-atividade";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, orgEfetiva, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
+import { REGRAS } from "@/lib/regras";
 import {
   agregarProdutividade,
+  compararIndice,
   janelaAtual,
   janelaComparativo,
 } from "@/lib/produtividade";
 import {
-  buscarCategorias,
-  buscarColaboradores,
-  buscarDispositivos,
+  compararEquipes,
+  foraDaEscala,
+  janelaEvolucao,
+  montarEvolucao,
+  pontosDeAtencao,
+} from "@/lib/visao-geral";
+import {
+  buscarAplicativosResumo,
   buscarDispersao,
-  buscarDistribuicao,
-  buscarDominios,
   buscarEquipes,
-  buscarEvolucao,
-  buscarHorasExtras,
+  buscarEstacoes,
+  buscarPessoasContagem,
   buscarProdutividade,
-  buscarPresenca,
   buscarRitmo,
   buscarSerie,
+  buscarSerieProdutividade,
   buscarTempoReal,
+  buscarUltimaConsolidacao,
 } from "@/lib/consultas";
 
 // Telemetria muda a cada minuto: nada de cache de página.
 export const dynamic = "force-dynamic";
 
+/** Detalhamento embaixo do resumo — só a aba aberta consulta o banco. */
 const ABAS: AbaPainel[] = [
-  { chave: "resumo", rotulo: "Resumo" },
-  { chave: "aplicativos", rotulo: "Aplicativos" },
-  { chave: "presenca", rotulo: "Presença" },
-  { chave: "ritmo", rotulo: "Ritmo" },
-  { chave: "horas", rotulo: "Horas extras" },
-  { chave: "tempo", rotulo: "Tempo real" },
+  { chave: "atividade", rotulo: "Atividade ao longo do período" },
+  { chave: "ritmo", rotulo: "Ritmo e alternância" },
+  { chave: "registros", rotulo: "Últimos registros" },
 ];
+
+/** Abas que saíram daqui, e para onde foram. */
+const ABAS_MUDADAS: Record<string, (recorte: string) => string> = {
+  aplicativos: (r) => `/painel/aplicativos${r}`,
+  presenca: (r) => `/painel/jornada${r}`,
+  horas: (r) => `/painel/jornada${r}`,
+  pessoas: (r) => `/painel/pessoas${r}`,
+  tempo: (r) => `/painel${r ? `${r}&` : "?"}visao=registros`,
+  resumo: (r) => `/painel${r}`,
+};
 
 export default async function PaginaVisaoGeral({
   searchParams,
@@ -71,180 +77,106 @@ export default async function PaginaVisaoGeral({
 
   const abaBruta = params.visao;
   const escolhida = Array.isArray(abaBruta) ? abaBruta[0] : abaBruta;
-  const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "resumo";
+  if (escolhida && ABAS_MUDADAS[escolhida]) redirect(ABAS_MUDADAS[escolhida](recorte));
+  const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "atividade";
 
-  // Filtros e resumo executivo carregam sempre; o corpo de cada aba carrega só
-  // o que ela precisa — a tela abre mais leve e cada aba puxa o seu.
   // A janela atual para no relógio: somar o futuro do dia inflaria o expediente.
   // A de comparação é o período anterior cortado no mesmo ponto — e, no preset
   // de dia, o último dia COM expediente (segunda compara com sexta).
   const janela = janelaAtual(periodo);
+  const evolucao = janelaEvolucao(periodo, fuso);
   const comparativo = await comFalha(janelaComparativo(supabase, periodo, fuso, org), null);
 
-  const [equipes, colaboradores, dispositivos, produtividade, anterior] = await Promise.all([
+  const [
+    equipes,
+    estacoes,
+    produtividade,
+    anterior,
+    aplicativos,
+    pessoas,
+    serieAtual,
+    serieAnterior,
+    consolidacao,
+  ] = await Promise.all([
     comFalha(buscarEquipes(supabase, org), []),
-    comFalha(buscarColaboradores(supabase, null, org), []),
-    comFalha(buscarDispositivos(supabase, org), []),
+    comFalha(buscarEstacoes(supabase, escopo.orgId), []),
     comFalha(buscarProdutividade(supabase, janela, escopo), []),
     comparativo.dados
       ? comFalha(buscarProdutividade(supabase, comparativo.dados, escopo), [])
       : Promise.resolve({ dados: [], erro: null }),
+    comFalha(buscarAplicativosResumo(supabase, janela, escopo), null),
+    comFalha(buscarPessoasContagem(supabase, janela, escopo), null),
+    comFalha(buscarSerieProdutividade(supabase, evolucao.atual, evolucao.balde, escopo), []),
+    evolucao.anterior
+      ? comFalha(buscarSerieProdutividade(supabase, evolucao.anterior, evolucao.balde, escopo), [])
+      : Promise.resolve({ dados: [], erro: null }),
+    comFalha(buscarUltimaConsolidacao(supabase), null),
   ]);
 
   const resumo = agregarProdutividade(produtividade.dados);
-  const resumoAnterior = comparativo.dados ? agregarProdutividade(anterior.dados) : null;
+  const resumoAnterior = comparativo.dados && !anterior.erro ? agregarProdutividade(anterior.dados) : null;
+  const linhasEquipes = compararEquipes(produtividade.dados, resumoAnterior ? anterior.dados : null);
 
-  const precisaCategorias = admin && (aba === "resumo" || aba === "aplicativos");
-  const categorias = precisaCategorias
-    ? await comFalha(buscarCategorias(supabase, org), [])
-    : { dados: [], erro: null };
+  const pontos = pontosDeAtencao({
+    // A estação atrasada já tem a faixa própria logo abaixo dos indicadores.
+    aplicativos: aplicativos.dados,
+    pessoas: pessoas.dados,
+    produtividade: produtividade.dados,
+    equipes: linhasEquipes,
+    admin,
+    recorte,
+    limite: REGRAS.maxPontosAtencao,
+  });
+
+  // A série e as equipes têm aviso próprio: falhar ali não invalida o resto.
+  const erro = primeiroErro(produtividade, estacoes);
 
   return (
-    <div className="space-y-5">
-      <CabecalhoPagina
-        titulo="Visão geral"
-        descricao={`${contexto.empresa.nome} · ${periodo.rotulo}`}
-        icone={<LayoutDashboard className="h-5 w-5 text-cyan-400" />}
-        acoes={<BotaoExportar periodo={periodo} escopo={escopo} />}
-      />
-
-      <BarraFiltros
+    <div className="space-y-4 sm:space-y-5">
+      <ResumoVisaoGeral
         periodo={periodo}
         escopo={escopo}
         fuso={fuso}
         equipes={equipes.dados}
-        colaboradores={colaboradores.dados}
-        dispositivos={dispositivos.dados}
-        campos={["equipe", "colaborador", "dispositivo"]}
         travarEquipe={!!contexto.equipeEscopo}
-      />
-
-      {produtividade.erro && <AvisoErro mensagem={produtividade.erro} />}
-
-      {/* Resumo executivo: sempre visível, é o que a pessoa abre o app para ver. */}
-      <ResumoExpediente
+        estacoes={estacoes.dados}
+        ultimaConsolidacao={consolidacao.dados}
+        erro={erro}
         resumo={resumo}
-        anterior={resumoAnterior}
+        variacao={compararIndice(resumo, resumoAnterior)}
         rotuloComparacao={comparativo.dados?.rotulo ?? null}
-      />
-
-      <AbasPainel abas={ABAS} ativa={aba} />
-
-      {aba === "resumo" && (
-        <SecaoResumo
-          supabase={supabase}
-          periodo={periodo}
-          escopo={escopo}
-          fuso={fuso}
-          categorias={categorias.dados}
-          admin={admin}
-        />
-      )}
-
-      {aba === "aplicativos" && (
-        <SecaoAplicativosAba
-          supabase={supabase}
-          periodo={periodo}
-          escopo={escopo}
-          categorias={categorias.dados}
-          admin={admin}
-          recorte={recorte}
-        />
-      )}
-
-      {aba === "presenca" && (
-        <SecaoPresencaAba supabase={supabase} periodo={periodo} escopo={escopo} />
-      )}
-
-      {aba === "ritmo" && (
-        <SecaoRitmoAba supabase={supabase} periodo={periodo} escopo={escopo} />
-      )}
-
-      {aba === "horas" && (
-        <SecaoHorasAba
-          supabase={supabase}
-          periodo={periodo}
-          escopo={escopo}
-          admin={admin}
-        />
-      )}
-
-      {aba === "tempo" && (
-        <SecaoTempoReal supabase={supabase} orgId={escopo.orgId} />
-      )}
-    </div>
-  );
-}
-
-
-async function SecaoResumo({
-  supabase,
-  periodo,
-  escopo,
-  fuso,
-  categorias,
-  admin,
-}: any) {
-  const [serie, distribuicao, evolucao] = await Promise.all([
-    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
-    comFalha(buscarEvolucao(supabase, periodo, escopo), []),
-  ]);
-
-  const erro = primeiroErro(serie, distribuicao, evolucao);
-
-  return (
-    <div className="space-y-5">
-      {erro && <AvisoErro mensagem={erro} />}
-
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
-        <div className="min-w-0 xl:col-span-3">
-          <GraficoArea
-            dados={serie.dados}
-            bucket={periodo.bucket}
-            fuso={fuso}
-            periodoRotulo={periodo.rotulo}
-          />
-        </div>
-        <div className="min-w-0 xl:col-span-2">
-          <GraficoDonut
-            dados={distribuicao.dados}
-            categorias={categorias}
-            podeClassificar={admin}
-          />
-        </div>
-      </div>
-
-      <SecaoEvolucao linhas={evolucao.dados} />
-    </div>
-  );
-}
-
-async function SecaoAplicativosAba({ supabase, periodo, escopo, categorias, admin, recorte }: any) {
-  const [distribuicao, dominios] = await Promise.all([
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
-    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
-  ]);
-  return (
-    <>
-      {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
-      <SecaoAplicativos
-        apps={distribuicao.dados}
-        categorias={categorias}
-        admin={admin}
-        dominios={dominios.dados}
+        foraDoExpediente={produtividade.erro ? undefined : foraDaEscala(produtividade.dados)}
+        pontos={pontos}
+        evolucao={{
+          pontos: montarEvolucao(evolucao, serieAtual.dados, serieAnterior.dados, fuso),
+          descricao: evolucao.descricao,
+          temAnterior: !!evolucao.anterior,
+          erro: primeiroErro(serieAtual, serieAnterior),
+        }}
+        equipesComparadas={{ linhas: linhasEquipes, temAnterior: !!resumoAnterior, erro: produtividade.erro }}
         recorte={recorte}
       />
-    </>
+
+      <section aria-labelledby="titulo-detalhamento" className="space-y-4 pt-3">
+        <h2 id="titulo-detalhamento" className="text-lg font-semibold text-tinta">
+          Análise detalhada
+        </h2>
+        <AbasPainel abas={ABAS} ativa={aba} variante="sublinhado" />
+
+        {aba === "atividade" && <SecaoAtividade supabase={supabase} periodo={periodo} escopo={escopo} fuso={fuso} />}
+        {aba === "ritmo" && <SecaoRitmoAba supabase={supabase} periodo={periodo} escopo={escopo} />}
+        {aba === "registros" && <SecaoUltimosRegistros supabase={supabase} orgId={escopo.orgId} />}
+      </section>
+    </div>
   );
 }
 
-async function SecaoPresencaAba({ supabase, periodo, escopo }: any) {
-  const presenca = await comFalha(buscarPresenca(supabase, periodo, escopo), []);
+async function SecaoAtividade({ supabase, periodo, escopo, fuso }: any) {
+  const serie = await comFalha(buscarSerie(supabase, periodo, escopo, fuso), []);
   return (
     <>
-      {presenca.erro && <AvisoErro mensagem={presenca.erro} />}
-      <SecaoPresenca linhas={presenca.dados} mostrarPessoa={!escopo.equipeId} />
+      {serie.erro && <AvisoErro mensagem={serie.erro} />}
+      <GraficoArea dados={serie.dados} bucket={periodo.bucket} fuso={fuso} periodoRotulo={periodo.rotulo} />
     </>
   );
 }
@@ -256,24 +188,14 @@ async function SecaoRitmoAba({ supabase, periodo, escopo }: any) {
   ]);
   return (
     <>
-      {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
+      {primeiroErro(ritmo, dispersao) && <AvisoErro mensagem={primeiroErro(ritmo, dispersao)!} />}
       <SecaoRitmo dados={ritmo.dados} />
       <SecaoDispersao linhas={dispersao.dados} />
     </>
   );
 }
 
-async function SecaoHorasAba({ supabase, periodo, escopo, admin }: any) {
-  const horas = await comFalha(buscarHorasExtras(supabase, periodo, escopo), []);
-  return (
-    <>
-      {horas.erro && <AvisoErro mensagem={horas.erro} />}
-      <SecaoHorasExtras linhas={horas.dados} mostrarEquipe={!escopo.equipeId} admin={admin} />
-    </>
-  );
-}
-
-async function SecaoTempoReal({ supabase, orgId }: any) {
+async function SecaoUltimosRegistros({ supabase, orgId }: any) {
   const tempoReal = await comFalha(buscarTempoReal(supabase, orgId), []);
   return (
     <>

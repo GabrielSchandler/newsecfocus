@@ -23,6 +23,28 @@ export function formatarHorasCurto(minutos: number): string {
   return `${h}h${m.toString().padStart(2, "0")}`;
 }
 
+/**
+ * Duração para número grande de indicador: "158h 24m", "124h", "40m".
+ * Mais curta que formatarHoras porque divide a linha com um título.
+ */
+export function formatarDuracao(minutos: number): string {
+  const total = Math.max(0, Math.round(minutos));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m.toString().padStart(2, "0")}m`;
+}
+
+/** "62%" quando é redondo, "10,8%" quando não é — sem ",0" sobrando. */
+export function formatarPorcentagemEnxuta(valor: number | null): string {
+  if (valor === null || Number.isNaN(valor)) return "—";
+  const arredondado = Math.round(valor * 10) / 10;
+  return Number.isInteger(arredondado)
+    ? `${arredondado}%`
+    : `${arredondado.toFixed(1).replace(".", ",")}%`;
+}
+
 export function formatarNumero(valor: number): string {
   return new Intl.NumberFormat("pt-BR").format(Math.round(valor));
 }
@@ -140,11 +162,13 @@ export function rotuloDoBalde(iso: string, bucket: BucketSerie, fuso: string): s
 // ----------------------------------------------------------------------------
 //  Cores e rótulos das categorias de produtividade
 // ----------------------------------------------------------------------------
+// Mesmos tons das fatias do expediente (lib/cores-expediente.ts): a categoria
+// de um aplicativo e o tempo que ele ocupa são a mesma leitura.
 export const CORES_TIPO: Record<string, string> = {
-  PRODUCTIVE: "#22d3ee",
-  NEUTRAL: "#a78bfa",
-  UNPRODUCTIVE: "#fb7185",
-  SEM: "#475569",
+  PRODUCTIVE: "#1f9fb2",
+  NEUTRAL: "#3d5f8f",
+  UNPRODUCTIVE: "#e0676b",
+  SEM: "#a9c8e4",
 };
 
 export const ROTULOS_TIPO: Record<string, string> = {
@@ -155,9 +179,9 @@ export const ROTULOS_TIPO: Record<string, string> = {
 };
 
 export const PALETA_SERIES = [
-  "#22d3ee", "#a78bfa", "#34d399", "#fbbf24",
-  "#fb7185", "#38bdf8", "#f472b6", "#818cf8",
-  "#2dd4bf", "#facc15",
+  "#1f9fb2", "#3d5f8f", "#e0a13a", "#6b8fbf",
+  "#e0676b", "#4f9d78", "#8a6fb0", "#c07a4f",
+  "#5aa7c9", "#9aa5b4",
 ];
 
 /**
@@ -170,11 +194,11 @@ export function faixaIndice(indice: number | null): {
   classe: string;
 } {
   if (indice === null) {
-    return { rotulo: "sem classificação", cor: "#475569", classe: "text-slate-500" };
+    return { rotulo: "sem classificação", cor: "#94a3b8", classe: "text-slate-500" };
   }
-  if (indice >= 70) return { rotulo: "alto", cor: "#34d399", classe: "text-emerald-400" };
-  if (indice >= 45) return { rotulo: "médio", cor: "#fbbf24", classe: "text-amber-400" };
-  return { rotulo: "baixo", cor: "#fb7185", classe: "text-rose-400" };
+  if (indice >= 70) return { rotulo: "alto", cor: "#15803d", classe: "text-emerald-700" };
+  if (indice >= 45) return { rotulo: "médio", cor: "#b45309", classe: "text-amber-700" };
+  return { rotulo: "baixo", cor: "#be123c", classe: "text-rose-700" };
 }
 
 /**

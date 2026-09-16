@@ -29,10 +29,12 @@ export default async function LayoutPlataforma({
 
   return (
     <div className="flex min-h-screen">
-      <NavegacaoLateral itens={itens} />
+      <NavegacaoLateral itens={itens} contexto={contexto} />
       <div className="flex min-w-0 flex-1 flex-col">
         <BarraTopo contexto={contexto} />
-        <main className="espaco-navegacao flex-1 p-4 sm:p-6 lg:pb-6">{children}</main>
+        <main className="espaco-navegacao mx-auto w-full max-w-[1480px] flex-1 p-4 sm:p-5 lg:px-6 lg:pb-8">
+          {children}
+        </main>
       </div>
 
       <NavegacaoInferior itens={itens} contexto={contexto} />

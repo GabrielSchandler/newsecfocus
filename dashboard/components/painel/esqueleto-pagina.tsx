@@ -12,26 +12,26 @@ export function EsqueletoPagina() {
     <div className="animate-pulse space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <div className="h-5 w-40 rounded bg-slate-800/70" />
-          <div className="h-3 w-64 rounded bg-slate-800/50" />
+          <div className="h-5 w-40 rounded bg-slate-100" />
+          <div className="h-3 w-64 rounded bg-slate-100" />
         </div>
-        <div className="h-8 w-28 rounded-lg bg-slate-800/70" />
+        <div className="h-8 w-28 rounded-lg bg-slate-100" />
       </div>
 
       <Card className="h-24 p-4">
-        <div className="h-full rounded-lg bg-slate-800/40" />
+        <div className="h-full rounded-lg bg-slate-50" />
       </Card>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="h-24 p-4">
-            <div className="h-full rounded-lg bg-slate-800/40" />
+            <div className="h-full rounded-lg bg-slate-50" />
           </Card>
         ))}
       </div>
 
       <Card className="h-72 p-4">
-        <div className="h-full rounded-lg bg-slate-800/30" />
+        <div className="h-full rounded-lg bg-slate-50" />
       </Card>
     </div>
   );

@@ -1,60 +1,21 @@
-import { AlarmClockCheck } from "lucide-react";
 import { redirect } from "next/navigation";
-import { BarraFiltros } from "@/components/painel/barra-filtros";
-import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
-import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
-import { criarClienteServidor } from "@/lib/supabase/server";
-import { carregarContexto, podeAdministrar } from "@/lib/sessao";
-import { comFalha, primeiroErro } from "@/lib/carregar";
-import { lerFiltros, type ParamsPagina } from "@/lib/filtros-url";
-import { buscarEquipes, buscarHorasExtras } from "@/lib/consultas";
+import type { ParamsPagina } from "@/lib/filtros-url";
 
-export const dynamic = "force-dynamic";
-
+/**
+ * Horas extras virou parte de Jornada ("fora da escala"). O endereço antigo
+ * continua valendo para links salvos e leva ao mesmo recorte.
+ */
 export default async function PaginaHorasExtras({
   searchParams,
 }: {
   searchParams: Promise<ParamsPagina>;
 }) {
   const params = await searchParams;
-  const supabase = await criarClienteServidor();
-  const contexto = await carregarContexto(supabase);
-
-  if (!contexto) redirect("/entrar");
-
-  const { periodo, escopo } = lerFiltros(params, contexto);
-
-  const [equipes, horasExtras] = await Promise.all([
-    comFalha(buscarEquipes(supabase, escopo.orgId), []),
-    comFalha(buscarHorasExtras(supabase, periodo, escopo), []),
-  ]);
-
-  const erro = primeiroErro(equipes, horasExtras);
-
-  return (
-    <div className="space-y-5">
-      <CabecalhoPagina
-        titulo="Horas extras"
-        descricao={`Atividade fora da janela de expediente esperada · ${periodo.rotulo}`}
-        icone={<AlarmClockCheck className="h-5 w-5 text-cyan-400" />}
-      />
-
-      <BarraFiltros
-        periodo={periodo}
-        escopo={escopo}
-        fuso={contexto.empresa.fuso}
-        equipes={equipes.dados}
-        campos={["equipe"]}
-        travarEquipe={!!contexto.equipeEscopo}
-      />
-
-      {erro && <AvisoErro mensagem={erro} />}
-
-      <SecaoHorasExtras
-        linhas={horasExtras.dados}
-        mostrarEquipe={!escopo.equipeId}
-        admin={podeAdministrar(contexto)}
-      />
-    </div>
-  );
+  const busca = new URLSearchParams();
+  for (const [chave, valor] of Object.entries(params)) {
+    const v = Array.isArray(valor) ? valor[0] : valor;
+    if (v) busca.set(chave, v);
+  }
+  const q = busca.toString();
+  redirect(`/painel/jornada${q ? `?${q}` : ""}`);
 }

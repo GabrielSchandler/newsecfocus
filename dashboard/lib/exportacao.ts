@@ -16,14 +16,9 @@
 // ============================================================================
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import {
-  buscarRankingColaboradores,
-  buscarRankingEquipes,
-  buscarRelatorioAplicativos,
-  buscarRelatorioDiario,
-} from "./consultas";
-import { horaCurta } from "./formato";
-import type { Escopo, Periodo, TipoRelatorio } from "./tipos";
+import { buscarAplicativosLista, buscarProdutividade, buscarProdutividadeDiaria } from "./consultas";
+import { agruparPorEquipe, janelaAtual } from "./produtividade";
+import type { Escopo, MinutosExpediente, Periodo, TipoRelatorio } from "./tipos";
 import { RELATORIOS } from "./tipos";
 
 export type TipoColuna = "texto" | "inteiro" | "duracao" | "percentual" | "data" | "hora";
@@ -40,156 +35,176 @@ export interface TabelaRelatorio {
   subtitulo: string;
   colunas: ColunaRelatorio[];
   linhas: Record<string, unknown>[];
+  /** Observações que acompanham o arquivo (critério, aproximação). */
+  notas: string[];
 }
 
 // ----------------------------------------------------------------------------
 //  Montagem das tabelas
+//
+//  Os quatro relatórios saem das MESMAS funções das telas (fonte única da
+//  migration 0036), com a MESMA janela (período cortado no presente) e o MESMO
+//  escopo. A prévia da tela de Relatórios chama esta função — o que se vê é o
+//  que se baixa.
 // ----------------------------------------------------------------------------
+
+const COLUNAS_MINUTOS: ColunaRelatorio[] = [
+  { chave: "expediente", rotulo: "Expediente previsto", tipo: "duracao", largura: 16 },
+  { chave: "registrados", rotulo: "Com registro", tipo: "duracao" },
+  { chave: "ativos", rotulo: "Tempo ativo", tipo: "duracao" },
+  { chave: "produtivos", rotulo: "Produtivo", tipo: "duracao" },
+  { chave: "neutros", rotulo: "Neutro", tipo: "duracao" },
+  { chave: "improdutivos", rotulo: "Improdutivo", tipo: "duracao" },
+  { chave: "semClassificar", rotulo: "Sem classificação", tipo: "duracao", largura: 16 },
+  { chave: "ociosos", rotulo: "Ocioso", tipo: "duracao" },
+  { chave: "bloqueado", rotulo: "Bloqueado", tipo: "duracao" },
+  { chave: "semDados", rotulo: "Sem dados", tipo: "duracao" },
+  { chave: "ativosFora", rotulo: "Fora da escala", tipo: "duracao" },
+];
+
+const minutos = (m: MinutosExpediente) => ({
+  expediente: m.expediente,
+  registrados: Math.min(m.registrados, m.expediente),
+  ativos: m.ativos,
+  produtivos: m.produtivos,
+  neutros: m.neutros,
+  improdutivos: m.improdutivos,
+  semClassificar: m.semClassificar,
+  ociosos: m.ociosos,
+  bloqueado: m.bloqueado,
+  semDados: m.semDados,
+  ativosFora: m.ativosFora,
+});
+
+const NOTAS_COMUNS = [
+  "Índice = tempo em aplicativos produtivos ÷ expediente previsto até o momento da exportação.",
+  "Fora da escala é estimativa por blocos de 15 minutos; não é marcação de ponto nem banco de horas.",
+  "Sem dados = expediente sem nenhum registro recebido (máquina desligada, agente parado ou envio atrasado).",
+];
 
 export async function montarRelatorio(
   supabase: SupabaseClient,
   tipo: TipoRelatorio,
   periodo: Periodo,
   escopo: Escopo,
-  fuso: string,
+  _fuso: string,
   empresa: string,
 ): Promise<TabelaRelatorio> {
   const subtitulo = `${empresa} · ${periodo.rotulo}`;
+  const janela = janelaAtual(periodo);
 
   switch (tipo) {
     case "diario": {
-      const dados = await buscarRelatorioDiario(supabase, periodo, escopo);
+      const dados = await buscarProdutividadeDiaria(supabase, janela, escopo);
       return {
         titulo: RELATORIOS.diario.titulo,
         subtitulo,
         colunas: [
           { chave: "dia", rotulo: "Data", tipo: "data", largura: 12 },
-          { chave: "colaborador", rotulo: "Colaborador", tipo: "texto", largura: 28 },
-          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 20 },
-          { chave: "cargo", rotulo: "Cargo", tipo: "texto", largura: 20 },
-          { chave: "ativo", rotulo: "Tempo ativo", tipo: "duracao" },
-          { chave: "ocioso", rotulo: "Tempo ocioso", tipo: "duracao" },
-          { chave: "produtivo", rotulo: "Produtivo", tipo: "duracao" },
-          { chave: "neutro", rotulo: "Neutro", tipo: "duracao" },
-          { chave: "improdutivo", rotulo: "Improdutivo", tipo: "duracao" },
-          { chave: "sem_classificar", rotulo: "Sem classificação", tipo: "duracao", largura: 18 },
+          { chave: "pessoa", rotulo: "Pessoa", tipo: "texto", largura: 26 },
+          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 18 },
+          { chave: "escala", rotulo: "Escala", tipo: "texto", largura: 22 },
+          ...COLUNAS_MINUTOS,
           { chave: "indice", rotulo: "Índice", tipo: "percentual" },
-          { chave: "entrada", rotulo: "1º sinal", tipo: "hora" },
-          { chave: "saida", rotulo: "Último sinal", tipo: "hora", largura: 14 },
-          { chave: "teclas", rotulo: "Teclas", tipo: "inteiro" },
-          { chave: "cliques", rotulo: "Cliques", tipo: "inteiro" },
+          { chave: "cobertura", rotulo: "Cobertura", tipo: "percentual" },
+          { chave: "aproximado", rotulo: "Horário rateado", tipo: "texto", largura: 14 },
         ],
-        linhas: dados.map((r: any) => ({
-          dia: r.dia,
-          colaborador: r.colaborador,
-          equipe: r.equipe,
-          cargo: r.cargo ?? "",
-          ativo: Number(r.minutos_ativos ?? 0),
-          ocioso: Number(r.minutos_ociosos ?? 0),
-          produtivo: Number(r.minutos_produtivos ?? 0),
-          neutro: Number(r.minutos_neutros ?? 0),
-          improdutivo: Number(r.minutos_improdutivos ?? 0),
-          sem_classificar: Number(r.minutos_sem_classificar ?? 0),
-          indice: r.indice === null ? null : Number(r.indice),
-          entrada: r.primeiro_sinal ? horaCurta(r.primeiro_sinal, fuso) : "",
-          saida: r.ultimo_sinal ? horaCurta(r.ultimo_sinal, fuso) : "",
-          teclas: Number(r.teclas ?? 0),
-          cliques: Number(r.cliques ?? 0),
+        linhas: dados.map((l) => ({
+          dia: l.dia,
+          pessoa: l.colaborador,
+          equipe: l.equipe ?? "Sem equipe",
+          escala: l.trabalha
+            ? `${l.escalaInicio}–${l.escalaFim}${l.intervaloInicio ? ` (int. ${l.intervaloInicio}–${l.intervaloFim})` : ""}`
+            : "Sem expediente",
+          ...minutos(l.minutos),
+          indice: l.indice,
+          cobertura: l.cobertura,
+          aproximado: l.aproximado ? "Sim" : "Não",
         })),
+        notas: NOTAS_COMUNS,
       };
     }
 
     case "colaboradores": {
-      const dados = await buscarRankingColaboradores(supabase, periodo, escopo.equipeId, 5000);
+      const dados = await buscarProdutividade(supabase, janela, escopo);
       return {
         titulo: RELATORIOS.colaboradores.titulo,
         subtitulo,
         colunas: [
-          { chave: "colaborador", rotulo: "Colaborador", tipo: "texto", largura: 28 },
-          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 20 },
-          { chave: "cargo", rotulo: "Cargo", tipo: "texto", largura: 20 },
-          { chave: "dias", rotulo: "Dias com registro", tipo: "inteiro", largura: 18 },
-          { chave: "ativo", rotulo: "Tempo ativo", tipo: "duracao" },
-          { chave: "ocioso", rotulo: "Tempo ocioso", tipo: "duracao" },
-          { chave: "produtivo", rotulo: "Produtivo", tipo: "duracao" },
-          { chave: "neutro", rotulo: "Neutro", tipo: "duracao" },
-          { chave: "improdutivo", rotulo: "Improdutivo", tipo: "duracao" },
+          { chave: "pessoa", rotulo: "Pessoa", tipo: "texto", largura: 26 },
+          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 18 },
+          { chave: "diasExpediente", rotulo: "Dias com expediente", tipo: "inteiro", largura: 16 },
+          { chave: "diasRegistro", rotulo: "Dias com registro", tipo: "inteiro", largura: 16 },
+          ...COLUNAS_MINUTOS,
           { chave: "indice", rotulo: "Índice", tipo: "percentual" },
-          { chave: "aderencia", rotulo: "Aderência à jornada", tipo: "percentual", largura: 20 },
-          { chave: "teclas", rotulo: "Teclas", tipo: "inteiro" },
-          { chave: "cliques", rotulo: "Cliques", tipo: "inteiro" },
+          { chave: "cobertura", rotulo: "Cobertura", tipo: "percentual" },
         ],
-        linhas: dados.map((r) => ({
-          colaborador: r.colaborador,
-          equipe: r.equipe ?? "Sem equipe",
-          cargo: r.cargo ?? "",
-          dias: r.diasComRegistro,
-          ativo: r.minutosAtivos,
-          ocioso: r.minutosOciosos,
-          produtivo: r.minutosProdutivos,
-          neutro: r.minutosNeutros,
-          improdutivo: r.minutosImprodutivos,
-          indice: r.indice,
-          aderencia: r.aderencia,
-          teclas: r.teclas,
-          cliques: r.cliques,
+        linhas: dados.map((l) => ({
+          pessoa: l.colaborador,
+          equipe: l.equipe ?? "Sem equipe",
+          diasExpediente: l.diasComExpediente,
+          diasRegistro: l.diasComRegistro,
+          ...minutos(l.minutos),
+          indice: l.indice,
+          cobertura: l.cobertura,
         })),
+        notas: NOTAS_COMUNS,
       };
     }
 
     case "equipes": {
-      const dados = await buscarRankingEquipes(supabase, periodo);
+      const dados = await buscarProdutividade(supabase, janela, escopo);
       return {
         titulo: RELATORIOS.equipes.titulo,
         subtitulo,
         colunas: [
-          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 26 },
+          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 22 },
           { chave: "pessoas", rotulo: "Pessoas", tipo: "inteiro" },
-          { chave: "ativo", rotulo: "Tempo ativo", tipo: "duracao" },
-          { chave: "ocioso", rotulo: "Tempo ocioso", tipo: "duracao" },
-          { chave: "produtivo", rotulo: "Produtivo", tipo: "duracao" },
-          { chave: "neutro", rotulo: "Neutro", tipo: "duracao" },
-          { chave: "improdutivo", rotulo: "Improdutivo", tipo: "duracao" },
-          { chave: "indice", rotulo: "Índice", tipo: "percentual" },
-          { chave: "aderencia", rotulo: "Aderência à jornada", tipo: "percentual", largura: 20 },
+          { chave: "indice", rotulo: "Índice (média por pessoa)", tipo: "percentual", largura: 18 },
+          { chave: "cobertura", rotulo: "Cobertura (horas)", tipo: "percentual", largura: 16 },
+          ...COLUNAS_MINUTOS,
         ],
-        linhas: dados.map((r) => ({
-          equipe: r.equipe,
-          pessoas: r.pessoas,
-          ativo: r.minutosAtivos,
-          ocioso: r.minutosOciosos,
-          produtivo: r.minutosProdutivos,
-          neutro: r.minutosNeutros,
-          improdutivo: r.minutosImprodutivos,
-          indice: r.indice,
-          aderencia: r.aderencia,
+        linhas: agruparPorEquipe(dados).map((g) => ({
+          equipe: g.equipe,
+          pessoas: g.resumo.pessoas,
+          indice: g.resumo.indiceMedio,
+          cobertura: g.resumo.cobertura,
+          ...minutos(g.resumo.minutos),
         })),
+        notas: [
+          "Índice da equipe = média simples do índice de cada pessoa (cada pessoa pesa igual).",
+          "Cobertura e horas da equipe = somas das pessoas da equipe.",
+          ...NOTAS_COMUNS.slice(1),
+        ],
       };
     }
 
     case "aplicativos": {
-      const dados = await buscarRelatorioAplicativos(supabase, periodo, escopo);
+      const { linhas } = await buscarAplicativosLista(supabase, janela, escopo, { limite: 500 });
+      const rotulos = { PRODUCTIVE: "Produtivo", NEUTRAL: "Neutro", UNPRODUCTIVE: "Improdutivo" } as const;
       return {
         titulo: RELATORIOS.aplicativos.titulo,
         subtitulo,
         colunas: [
-          { chave: "aplicativo", rotulo: "Aplicativo / site", tipo: "texto", largura: 30 },
-          { chave: "categoria", rotulo: "Categoria", tipo: "texto", largura: 20 },
-          { chave: "colaborador", rotulo: "Colaborador", tipo: "texto", largura: 28 },
-          { chave: "equipe", rotulo: "Equipe", tipo: "texto", largura: 20 },
-          { chave: "tempo", rotulo: "Tempo", tipo: "duracao" },
-          { chave: "teclas", rotulo: "Teclas", tipo: "inteiro" },
-          { chave: "cliques", rotulo: "Cliques", tipo: "inteiro" },
+          { chave: "alvo", rotulo: "Aplicativo / domínio", tipo: "texto", largura: 30 },
+          { chave: "tipoAlvo", rotulo: "Tipo", tipo: "texto", largura: 12 },
+          { chave: "categoria", rotulo: "Categoria", tipo: "texto", largura: 18 },
+          { chave: "minutos", rotulo: "Tempo ativo", tipo: "duracao" },
+          { chave: "pessoas", rotulo: "Pessoas", tipo: "inteiro" },
+          { chave: "dias", rotulo: "Dias com uso", tipo: "inteiro" },
         ],
-        linhas: dados.map((r: any) => ({
-          aplicativo: r.aplicativo,
-          categoria: r.categoria,
-          colaborador: r.colaborador,
-          equipe: r.equipe,
-          tempo: Number(r.minutos ?? 0),
-          teclas: Number(r.teclas ?? 0),
-          cliques: Number(r.cliques ?? 0),
+        linhas: linhas.map((l) => ({
+          alvo: l.alvo,
+          tipoAlvo: l.ehSite ? "Site" : "Aplicativo",
+          categoria: l.tipo ? rotulos[l.tipo] : "Sem classificação",
+          minutos: l.minutos,
+          pessoas: l.pessoas,
+          dias: l.dias,
         })),
+        notas: [
+          "Tempo ativo inclui uso dentro e fora da escala.",
+          "A categoria de um domínio específico prevalece sobre a do processo do navegador.",
+        ],
       };
     }
   }
@@ -232,21 +247,22 @@ export function paraCsv(tabela: TabelaRelatorio): string {
     tabela.colunas.map((c) => celulaCsv(linha[c.chave], c.tipo)).join(";"),
   );
 
-  return BOM + [cabecalho, ...corpo].join("\r\n") + "\r\n";
+  const notas = tabela.notas.map((n) => celulaCsv(n, "texto"));
+  return BOM + [cabecalho, ...corpo, ...(notas.length ? ["", ...notas] : [])].join("\r\n") + "\r\n";
 }
 
 // ----------------------------------------------------------------------------
 //  XLSX — planilha formatada, com totais, congelamento e autofiltro
 // ----------------------------------------------------------------------------
 
-const AZUL_ESCURO = "FF0F1524";
-const CIANO = "FF22D3EE";
+const AZUL_ESCURO = "FF13233A";
+const CIANO = "FF1F9FB2";
 
 export async function paraXlsx(tabela: TabelaRelatorio): Promise<Buffer> {
   const ExcelJS = (await import("exceljs")).default;
   const livro = new ExcelJS.Workbook();
 
-  livro.creator = "Telemetria de Produtividade";
+  livro.creator = "NewSec Focus";
   livro.created = new Date();
 
   const aba = livro.addWorksheet("Relatório", {
@@ -278,7 +294,7 @@ export async function paraXlsx(tabela: TabelaRelatorio): Promise<Buffer> {
     const celula = linhaCabecalho.getCell(i + 1);
     celula.value = coluna.rotulo;
     celula.font = { bold: true, size: 10, color: { argb: AZUL_ESCURO } };
-    celula.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE2F5F9" } };
+    celula.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE4F4F6" } };
     celula.border = { bottom: { style: "medium", color: { argb: CIANO } } };
     celula.alignment = { vertical: "middle", wrapText: true };
     aba.getColumn(i + 1).width = coluna.largura ?? 14;
@@ -352,6 +368,14 @@ export async function paraXlsx(tabela: TabelaRelatorio): Promise<Buffer> {
       if (coluna?.tipo === "duracao") celula.numFmt = "[h]:mm";
       if (coluna?.tipo === "inteiro") celula.numFmt = "#,##0";
     });
+  }
+
+  if (tabela.notas.length > 0) {
+    aba.addRow([]);
+    for (const nota of tabela.notas) {
+      const linha = aba.addRow([nota]);
+      linha.getCell(1).font = { size: 9, italic: true, color: { argb: "FF64748B" } };
+    }
   }
 
   aba.autoFilter = {

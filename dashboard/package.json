@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "verificar": "tsc --noEmit",
-    "fumaca": "node scripts/fumaca.mjs"
+    "fumaca": "node scripts/fumaca.mjs",
+    "dev:local": "node scripts/banco-local/dev.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

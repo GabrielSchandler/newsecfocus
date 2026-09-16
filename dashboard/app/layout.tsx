@@ -29,14 +29,14 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Focus",
-    // "default" mantém o texto do relógio claro sobre o fundo escuro do painel.
-    statusBarStyle: "black-translucent",
+    // "default": relógio e bateria escuros sobre o topo claro do painel.
+    statusBarStyle: "default",
   },
   formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#090d16",
+  themeColor: "#ffffff",
   // viewport-fit=cover: sem isso o app instalado no iPhone ganha faixas
   // brancas em cima e embaixo, e a navegação inferior fica atrás do
   // indicador de home. As áreas seguras são tratadas no globals.css.
@@ -50,9 +50,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${jetbrains.variable} dark`}>
+    <html lang="pt-BR" className={`${inter.variable} ${jetbrains.variable}`}>
       <body className="min-h-screen bg-fundo font-sans antialiased">
-        <div className="fundo-aurora" />
         {children}
       </body>
     </html>

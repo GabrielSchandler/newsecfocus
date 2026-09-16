@@ -28,6 +28,8 @@ interface Props<T> {
   vazio?: React.ReactNode;
   ordenacaoInicial?: { coluna: string; direcao: "asc" | "desc" };
   className?: string;
+  /** Sem cartão em volta: para usar dentro de uma Secao que já é cartão. */
+  semMoldura?: boolean;
 }
 
 /**
@@ -43,6 +45,7 @@ export function Tabela<T>({
   vazio = "Nenhum registro no período.",
   ordenacaoInicial,
   className,
+  semMoldura = false,
 }: Props<T>) {
   const [ordenacao, setOrdenacao] = React.useState(ordenacaoInicial);
 
@@ -70,21 +73,25 @@ export function Tabela<T>({
   }
 
   if (linhas.length === 0) {
-    return (
+    return semMoldura ? (
+      <p className={cn("py-8 text-center text-sm text-slate-500", className)}>{vazio}</p>
+    ) : (
       <Card className={cn("p-10 text-center text-sm text-slate-500", className)}>{vazio}</Card>
     );
   }
+
+  const Moldura = semMoldura ? SemMoldura : Card;
 
   const principal = colunas.find((c) => c.principal) ?? colunas[0];
   const secundarias = colunas.filter((c) => c !== principal && !c.ocultarMobile);
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Moldura className={cn("overflow-hidden", semMoldura && "rounded-lg border border-borda", className)}>
       {/* Desktop */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
-          <thead className="border-b border-borda">
-            <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-borda bg-slate-50">
+            <tr className="text-left text-[13px] text-slate-600">
               {colunas.map((coluna) => {
                 const ativa = ordenacao?.coluna === coluna.chave;
                 return (
@@ -95,7 +102,7 @@ export function Tabela<T>({
                       ativa ? (ordenacao!.direcao === "asc" ? "ascending" : "descending") : "none"
                     }
                     className={cn(
-                      "px-4 py-3 font-medium",
+                      "px-3 py-2.5 font-medium",
                       coluna.alinhar === "direita" && "text-right",
                     )}
                   >
@@ -104,8 +111,8 @@ export function Tabela<T>({
                         type="button"
                         onClick={() => alternarOrdenacao(coluna)}
                         className={cn(
-                          "inline-flex items-center gap-1 transition-colors hover:text-slate-300",
-                          ativa && "text-cyan-300",
+                          "inline-flex items-center gap-1 transition-colors hover:text-slate-700",
+                          ativa && "text-slate-900",
                         )}
                       >
                         {coluna.rotulo}
@@ -125,24 +132,24 @@ export function Tabela<T>({
               {href && <th className="w-8" />}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/70">
+          <tbody className="divide-y divide-borda">
             {ordenadas.map((linha) => {
               const destino = href?.(linha);
               return (
                 <tr
                   key={chave(linha)}
                   className={cn(
-                    "transition-colors hover:bg-slate-800/30",
+                    "transition-colors hover:bg-slate-50",
                     destino && "cursor-pointer",
                   )}
                 >
                   {colunas.map((coluna) => (
                     <td
                       key={coluna.chave}
-                      className={cn("px-4 py-3", coluna.alinhar === "direita" && "text-right")}
+                      className={cn("px-3 py-3 text-slate-800", coluna.alinhar === "direita" && "whitespace-nowrap text-right")}
                     >
                       {destino && coluna === principal ? (
-                        <Link href={destino} className="block hover:text-cyan-300">
+                        <Link href={destino} className="block font-medium hover:text-acao hover:underline">
                           {coluna.render(linha)}
                         </Link>
                       ) : (
@@ -153,7 +160,7 @@ export function Tabela<T>({
                   {destino && (
                     <td className="px-2">
                       <Link href={destino} aria-label="Abrir detalhe">
-                        <ChevronRight className="h-4 w-4 text-slate-600" />
+                        <ChevronRight className="h-4 w-4 text-slate-500" />
                       </Link>
                     </td>
                   )}
@@ -165,22 +172,22 @@ export function Tabela<T>({
       </div>
 
       {/* Celular */}
-      <ul className="divide-y divide-slate-800/70 md:hidden">
+      <ul className="divide-y divide-slate-100 md:hidden">
         {ordenadas.map((linha) => {
           const destino = href?.(linha);
           const conteudo = (
             <>
               <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0 font-medium text-slate-100">
+                <div className="min-w-0 font-medium text-slate-900">
                   {principal.render(linha)}
                 </div>
-                {destino && <ChevronRight className="h-4 w-4 shrink-0 text-slate-600" />}
+                {destino && <ChevronRight className="h-4 w-4 shrink-0 text-slate-500" />}
               </div>
               <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
                 {secundarias.map((coluna) => (
                   <div key={coluna.chave} className="min-w-0">
                     <dt className="text-xs text-slate-500">{coluna.rotulo}</dt>
-                    <dd className="truncate text-sm text-slate-300">{coluna.render(linha)}</dd>
+                    <dd className="truncate text-sm text-slate-700">{coluna.render(linha)}</dd>
                   </div>
                 ))}
               </dl>
@@ -200,8 +207,12 @@ export function Tabela<T>({
           );
         })}
       </ul>
-    </Card>
+    </Moldura>
   );
+}
+
+function SemMoldura({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={className}>{children}</div>;
 }
 
 // ----------------------------------------------------------------------------
@@ -213,7 +224,7 @@ export function CelulaBarra({
   valor,
   maximo,
   rotulo,
-  cor = "#22d3ee",
+  cor = "#1f9fb2",
 }: {
   valor: number;
   maximo: number;
@@ -223,8 +234,8 @@ export function CelulaBarra({
   const pct = maximo > 0 ? Math.min(100, (valor / maximo) * 100) : 0;
   return (
     <div className="flex items-center justify-end gap-2">
-      <span className="tabular-nums text-slate-300">{rotulo}</span>
-      <span className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-800 lg:block">
+      <span className="tabular-nums text-slate-700">{rotulo}</span>
+      <span className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 lg:block">
         <span
           className="block h-full rounded-full transition-all"
           style={{ width: `${pct}%`, background: cor }}

@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 type EstadoLed = "ativo" | "ocioso" | "offline";
 
 const CORES: Record<EstadoLed, string> = {
-  ativo: "bg-emerald-400 shadow-[0_0_10px_2px_rgba(52,211,153,0.7)]",
-  ocioso: "bg-amber-400 shadow-[0_0_10px_2px_rgba(251,191,36,0.6)]",
-  offline: "bg-rose-500 shadow-[0_0_8px_1px_rgba(244,63,94,0.5)]",
+  ativo: "bg-emerald-400 shadow-[0_0_0_3px_rgba(16,185,129,0.18)]",
+  ocioso: "bg-amber-400 shadow-[0_0_0_3px_rgba(245,158,11,0.18)]",
+  offline: "bg-rose-500 shadow-[0_0_0_3px_rgba(244,63,94,0.15)]",
 };
 
 /** Ponto LED verde/âmbar/vermelho usado na timeline de atividade. */

@@ -86,7 +86,7 @@ export function FiltrosCelular({
           aria-label="Período anterior"
           disabled={periodo.preset === "geral"}
           onClick={() => aoMudarPeriodo(navegar(periodo, -1, fuso))}
-          className="toque-afunda flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 active:bg-slate-800/60 disabled:opacity-30"
+          className="toque-afunda flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 active:bg-slate-100 disabled:opacity-30"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
@@ -94,10 +94,10 @@ export function FiltrosCelular({
         <button
           type="button"
           onClick={() => setAberta(true)}
-          className="toque-afunda flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-2 py-1 active:bg-slate-800/60"
+          className="toque-afunda flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-2 py-1 active:bg-slate-100"
         >
-          <span className="flex items-center gap-1.5 text-sm font-medium text-slate-100">
-            <CalendarDays className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
+          <span className="flex items-center gap-1.5 text-sm font-medium text-slate-900">
+            <CalendarDays className="h-3.5 w-3.5 shrink-0 text-cyan-700" />
             <span className="truncate">{periodo.rotulo}</span>
           </span>
           <span className="text-[10px] uppercase tracking-wide text-slate-500">
@@ -110,7 +110,7 @@ export function FiltrosCelular({
           aria-label="Próximo período"
           disabled={noPresente || periodo.preset === "geral"}
           onClick={() => aoMudarPeriodo(navegar(periodo, 1, fuso))}
-          className="toque-afunda flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 active:bg-slate-800/60 disabled:opacity-30"
+          className="toque-afunda flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 active:bg-slate-100 disabled:opacity-30"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -121,13 +121,13 @@ export function FiltrosCelular({
             aria-label="Filtros"
             onClick={() => setAberta(true)}
             className={cn(
-              "toque-afunda relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg active:bg-slate-800/60",
-              recortes > 0 ? "text-cyan-300" : "text-slate-400",
+              "toque-afunda relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg active:bg-slate-100",
+              recortes > 0 ? "text-cyan-700" : "text-slate-600",
             )}
           >
             <SlidersHorizontal className="h-[18px] w-[18px]" />
             {recortes > 0 && (
-              <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-cyan-500 px-1 text-[10px] font-semibold text-slate-950">
+              <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-acao px-1 text-[10px] font-semibold text-white">
                 {recortes}
               </span>
             )}
@@ -172,8 +172,8 @@ export function FiltrosCelular({
                 className={cn(
                   "toque-afunda rounded-xl border px-2 py-3 text-sm font-medium transition-colors",
                   periodo.preset === p.valor
-                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300"
-                    : "border-borda bg-fundo-suave text-slate-400",
+                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-700"
+                    : "border-borda bg-fundo-suave text-slate-600",
                 )}
               >
                 {p.rotulo}
@@ -187,11 +187,11 @@ export function FiltrosCelular({
                 type="button"
                 aria-label="Período anterior"
                 onClick={() => aoMudarPeriodo(navegar(periodo, -1, fuso))}
-                className="toque-afunda flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 active:bg-slate-800/60"
+                className="toque-afunda flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 active:bg-slate-100"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="flex-1 truncate text-center text-sm font-medium text-slate-100">
+              <span className="flex-1 truncate text-center text-sm font-medium text-slate-900">
                 {periodo.rotulo}
               </span>
               <button
@@ -199,7 +199,7 @@ export function FiltrosCelular({
                 aria-label="Próximo período"
                 disabled={noPresente}
                 onClick={() => aoMudarPeriodo(navegar(periodo, 1, fuso))}
-                className="toque-afunda flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 active:bg-slate-800/60 disabled:opacity-30"
+                className="toque-afunda flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 active:bg-slate-100 disabled:opacity-30"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -242,7 +242,7 @@ export function FiltrosCelular({
 
             {mostrarEquipe && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-slate-400">Equipe</span>
+                <span className="text-xs text-slate-600">Equipe</span>
                 <Select
                   aria-label="Equipe"
                   valor={escopo.equipeId ?? "todos"}
@@ -262,7 +262,7 @@ export function FiltrosCelular({
 
             {mostrarColaborador && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-slate-400">Colaborador</span>
+                <span className="text-xs text-slate-600">Colaborador</span>
                 <Select
                   aria-label="Colaborador"
                   valor={escopo.colaboradorId ?? "todos"}
@@ -277,7 +277,7 @@ export function FiltrosCelular({
 
             {mostrarDispositivo && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-slate-400">Dispositivo</span>
+                <span className="text-xs text-slate-600">Dispositivo</span>
                 <Select
                   aria-label="Dispositivo"
                   valor={escopo.dispositivoId ?? "todos"}

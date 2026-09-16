@@ -54,7 +54,7 @@ export function FolhaInferior({
         type="button"
         aria-label="Fechar"
         onClick={aoFechar}
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
       />
 
       <div
@@ -66,15 +66,15 @@ export function FolhaInferior({
         <div className="shrink-0 px-5 pb-3 pt-3">
           {/* Alça: sinaliza que isto se fecha puxando para baixo. */}
           <div className="mb-3 flex justify-center">
-            <span className="h-1 w-10 rounded-full bg-slate-700" />
+            <span className="h-1 w-10 rounded-full bg-slate-200" />
           </div>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-slate-100">{titulo}</h2>
+            <h2 className="text-base font-semibold text-slate-900">{titulo}</h2>
             <button
               type="button"
               onClick={aoFechar}
               aria-label="Fechar"
-              className="toque-afunda rounded-lg p-2 text-slate-400 active:bg-slate-800/60"
+              className="toque-afunda rounded-lg p-2 text-slate-600 active:bg-slate-100"
             >
               <X className="h-5 w-5" />
             </button>

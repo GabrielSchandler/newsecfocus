@@ -57,7 +57,7 @@ function BotaoEnviar({ children = "Salvar escala" }: { children?: React.ReactNod
 
 function Aviso({ resultado }: { resultado: ResultadoAcao | null }) {
   if (!resultado) return null;
-  const cor = resultado.ok ? "text-emerald-300" : "text-rose-300";
+  const cor = resultado.ok ? "text-emerald-700" : "text-rose-700";
   return (
     <p className={"flex items-start gap-2 text-xs " + cor}>
       {resultado.ok ? (
@@ -140,16 +140,16 @@ export function PainelExpediente({
     <div className="space-y-4">
       <Card className="p-5">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800/60">
-            <CalendarClock className="h-5 w-5 text-cyan-400" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+            <CalendarClock className="h-5 w-5 text-cyan-700" />
           </span>
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-medium text-slate-200">Expediente</h3>
+            <h3 className="text-sm font-medium text-slate-800">Escalas</h3>
             <p className="mt-1 text-xs leading-relaxed text-slate-500">
               Horário de trabalho por dia da semana, com intervalo. É contra ele que o painel
-              calcula o <strong>índice de produtividade</strong> e a <strong>aderência</strong> —
-              máquina desligada, tela bloqueada e ociosidade dentro do expediente puxam os números
-              para baixo. A equipe herda a empresa; a pessoa herda a equipe.
+              calcula o <strong>tempo produtivo / expediente</strong> e a{" "}
+              <strong>cobertura de dados</strong>; o que acontece fora dele aparece à parte, como
+              estimativa. A equipe herda a empresa; a pessoa herda a equipe.
             </p>
           </div>
         </div>
@@ -234,12 +234,12 @@ export function PainelExpediente({
                     key={d.n}
                     className="grid grid-cols-2 items-center gap-2 rounded-lg border border-borda px-3 py-2 sm:grid-cols-[130px_repeat(4,minmax(0,1fr))]"
                   >
-                    <label className="col-span-2 flex items-center gap-2 text-sm text-slate-200 sm:col-span-1">
+                    <label className="col-span-2 flex items-center gap-2 text-sm text-slate-800 sm:col-span-1">
                       <input
                         type="checkbox"
                         name={"d" + d.n + "_trabalha"}
                         defaultChecked={v.trabalha}
-                        className="h-4 w-4 rounded border-slate-600 bg-slate-900 accent-cyan-500"
+                        className="h-4 w-4 rounded border-slate-300 bg-slate-50 accent-cyan-700"
                       />
                       {d.nome}
                     </label>
@@ -253,7 +253,7 @@ export function PainelExpediente({
               })}
             </div>
 
-            <p className="text-[11px] leading-relaxed text-slate-600">
+            <p className="text-[11px] leading-relaxed text-slate-500">
               Desmarque o dia para folga. Para incluir sábado (ou qualquer outro dia com horário
               próprio), basta marcar e preencher. O intervalo é descontado do expediente — deixe em
               branco se não houver.
@@ -290,12 +290,12 @@ export function PainelExpediente({
 function CampoHora({ rotulo, nome, valor }: { rotulo: string; nome: string; valor: string }) {
   return (
     <label className="flex flex-col gap-0.5">
-      <span className="text-[10px] uppercase tracking-wide text-slate-600">{rotulo}</span>
+      <span className="text-[10px] uppercase tracking-wide text-slate-500">{rotulo}</span>
       <input
         type="time"
         name={nome}
         defaultValue={valor}
-        className="rounded-md border border-borda bg-fundo-suave px-2 py-1 text-sm text-slate-200 [color-scheme:dark]"
+        className="rounded-md border border-borda bg-fundo-suave px-2 py-1 text-sm text-slate-800"
       />
     </label>
   );

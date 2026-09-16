@@ -1,24 +1,20 @@
-import { ScrollText } from "lucide-react";
 import { redirect } from "next/navigation";
-import { BarraFiltros } from "@/components/painel/barra-filtros";
+import { ScrollText } from "lucide-react";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
-import { TabelaRegistros } from "@/components/painel/tabela-registros";
-import { Badge } from "@/components/ui/badge";
+import { FiltrosRegistros, RegistrosComDetalhe } from "@/components/painel/registros";
+import { Paginacao, Secao } from "@/components/painel/kit";
+import { Card } from "@/components/ui/card";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, orgEfetiva, type ParamsPagina } from "@/lib/filtros-url";
-import {
-  buscarColaboradores,
-  buscarDispositivos,
-  buscarEquipes,
-  buscarRegistros,
-} from "@/lib/consultas";
-import type { PaginaRegistros } from "@/lib/consultas";
+import { buscarColaboradores, buscarDispositivos, buscarRegistros, type PaginaRegistros } from "@/lib/consultas";
+import { diaNoFuso, instanteNoFuso } from "@/lib/periodos";
+import type { Periodo } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
-const POR_PAGINA = 100;
+const POR_PAGINA = 25;
 
 function texto(params: ParamsPagina, chave: string): string | null {
   const v = params[chave];
@@ -26,6 +22,11 @@ function texto(params: ParamsPagina, chave: string): string | null {
   return valor && valor !== "" ? valor : null;
 }
 
+/**
+ * Registros de atividade: o minuto a minuto por trás dos números, um dia por
+ * vez. Paginado no banco — um mês de uma empresa média passa de um milhão de
+ * linhas. Só existe dentro da retenção do dado detalhado.
+ */
 export default async function PaginaRegistros({
   searchParams,
 }: {
@@ -37,71 +38,68 @@ export default async function PaginaRegistros({
 
   if (!contexto) redirect("/entrar");
 
-  const { periodo, escopo } = lerFiltros(params, contexto);
+  const { periodo: periodoUrl, escopo } = lerFiltros(params, contexto);
+  const fuso = contexto.empresa.fuso;
   const org = orgEfetiva(contexto, escopo);
+
+  const hoje = diaNoFuso(new Date(), fuso);
+  const dataPedida = texto(params, "data");
+  // Links antigos chegam com preset de período; os novos com ?data=.
+  const usarPeriodo = !dataPedida && !!texto(params, "preset");
+  const dia = dataPedida && /^\d{4}-\d{2}-\d{2}$/.test(dataPedida) ? dataPedida : hoje;
+  const [a, m, d] = dia.split("-").map(Number);
+  const periodo: Periodo = usarPeriodo
+    ? periodoUrl
+    : { ...periodoUrl, inicio: instanteNoFuso(fuso, a, m, d).toISOString(), fim: instanteNoFuso(fuso, a, m, d + 1).toISOString() };
 
   const estado = texto(params, "estado");
   const busca = texto(params, "busca");
   const pagina = Math.max(1, Number(texto(params, "pagina") ?? 1) || 1);
 
-  const [equipes, colaboradores, dispositivos, registros] = await Promise.all([
-    comFalha(buscarEquipes(supabase, org), []),
-    comFalha(buscarColaboradores(supabase, null, org), []),
+  const [colaboradores, dispositivos, registros] = await Promise.all([
+    comFalha(buscarColaboradores(supabase, escopo.equipeId, org), []),
     comFalha(buscarDispositivos(supabase, org), []),
-    comFalha(
-      buscarRegistros(supabase, periodo, escopo, {
-        estado,
-        busca,
-        limite: POR_PAGINA,
-        pagina,
-      }),
-      { linhas: [], total: 0 } as PaginaRegistros,
-    ),
+    comFalha(buscarRegistros(supabase, periodo, escopo, { estado, busca, limite: POR_PAGINA, pagina }), {
+      linhas: [],
+      total: 0,
+    } as PaginaRegistros),
   ]);
 
-  const erro = primeiroErro(equipes, colaboradores, dispositivos, registros);
+  const hrefPagina = (p: number) => {
+    const u = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      const valor = Array.isArray(v) ? v[0] : v;
+      if (valor) u.set(k, valor);
+    }
+    u.set("pagina", String(p));
+    return `/painel/registros?${u.toString()}`;
+  };
+
+  const erro = primeiroErro(colaboradores, dispositivos, registros);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       <CabecalhoPagina
-        titulo="Registros"
-        descricao={`Atividade minuto a minuto · ${periodo.rotulo}`}
-        icone={<ScrollText className="h-5 w-5 text-cyan-400" />}
-        acoes={
-          <Badge variante="neutro">retenção de {contexto.empresa.retencaoDias} dias</Badge>
-        }
+        titulo="Registros de atividade"
+        descricao="Veja as atividades minuto a minuto, com foco em processos e domínios."
+        nota={`Dado detalhado guardado por ${contexto.empresa.retencaoDias} dias`}
       />
 
-      <BarraFiltros
-        periodo={periodo}
-        escopo={escopo}
-        fuso={contexto.empresa.fuso}
-        equipes={equipes.dados}
-        colaboradores={colaboradores.dados}
-        dispositivos={dispositivos.dados}
-        campos={["equipe", "colaborador", "dispositivo"]}
-        travarEquipe={!!contexto.equipeEscopo}
-      />
+      <Card className="p-4 sm:p-5">
+        <FiltrosRegistros colaboradores={colaboradores.dados} dispositivos={dispositivos.dados} dia={dia} hoje={hoje} />
+      </Card>
 
       {erro && <AvisoErro mensagem={erro} />}
 
-      <TabelaRegistros
-        linhas={registros.dados.linhas}
-        total={registros.dados.total}
-        pagina={pagina}
-        porPagina={POR_PAGINA}
-        fuso={contexto.empresa.fuso}
-        estado={estado}
-        busca={busca}
-      />
-
-      <p className="text-xs leading-relaxed text-slate-600">
-        Cada linha é um minuto de atividade enviado pelo agente. O painel guarda essa
-        granularidade por {contexto.empresa.retencaoDias} dias — depois disso permanece o
-        consolidado, que não expira. Nenhum conteúdo digitado é registrado: o que aparece é a
-        contagem de teclas e cliques, o aplicativo em primeiro plano e o título da janela já
-        higienizado.
-      </p>
+      <Secao icone={<ScrollText />} titulo={`Registros (${registros.dados.total.toLocaleString("pt-BR")})`} subtitulo={usarPeriodo ? periodo.rotulo : dia.split("-").reverse().join("/")}>
+        <RegistrosComDetalhe linhas={registros.dados.linhas} fuso={fuso} colaboradorId={escopo.colaboradorId} />
+        <Paginacao pagina={pagina} porPagina={POR_PAGINA} total={registros.dados.total} href={hrefPagina} rotuloItens="registros" />
+        <p className="mt-3 text-xs leading-relaxed text-slate-500">
+          Cada linha é um minuto enviado pelo agente de uma estação. Com duas estações da mesma pessoa, os dois
+          minutos aparecem aqui; nos indicadores, o minuto conta uma vez só. Depois de {contexto.empresa.retencaoDias} dias
+          permanece apenas o consolidado.
+        </p>
+      </Secao>
     </div>
   );
 }

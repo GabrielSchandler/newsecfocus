@@ -13,6 +13,8 @@ interface Props {
   /** Relatórios oferecidos nesta tela. Padrão: todos. */
   tipos?: TipoRelatorio[];
   rotulo?: string;
+  /** Botão maior, contornado na cor de ação — o do cabeçalho da Visão geral. */
+  destaque?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function BotaoExportar({
   escopo,
   tipos = ["diario", "colaboradores", "equipes", "aplicativos"],
   rotulo = "Exportar",
+  destaque = false,
 }: Props) {
   const [aberto, setAberto] = useState(false);
   const [baixando, setBaixando] = useState<string | null>(null);
@@ -79,29 +82,30 @@ export function BotaoExportar({
   return (
     <div className="relative" ref={caixa}>
       <Button
-        variante="contorno"
+        variante={destaque ? "destaque" : "contorno"}
         tamanho="sm"
+        className={destaque ? "h-11 px-4 text-[15px]" : undefined}
         onClick={() => setAberto((v) => !v)}
         aria-expanded={aberto}
         aria-haspopup="menu"
       >
-        <Download className="h-3.5 w-3.5" />
+        <Download className={destaque ? "h-[18px] w-[18px]" : "h-3.5 w-3.5"} />
         {rotulo}
       </Button>
 
       {aberto && (
         <div
           role="menu"
-          className="absolute right-0 z-30 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl2 border border-borda bg-fundo-cartao/95 shadow-glow backdrop-blur-md"
+          className="absolute right-0 z-30 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl2 border border-borda bg-white shadow-menu"
         >
           <p className="border-b border-borda px-4 py-2.5 text-xs text-slate-500">
             {periodo.rotulo}
           </p>
 
-          <ul className="divide-y divide-slate-800/70">
+          <ul className="divide-y divide-slate-100">
             {tipos.map((tipo) => (
               <li key={tipo} className="px-4 py-3">
-                <p className="text-sm font-medium text-slate-200">{RELATORIOS[tipo].titulo}</p>
+                <p className="text-sm font-medium text-slate-800">{RELATORIOS[tipo].titulo}</p>
                 <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
                   {RELATORIOS[tipo].descricao}
                 </p>
@@ -110,7 +114,7 @@ export function BotaoExportar({
                     type="button"
                     onClick={() => baixar(tipo, "xlsx")}
                     disabled={baixando !== null}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300 transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
                   >
                     {baixando === `${tipo}-xlsx` ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -123,7 +127,7 @@ export function BotaoExportar({
                     type="button"
                     onClick={() => baixar(tipo, "csv")}
                     disabled={baixando !== null}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-borda px-2.5 py-1 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800/60 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-borda px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
                   >
                     {baixando === `${tipo}-csv` ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -15,62 +15,84 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buscarDiaExpedienteAnterior } from "./consultas";
 import { criarPeriodo, periodoAnterior } from "./periodos";
-import type { LinhaProdutividade, Periodo, ResumoProdutividade } from "./tipos";
+import { REGRAS } from "./regras";
+import type { LinhaProdutividade, MinutosExpediente, Periodo, ResumoProdutividade } from "./tipos";
 
-export const COMPOSICAO_VAZIA = {
-  produtivo: 0,
-  neutro: 0,
-  improdutivo: 0,
+export const MINUTOS_VAZIOS: MinutosExpediente = {
+  expediente: 0,
+  registrados: 0,
+  ativos: 0,
+  produtivos: 0,
+  neutros: 0,
+  improdutivos: 0,
   semClassificar: 0,
-  ocioso: 0,
+  ociosos: 0,
   bloqueado: 0,
-  desligado: 0,
+  semDados: 0,
+  ativosFora: 0,
+  sobrepostos: 0,
 };
 
 export const RESUMO_VAZIO: ResumoProdutividade = {
   pessoas: 0,
+  pessoasComRegistro: 0,
   indiceMedio: null,
-  aderenciaMedia: null,
-  composicao: COMPOSICAO_VAZIA,
-  totais: { expediente: 0, registrados: 0, produtivos: 0, ociosos: 0, bloqueado: 0, desligado: 0 },
+  coberturaMedia: null,
+  cobertura: null,
+  minutos: MINUTOS_VAZIOS,
+  aproximado: false,
+  pessoasComSobreposicao: 0,
 };
 
-/** Média simples dos percentuais — cada pessoa pesa igual. */
+export function somarMinutos(lista: MinutosExpediente[]): MinutosExpediente {
+  const total = { ...MINUTOS_VAZIOS };
+  for (const m of lista) {
+    for (const chave of Object.keys(total) as (keyof MinutosExpediente)[]) total[chave] += m[chave];
+  }
+  return total;
+}
+
+const media = (valores: (number | null)[]) => {
+  const v = valores.filter((x): x is number => x !== null);
+  return v.length === 0 ? null : v.reduce((s, x) => s + x, 0) / v.length;
+};
+
+/**
+ * Resumo de um recorte. Duas medidas convivem aqui e cada tela diz qual usa:
+ *   • indiceMedio / coberturaMedia — média simples por pessoa (regra 1);
+ *   • minutos e cobertura — somas e razão dos totais, base da barra em horas.
+ */
 export function agregarProdutividade(linhas: LinhaProdutividade[]): ResumoProdutividade {
-  const base = linhas.filter((l) => l.minutosExpediente > 0);
-  const n = base.length;
-
-  const soma = (f: (l: LinhaProdutividade) => number) => linhas.reduce((s, l) => s + f(l), 0);
-  const mediaPct = (f: (l: LinhaProdutividade) => number) =>
-    n === 0 ? 0 : base.reduce((s, l) => s + (f(l) / l.minutosExpediente) * 100, 0) / n;
-
-  const mediaCampo = (f: (l: LinhaProdutividade) => number | null) => {
-    const vals = base.map(f).filter((v): v is number => v !== null);
-    return vals.length === 0 ? null : vals.reduce((s, v) => s + v, 0) / vals.length;
-  };
-
+  const base = linhas.filter((l) => l.minutos.expediente > 0);
+  const minutos = somarMinutos(linhas.map((l) => l.minutos));
   return {
-    pessoas: n,
-    indiceMedio: mediaCampo((l) => l.indice),
-    aderenciaMedia: mediaCampo((l) => l.aderencia),
-    composicao: {
-      produtivo: mediaPct((l) => l.minutosProdutivos),
-      neutro: mediaPct((l) => l.minutosNeutros),
-      improdutivo: mediaPct((l) => l.minutosImprodutivos),
-      semClassificar: mediaPct((l) => l.minutosSemClassificar),
-      ocioso: mediaPct((l) => l.minutosOciosos),
-      bloqueado: mediaPct((l) => l.minutosBloqueado),
-      desligado: mediaPct((l) => l.minutosDesligado),
-    },
-    totais: {
-      expediente: soma((l) => l.minutosExpediente),
-      registrados: soma((l) => l.minutosRegistrados),
-      produtivos: soma((l) => l.minutosProdutivos),
-      ociosos: soma((l) => l.minutosOciosos),
-      bloqueado: soma((l) => l.minutosBloqueado),
-      desligado: soma((l) => l.minutosDesligado),
-    },
+    pessoas: base.length,
+    pessoasComRegistro: linhas.filter((l) => l.minutos.registrados + l.minutos.ativosFora > 0).length,
+    indiceMedio: media(base.map((l) => l.indice)),
+    coberturaMedia: media(base.map((l) => l.cobertura)),
+    cobertura:
+      minutos.expediente > 0
+        ? (Math.min(minutos.registrados, minutos.expediente) / minutos.expediente) * 100
+        : null,
+    minutos,
+    aproximado: linhas.some((l) => l.aproximado),
+    pessoasComSobreposicao: linhas.filter((l) => l.minutos.sobrepostos > 0).length,
   };
+}
+
+/**
+ * Variação do índice médio entre dois recortes, em p.p. — ou NULL quando não
+ * há base: sem expediente de um dos lados, ou com cobertura baixa demais para
+ * a diferença significar mudança de trabalho e não falta de dado.
+ */
+export function compararIndice(
+  atual: ResumoProdutividade,
+  anterior: ResumoProdutividade | null,
+): number | null {
+  if (!anterior || atual.indiceMedio === null || anterior.indiceMedio === null) return null;
+  const minima = REGRAS.coberturaMinimaComparacao;
+  if ((atual.cobertura ?? 0) < minima || (anterior.cobertura ?? 0) < minima) return null;
+  return Number((atual.indiceMedio - anterior.indiceMedio).toFixed(1));
 }
 
 export interface JanelaComparativo {

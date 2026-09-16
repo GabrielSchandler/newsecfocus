@@ -2,10 +2,11 @@
 
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
+import { RotateCcw, SlidersHorizontal, UserRound, Users } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { SeletorPeriodo } from "./seletor-periodo";
+import { SeletorPeriodoCompacto } from "./seletor-periodo-compacto";
 import { FiltrosCelular } from "./filtros-celular";
 import { periodoParaParams } from "@/lib/periodos";
 import type { Colaborador, Dispositivo, Equipe, Escopo, Periodo } from "@/lib/tipos";
@@ -23,6 +24,13 @@ interface Props {
   campos?: CampoFiltro[];
   /** Líder de equipe não escolhe equipe: o escopo dele já é fixo. */
   travarEquipe?: boolean;
+  /**
+   * "cartao" (padrão): painel com todos os filtros à vista.
+   * "topo": uma linha só, para o cabeçalho da Visão geral — período num botão
+   * e equipe num seletor. Exige `rotuloPeriodo`.
+   */
+  variante?: "cartao" | "topo";
+  rotuloPeriodo?: string;
 }
 
 /**
@@ -39,6 +47,8 @@ export function BarraFiltros({
   dispositivos = [],
   campos = ["equipe", "colaborador"],
   travarEquipe = false,
+  variante = "cartao",
+  rotuloPeriodo,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -103,6 +113,56 @@ export function BarraFiltros({
         aoAplicar={aplicar}
       />
 
+    {variante === "topo" ? (
+      <div aria-label="Filtros do painel" className="hidden items-center gap-3 lg:flex">
+        <SeletorPeriodoCompacto
+          periodo={periodo}
+          fuso={fuso}
+          rotulo={rotuloPeriodo ?? periodo.rotulo}
+          aoMudar={mudarPeriodo}
+        />
+        {mostrarEquipe && (
+          <Select
+            aria-label="Equipe"
+            className="w-60"
+            classeCampo="h-11 text-[15px] text-slate-900"
+            icone={<Users className="h-[18px] w-[18px]" />}
+            valor={escopo.equipeId ?? "todos"}
+            aoMudar={mudarEquipe}
+            opcoes={[
+              { valor: "todos", rotulo: "Todas as equipes" },
+              ...equipes.map((e) => ({ valor: e.id, rotulo: e.nome })),
+            ]}
+          />
+        )}
+        {mostrarColaborador && (
+          <Select
+            aria-label="Pessoa"
+            className="w-56"
+            classeCampo="h-11 text-[15px] text-slate-900"
+            icone={<UserRound className="h-[18px] w-[18px]" />}
+            valor={escopo.colaboradorId ?? "todos"}
+            aoMudar={(v) => aplicar({ colaborador: v === "todos" ? null : v })}
+            opcoes={[
+              { valor: "todos", rotulo: "Todas as pessoas" },
+              ...pessoasVisiveis.map((c) => ({ valor: c.id, rotulo: c.nome ?? c.os_user })),
+            ]}
+          />
+        )}
+        {/* Estação (e pessoa, onde não há seletor) podem chegar por link:
+            sem este botão o recorte ficaria preso sem jeito de sair. */}
+        {((escopo.colaboradorId && !mostrarColaborador) || escopo.dispositivoId) && (
+          <Button
+            variante="fantasma"
+            tamanho="sm"
+            onClick={() => aplicar({ colaborador: null, dispositivo: null })}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Limpar recorte
+          </Button>
+        )}
+      </div>
+    ) : (
     <section
       aria-label="Filtros do painel"
       className="hidden flex-col gap-4 rounded-xl2 border border-borda vidro p-4 lg:flex"
@@ -187,6 +247,7 @@ export function BarraFiltros({
       </div>
       )}
     </section>
+    )}
     </>
   );
 }

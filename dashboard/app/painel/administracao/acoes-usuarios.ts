@@ -10,7 +10,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/server";
-import { carregarContexto } from "@/lib/sessao";
+import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import type { PapelUsuario } from "@/lib/tipos";
 
 export interface ResultadoAcao {
@@ -37,6 +37,8 @@ export async function convidarUsuario(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const email = texto(dados, "email");
   const papel = texto(dados, "papel") as PapelUsuario | null;
@@ -76,6 +78,8 @@ export async function salvarAcesso(
   const supabase = await criarClienteServidor();
   const contexto = await carregarContexto(supabase);
   if (!contexto) return FALHA("Sessão expirada.");
+  // Esconder o botão não protege nada: o papel é conferido aqui de novo, além do RLS.
+  if (!podeAdministrar(contexto)) return FALHA("Seu papel não permite alterar a administração da empresa.");
 
   const id = texto(dados, "id");
   const papel = texto(dados, "papel") as PapelUsuario | null;

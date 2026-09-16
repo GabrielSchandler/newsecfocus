@@ -46,3 +46,6 @@ publicado-msi/
 publicado-cliente/
 *.msi
 *.wixpdb
+
+# Backup das funções tirado antes de migration (supabase/salvar-funcoes.mjs)
+supabase/backup-producao/

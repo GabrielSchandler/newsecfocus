@@ -1,36 +1,47 @@
-import { Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
+import { Activity, Clock, Database, LayoutGrid, UserRound, Users, UsersRound } from "lucide-react";
+import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
 import { BarraFiltros } from "@/components/painel/barra-filtros";
 import { BotaoExportar } from "@/components/painel/botao-exportar";
 import { AvisoErro, CabecalhoPagina } from "@/components/painel/cabecalho";
-import { AbasPainel, type AbaPainel } from "@/components/painel/abas-painel";
-import { ResumoExpediente } from "@/components/painel/resumo-expediente";
-import { GraficoArea } from "@/components/painel/grafico-area";
-import { GraficoDonut } from "@/components/painel/grafico-donut";
-import { SecaoAplicativos } from "@/components/painel/secao-aplicativos";
+import { GraficoEvolucaoIndice } from "@/components/painel/grafico-evolucao-indice";
+import { PontosAtencao } from "@/components/painel/pontos-atencao";
+import { BarraExpediente, DEFINICOES, LegendaExpediente } from "@/components/painel/resumo-expediente";
+import { TabelaMembros } from "@/components/painel/tabela-membros";
+import { ListaAplicativos } from "@/components/painel/lista-aplicativos";
+import { TabelaJornada } from "@/components/painel/jornada";
 import { SecaoDispersao } from "@/components/painel/secao-dispersao";
-import { SecaoHorasExtras } from "@/components/painel/secao-horas-extras";
-import { SecaoPresenca } from "@/components/painel/secao-presenca";
 import { SecaoRitmo } from "@/components/painel/secao-ritmo";
-import { TabelaPessoasProdutividade } from "@/components/painel/tabela-pessoas-produtividade";
+import { GradeIndicadores, Indicador, LinkAcao, Secao, Variacao } from "@/components/painel/kit";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto, podeAdministrar } from "@/lib/sessao";
 import { comFalha, primeiroErro } from "@/lib/carregar";
 import { lerFiltros, paramsDoRecorte, type ParamsPagina } from "@/lib/filtros-url";
+import { formatarDuracao, formatarPorcentagemEnxuta } from "@/lib/formato";
 import {
   agregarProdutividade,
+  compararIndice,
   janelaAtual,
   janelaComparativo,
 } from "@/lib/produtividade";
 import {
+  foraDaEscala,
+  janelaEvolucao,
+  juntar,
+  montarEvolucao,
+  montarMembros,
+  pontosDeAtencao,
+  rotuloIntervaloCurto,
+} from "@/lib/visao-geral";
+import {
+  buscarAplicativosLista,
+  buscarCategorias,
   buscarDispersao,
-  buscarDistribuicao,
-  buscarDominios,
-  buscarHorasExtras,
+  buscarEstacoes,
+  buscarJornadaPessoas,
   buscarProdutividade,
-  buscarPresenca,
   buscarRitmo,
-  buscarSerie,
+  buscarSerieProdutividade,
 } from "@/lib/consultas";
 import type { Escopo } from "@/lib/tipos";
 
@@ -40,11 +51,14 @@ const ABAS: AbaPainel[] = [
   { chave: "resumo", rotulo: "Resumo" },
   { chave: "pessoas", rotulo: "Pessoas" },
   { chave: "aplicativos", rotulo: "Aplicativos" },
-  { chave: "presenca", rotulo: "Presença" },
-  { chave: "ritmo", rotulo: "Ritmo" },
-  { chave: "horas", rotulo: "Horas extras" },
+  { chave: "jornada", rotulo: "Jornada" },
+  { chave: "ritmo", rotulo: "Ritmo e alternância" },
 ];
 
+/** Abas antigas que viraram outras. */
+const EQUIVALENTES: Record<string, string> = { presenca: "jornada", horas: "jornada" };
+
+const POR_PAGINA = 15;
 
 export default async function PaginaDetalheEquipe({
   params,
@@ -60,6 +74,8 @@ export default async function PaginaDetalheEquipe({
 
   if (!contexto) redirect("/entrar");
 
+  // O RLS devolve vazio para equipe de outra empresa (ou de outra equipe, para
+  // o líder): a tela responde "não encontrada" sem vazar que ela existe.
   const { data: equipe } = await supabase
     .from("teams")
     .select("id, nome, descricao, cor")
@@ -73,24 +89,14 @@ export default async function PaginaDetalheEquipe({
   const recorte = paramsDoRecorte(busca);
   const admin = podeAdministrar(contexto);
 
-  const escopo: Escopo = {
-    orgId: recorteAtual.orgId,
-    equipeId: id,
-    colaboradorId: null,
-    dispositivoId: null,
-  };
+  const escopo: Escopo = { orgId: recorteAtual.orgId, equipeId: id, colaboradorId: null, dispositivoId: null };
 
-  const abaBruta = busca.visao;
-  const escolhida = Array.isArray(abaBruta) ? abaBruta[0] : abaBruta;
+  const abaBruta = Array.isArray(busca.visao) ? busca.visao[0] : busca.visao;
+  const escolhida = abaBruta ? (EQUIVALENTES[abaBruta] ?? abaBruta) : undefined;
   const aba = ABAS.some((a) => a.chave === escolhida) ? escolhida! : "resumo";
 
-  // Mesma régua da Visão geral: janela atual cortada no relógio e comparação
-  // com o período anterior no mesmo ponto.
   const janela = janelaAtual(periodo);
-  const comparativo = await comFalha(
-    janelaComparativo(supabase, periodo, fuso, escopo.orgId),
-    null,
-  );
+  const comparativo = await comFalha(janelaComparativo(supabase, periodo, fuso, escopo.orgId), null);
 
   const [produtividade, anterior] = await Promise.all([
     comFalha(buscarProdutividade(supabase, janela, escopo), []),
@@ -100,127 +106,221 @@ export default async function PaginaDetalheEquipe({
   ]);
 
   const resumo = agregarProdutividade(produtividade.dados);
-  const resumoAnterior = comparativo.dados ? agregarProdutividade(anterior.dados) : null;
+  const resumoAnterior = comparativo.dados && !anterior.erro ? agregarProdutividade(anterior.dados) : null;
+  const membros = montarMembros(produtividade.dados, resumoAnterior ? anterior.dados : null);
+  const fora = foraDaEscala(produtividade.dados);
+  const baseAba = `/painel/equipes/${id}${recorte}`;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       <CabecalhoPagina
-        titulo={equipe.nome}
-        descricao={equipe.descricao ?? periodo.rotulo}
-        icone={
-          <span className="h-3 w-3 rounded-full" style={{ background: equipe.cor ?? "#22d3ee" }} />
+        trilha={[{ rotulo: "Equipes", href: `/painel/equipes${recorte}` }, { rotulo: equipe.nome }]}
+        marca={
+          <span
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-acao-suave text-acao"
+            style={equipe.cor ? { color: equipe.cor } : undefined}
+          >
+            <UsersRound className="h-6 w-6" strokeWidth={1.75} />
+          </span>
         }
-        voltarPara={{ href: `/painel/equipes${recorte}`, rotulo: "Equipes" }}
+        titulo={equipe.nome}
+        complemento={`${membros.length} ${membros.length === 1 ? "pessoa" : "pessoas"}`}
+        descricao={equipe.descricao ?? "Acompanhe o desempenho da equipe e o detalhamento por pessoa."}
         acoes={
-          <BotaoExportar
-            periodo={periodo}
-            escopo={escopo}
-            tipos={["colaboradores", "diario", "aplicativos"]}
-          />
+          <>
+            <BarraFiltros
+              variante="topo"
+              rotuloPeriodo={rotuloIntervaloCurto(periodo, fuso)}
+              periodo={periodo}
+              escopo={escopo}
+              fuso={fuso}
+              campos={[]}
+            />
+            <BotaoExportar periodo={periodo} escopo={escopo} tipos={["colaboradores", "diario", "aplicativos"]} destaque />
+          </>
         }
       />
-
-      <BarraFiltros periodo={periodo} escopo={escopo} fuso={fuso} campos={[]} />
 
       {produtividade.erro && <AvisoErro mensagem={produtividade.erro} />}
 
-      <ResumoExpediente
-        resumo={resumo}
-        anterior={resumoAnterior}
-        rotuloComparacao={comparativo.dados?.rotulo ?? null}
-      />
+      <GradeIndicadores>
+        <Indicador
+          icone={<Clock />}
+          rotulo="Tempo produtivo / expediente"
+          definicao={DEFINICOES.indice}
+          valor={resumo.indiceMedio === null ? "—" : formatarPorcentagemEnxuta(resumo.indiceMedio)}
+          rodape={<Variacao valor={compararIndice(resumo, resumoAnterior)} rotulo={comparativo.dados?.rotulo ?? null} />}
+        />
+        <Indicador
+          icone={<Activity />}
+          rotulo="Tempo ativo"
+          definicao={DEFINICOES.ativo}
+          valor={formatarDuracao(resumo.minutos.ativos)}
+          rodape="Produtivo + neutro + improdutivo + sem classificação"
+        />
+        <Indicador
+          icone={<Database />}
+          rotulo="Cobertura de dados"
+          definicao={DEFINICOES.cobertura}
+          valor={resumo.cobertura === null ? "—" : `${Math.round(resumo.cobertura)}%`}
+          rodape={
+            resumo.cobertura === null
+              ? "Sem expediente previsto"
+              : `${formatarDuracao(Math.min(resumo.minutos.registrados, resumo.minutos.expediente))} de ${formatarDuracao(resumo.minutos.expediente)} previstas`
+          }
+        />
+        <Indicador
+          icone={<UserRound />}
+          rotulo="Fora da escala"
+          definicao={DEFINICOES.fora}
+          valor={formatarDuracao(fora.minutos)}
+          rodape={`${fora.pessoas} ${fora.pessoas === 1 ? "pessoa" : "pessoas"} · estimativa por 15 min`}
+        />
+      </GradeIndicadores>
 
-      <AbasPainel abas={ABAS} ativa={aba} />
+      <AbasPainel abas={ABAS} ativa={aba} variante="sublinhado" preservar={{ apagar: ["pagina"] }} />
 
       {aba === "resumo" && (
-        <ResumoEquipe supabase={supabase} periodo={periodo} escopo={escopo} fuso={fuso} />
+        <ResumoEquipe
+          supabase={supabase}
+          periodo={periodo}
+          escopo={escopo}
+          fuso={fuso}
+          produtividade={produtividade.dados}
+          membros={membros}
+          admin={admin}
+          recorte={recorte}
+          equipeId={id}
+        />
       )}
+
       {aba === "pessoas" && (
-        <PessoasEquipe supabase={supabase} periodo={periodo} escopo={escopo} recorte={recorte} />
+        <div className="space-y-4 sm:space-y-5">
+          <Secao icone={<Users />} titulo="Membros da equipe" subtitulo="Produtivo e cobertura de cada pessoa no período">
+            <TabelaMembros linhas={membros} recorte={recorte} />
+          </Secao>
+          <Secao
+            icone={<Clock />}
+            titulo="Como cada pessoa usou o expediente"
+            subtitulo="Horas de cada pessoa · % sobre o expediente dela"
+          >
+            <ul className="space-y-3">
+              {produtividade.dados
+                .filter((l) => l.minutos.expediente > 0)
+                .map((l) => (
+                  <li key={l.colaboradorId} className="grid grid-cols-1 gap-1.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center sm:gap-4">
+                    <span className="truncate text-sm text-slate-800">{l.colaborador}</span>
+                    <BarraExpediente minutos={l.minutos} rotulos className="h-6" />
+                  </li>
+                ))}
+            </ul>
+            <LegendaExpediente className="mt-5 justify-center" />
+          </Secao>
+        </div>
       )}
+
       {aba === "aplicativos" && (
-        <AplicativosEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} recorte={recorte} />
+        <AplicativosEquipe
+          supabase={supabase}
+          janela={janela}
+          escopo={escopo}
+          org={contexto.empresa.id}
+          admin={admin}
+          recorte={recorte}
+          pagina={Number(busca.pagina) || 1}
+          baseAba={baseAba}
+        />
       )}
-      {aba === "presenca" && (
-        <PresencaEquipe supabase={supabase} periodo={periodo} escopo={escopo} />
-      )}
+
+      {aba === "jornada" && <JornadaEquipe supabase={supabase} janela={janela} escopo={escopo} recorte={recorte} equipeId={id} />}
+
       {aba === "ritmo" && <RitmoEquipe supabase={supabase} periodo={periodo} escopo={escopo} />}
-      {aba === "horas" && (
-        <HorasEquipe supabase={supabase} periodo={periodo} escopo={escopo} admin={admin} />
-      )}
     </div>
   );
 }
 
-
-async function ResumoEquipe({ supabase, periodo, escopo, fuso }: any) {
-  const [serie, distribuicao] = await Promise.all([
-    comFalha(buscarSerie(supabase, periodo, escopo, fuso), []),
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 8), []),
+async function ResumoEquipe({ supabase, periodo, escopo, fuso, produtividade, membros, admin, recorte, equipeId }: any) {
+  const evolucao = janelaEvolucao(periodo, fuso);
+  const [atual, anterior, estacoes] = await Promise.all([
+    comFalha(buscarSerieProdutividade(supabase, evolucao.atual, evolucao.balde, escopo), []),
+    evolucao.anterior
+      ? comFalha(buscarSerieProdutividade(supabase, evolucao.anterior, evolucao.balde, escopo), [])
+      : Promise.resolve({ dados: [], erro: null }),
+    comFalha(buscarEstacoes(supabase, escopo.orgId), []),
   ]);
-  const erro = primeiroErro(serie, distribuicao);
+
+  const estacoesDaEquipe = (estacoes.dados as Awaited<ReturnType<typeof buscarEstacoes>>).filter(
+    (e) => e.equipeId === equipeId,
+  );
+  const pontos = pontosDeAtencao({
+    estacoes: estacoesDaEquipe,
+    produtividade,
+    admin,
+    recorte,
+  });
+
   return (
-    <div className="space-y-5">
-      {erro && <AvisoErro mensagem={erro} />}
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-5">
-        <div className="min-w-0 xl:col-span-3">
-          <GraficoArea
-            dados={serie.dados}
-            bucket={periodo.bucket}
-            fuso={fuso}
-            periodoRotulo={periodo.rotulo}
-            titulo="Produtividade da equipe"
-          />
-        </div>
-        <div className="min-w-0 xl:col-span-2">
-          <GraficoDonut dados={distribuicao.dados} titulo="Ferramentas da equipe" />
-        </div>
+    <div className="space-y-4 sm:space-y-5">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <GraficoEvolucaoIndice
+          pontos={montarEvolucao(evolucao, atual.dados, anterior.dados, fuso)}
+          descricao={evolucao.descricao}
+          temAnterior={!!evolucao.anterior}
+          erro={primeiroErro(atual, anterior)}
+        />
+        <PontosAtencao pontos={pontos} />
       </div>
+      <Secao
+        icone={<Users />}
+        titulo="Membros da equipe"
+        subtitulo="Produtivo é o índice de cada pessoa; variação só com cobertura suficiente"
+        acao={<LinkAcao href={`/painel/equipes/${equipeId}${juntar(recorte, "visao=pessoas")}`}>Detalhar</LinkAcao>}
+      >
+        <TabelaMembros linhas={membros} recorte={recorte} compacta />
+      </Secao>
     </div>
   );
 }
 
-async function PessoasEquipe({ supabase, periodo, escopo, recorte }: any) {
-  // Mesma planilha da tela de Pessoas, já filtrada pela equipe do escopo.
-  const pessoas = await comFalha(buscarProdutividade(supabase, janelaAtual(periodo), escopo), []);
-  return (
-    <>
-      {pessoas.erro && <AvisoErro mensagem={pessoas.erro} />}
-      <TabelaPessoasProdutividade
-        linhas={pessoas.dados}
-        recorte={recorte}
-        mostrarEquipe={false}
-      />
-    </>
-  );
-}
-
-async function AplicativosEquipe({ supabase, periodo, escopo, admin, recorte }: any) {
-  const [distribuicao, dominios] = await Promise.all([
-    comFalha(buscarDistribuicao(supabase, periodo, escopo, 60), []),
-    comFalha(buscarDominios(supabase, periodo, escopo, 20), []),
+async function AplicativosEquipe({ supabase, janela, escopo, org, admin, recorte, pagina, baseAba }: any) {
+  const [lista, categorias] = await Promise.all([
+    comFalha(buscarAplicativosLista(supabase, janela, escopo, { pagina, limite: POR_PAGINA }), { linhas: [], total: 0 }),
+    admin ? comFalha(buscarCategorias(supabase, org), []) : Promise.resolve({ dados: [], erro: null }),
   ]);
   return (
-    <>
-      {distribuicao.erro && <AvisoErro mensagem={distribuicao.erro} />}
-      <SecaoAplicativos
-        apps={distribuicao.dados}
-        categorias={[]}
-        admin={admin}
-        dominios={dominios.dados}
+    <Secao
+      icone={<LayoutGrid />}
+      titulo="Aplicativos e sites da equipe"
+      subtitulo="Tempo ativo no período, pela categoria efetiva"
+      acao={<LinkAcao href={`/painel/aplicativos${juntar(recorte, `equipe=${escopo.equipeId}`)}`}>Abrir em Aplicativos</LinkAcao>}
+    >
+      {lista.erro && <AvisoErro mensagem={lista.erro} className="mb-4" />}
+      <ListaAplicativos
+        linhas={lista.dados.linhas}
+        total={lista.dados.total}
+        pagina={pagina}
+        porPagina={POR_PAGINA}
+        hrefPagina={(p: number) => `${baseAba}${baseAba.includes("?") ? "&" : "?"}visao=aplicativos&pagina=${p}`}
         recorte={recorte}
+        categorias={categorias.dados}
+        admin={admin}
       />
-    </>
+    </Secao>
   );
 }
 
-async function PresencaEquipe({ supabase, periodo, escopo }: any) {
-  const presenca = await comFalha(buscarPresenca(supabase, periodo, escopo), []);
+async function JornadaEquipe({ supabase, janela, escopo, recorte, equipeId }: any) {
+  const jornada = await comFalha(buscarJornadaPessoas(supabase, janela, escopo), []);
   return (
-    <>
-      {presenca.erro && <AvisoErro mensagem={presenca.erro} />}
-      <SecaoPresenca linhas={presenca.dados} mostrarPessoa={false} />
-    </>
+    <Secao
+      icone={<Clock />}
+      titulo="Jornada da equipe"
+      subtitulo="Escala prevista e telemetria recebida no período"
+      acao={<LinkAcao href={`/painel/jornada${juntar(recorte, `equipe=${equipeId}`)}`}>Comparar dia a dia</LinkAcao>}
+    >
+      {jornada.erro && <AvisoErro mensagem={jornada.erro} className="mb-4" />}
+      <TabelaJornada linhas={jornada.dados} recorte={recorte} />
+    </Secao>
   );
 }
 
@@ -230,20 +330,10 @@ async function RitmoEquipe({ supabase, periodo, escopo }: any) {
     comFalha(buscarDispersao(supabase, periodo, escopo), []),
   ]);
   return (
-    <>
-      {ritmo.erro && <AvisoErro mensagem={ritmo.erro} />}
+    <div className="space-y-4 sm:space-y-5">
+      {primeiroErro(ritmo, dispersao) && <AvisoErro mensagem={primeiroErro(ritmo, dispersao)!} />}
       <SecaoRitmo dados={ritmo.dados} />
       <SecaoDispersao linhas={dispersao.dados} />
-    </>
-  );
-}
-
-async function HorasEquipe({ supabase, periodo, escopo, admin }: any) {
-  const horas = await comFalha(buscarHorasExtras(supabase, periodo, escopo), []);
-  return (
-    <>
-      {horas.erro && <AvisoErro mensagem={horas.erro} />}
-      <SecaoHorasExtras linhas={horas.dados} mostrarEquipe={false} admin={admin} />
-    </>
+    </div>
   );
 }

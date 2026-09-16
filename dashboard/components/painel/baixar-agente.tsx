@@ -46,12 +46,12 @@ export async function BaixarAgente() {
   return (
     <div className="mt-6 rounded-xl2 border border-borda vidro p-5">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800/60">
-          <MonitorDown className="h-5 w-5 text-cyan-400" />
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+          <MonitorDown className="h-5 w-5 text-cyan-700" />
         </span>
 
         <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-medium text-slate-200">Instalar nas estações</h2>
+          <h2 className="text-sm font-medium text-slate-800">Instalar nas estações</h2>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             Baixe, extraia e clique duas vezes em <strong>Instalar.bat</strong> na
             máquina que vai ser acompanhada. Ele pede o código de instalação da
@@ -62,13 +62,13 @@ export async function BaixarAgente() {
 
           <a
             href={`${BASE_PACOTE}/NewSecFocus-Instalador.zip`}
-            className="toque-afunda mt-3 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3.5 py-2 text-sm font-medium text-slate-950 transition-colors hover:bg-cyan-400"
+            className="toque-afunda mt-3 inline-flex items-center gap-2 rounded-lg bg-acao px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-acao-escuro"
           >
             <Download className="h-4 w-4" />
             Baixar o instalador
           </a>
 
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
             Windows 10 ou 11 · {tamanho ? `${tamanho} · ` : ""}
             {pacote ? `versão ${pacote.versao} · ` : ""}requer permissão de
             administrador
@@ -76,12 +76,12 @@ export async function BaixarAgente() {
           {/* Vale dizer: senão o TI acha que precisa repetir o download a cada
               correção, que é justamente o trabalho que a atualização automática
               elimina. */}
-          <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+          <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
             Depois de instalado, o agente se atualiza sozinho — não é preciso
             baixar de novo a cada versão.
           </p>
 
-          <p className="mt-3 border-t border-borda pt-3 text-[11px] leading-relaxed text-slate-600">
+          <p className="mt-3 border-t border-borda pt-3 text-[11px] leading-relaxed text-slate-500">
             Vai instalar em várias máquinas? Baixe uma vez, coloque a pasta
             extraída num compartilhamento de rede e rode o{" "}
             <strong>Instalar.bat</strong> a partir dele em cada estação.

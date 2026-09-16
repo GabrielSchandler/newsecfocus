@@ -17,10 +17,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarContexto } from "@/lib/sessao";
-import { periodoDeParams } from "@/lib/periodos";
+import { lerFiltros } from "@/lib/filtros-url";
 import { montarRelatorio, paraCsv, paraXlsx } from "@/lib/exportacao";
 import { nomeArquivo } from "@/lib/formato";
-import type { Escopo, TipoRelatorio } from "@/lib/tipos";
+import type { TipoRelatorio } from "@/lib/tipos";
 import { RELATORIOS } from "@/lib/tipos";
 
 // exceljs precisa do runtime Node (não roda no Edge).
@@ -46,16 +46,10 @@ export async function GET(request: NextRequest) {
   }
 
   const formato = params.get("formato") === "csv" ? "csv" : "xlsx";
-  const periodo = periodoDeParams(params, contexto.empresa.fuso);
-
-  const escopo: Escopo = {
-    // A empresa em foco só vale para a operação da NewSec; o banco recusa o
-    // parâmetro para qualquer outro usuário.
-    orgId: contexto.adminPlataforma ? params.get("empresa") || null : null,
-    equipeId: params.get("equipe") || null,
-    colaboradorId: params.get("colaborador") || null,
-    dispositivoId: params.get("dispositivo") || null,
-  };
+  // Mesma leitura de filtros das telas (lerFiltros): período no fuso da
+  // empresa, equipe travada para o líder e empresa em foco só para a revenda.
+  // Assim o arquivo nunca tem um recorte diferente do que a tela mostrou.
+  const { periodo, escopo } = lerFiltros(Object.fromEntries(params.entries()), contexto);
 
   let tabela;
   try {

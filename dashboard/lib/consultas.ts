@@ -26,7 +26,19 @@ import type {
   LinhaEscala,
   LinhaPresenca,
   LinhaProdutividade,
+  LinhaProdutividadeDia,
+  LinhaPessoa,
+  ContagemPessoas,
+  FiltroAplicativos,
+  LinhaAplicativo,
+  ResumoAplicativos,
+  LinhaJornada,
+  JornadaDia,
+  Sessao,
+  Estacao,
+  MinutosExpediente,
   PontoAppSerie,
+  PontoProdutividade,
   PontoRitmo,
   SegmentoLinha,
   Kpis,
@@ -68,31 +80,7 @@ function paramsEscopo(escopo: Escopo) {
   };
 }
 
-/** Variação percentual entre dois valores. NULL quando não há base de comparação. */
-function variacao(atual: number, anterior: number): number | null {
-  if (!anterior) return null;
-  return Number((((atual - anterior) / anterior) * 100).toFixed(1));
-}
 
-export const KPIS_VAZIOS: Kpis = {
-  minutosRegistrados: 0,
-  minutosAtivos: 0,
-  minutosOciosos: 0,
-  minutosBloqueado: 0,
-  minutosProdutivos: 0,
-  minutosNeutros: 0,
-  minutosImprodutivos: 0,
-  minutosSemClassificar: 0,
-  teclas: 0,
-  cliques: 0,
-  rolagens: 0,
-  indice: null,
-  colaboradores: 0,
-  dispositivos: 0,
-  diasComRegistro: 0,
-  topAplicacao: null,
-  jornadaEsperada: 0,
-};
 
 // ----------------------------------------------------------------------------
 //  Cadastros
@@ -229,34 +217,6 @@ export async function buscarLinhaDoTempo(
   return (data ?? []) as SegmentoLinha[];
 }
 
-/** Presença e pontualidade por pessoa no recorte. */
-export async function buscarPresenca(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-): Promise<LinhaPresenca[]> {
-  const { data, error } = await supabase.rpc("painel_presenca", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-  });
-  if (error) throw error;
-  return (data ?? []).map((r: any) => ({
-    colaboradorId: r.colaborador_id,
-    colaborador: r.colaborador,
-    equipeId: r.equipe_id,
-    equipe: r.equipe,
-    diasPresentes: num(r.dias_presentes),
-    diasUteis: num(r.dias_uteis),
-    faltas: num(r.faltas),
-    chegadaMedia: numOuNulo(r.chegada_media),
-    saidaMedia: numOuNulo(r.saida_media),
-    chegadaCedo: numOuNulo(r.chegada_cedo),
-    saidaTarde: numOuNulo(r.saida_tarde),
-  })) as LinhaPresenca[];
-}
 
 /** Ritmo por hora do dia e dia da semana (curva + mapa de calor). */
 export async function buscarRitmo(
@@ -281,56 +241,7 @@ export async function buscarRitmo(
   })) as PontoRitmo[];
 }
 
-/** Evolução por pessoa: período atual vs. período anterior de mesma duração. */
-export async function buscarEvolucao(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-): Promise<LinhaEvolucao[]> {
-  const { data, error } = await supabase.rpc("painel_evolucao", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-  });
-  if (error) throw error;
-  return (data ?? []).map((r: any) => ({
-    colaboradorId: r.colaborador_id,
-    colaborador: r.colaborador,
-    equipe: r.equipe,
-    indiceAtual: numOuNulo(r.indice_atual),
-    indiceAnterior: numOuNulo(r.indice_anterior),
-    ativosAtual: num(r.minutos_ativos_atual),
-    ativosAnterior: num(r.minutos_ativos_anterior),
-    diasAtual: num(r.dias_atual),
-    diasAnterior: num(r.dias_anterior),
-  })) as LinhaEvolucao[];
-}
 
-/** Sites (domínios) mais usados no recorte. */
-export async function buscarDominios(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-  limite = 20,
-): Promise<LinhaDominio[]> {
-  const { data, error } = await supabase.rpc("painel_dominios", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-    p_limite: limite,
-  });
-  if (error) throw error;
-  return (data ?? []).map((r: any) => ({
-    dominio: r.dominio,
-    tipo: r.tipo ?? null,
-    minutos: num(r.minutos),
-    pessoas: num(r.pessoas),
-  })) as LinhaDominio[];
-}
 
 /** Dispersão por pessoa: trocas de aplicativo por hora ativa. */
 export async function buscarDispersao(
@@ -408,19 +319,92 @@ export async function buscarProdutividade(
     colaborador: r.colaborador,
     equipeId: r.equipe_id,
     equipe: r.equipe,
-    minutosExpediente: num(r.minutos_expediente),
-    minutosRegistrados: num(r.minutos_registrados),
-    minutosProdutivos: num(r.minutos_produtivos),
-    minutosNeutros: num(r.minutos_neutros),
-    minutosImprodutivos: num(r.minutos_improdutivos),
-    minutosSemClassificar: num(r.minutos_sem_classificar),
-    minutosOciosos: num(r.minutos_ociosos),
-    minutosBloqueado: num(r.minutos_bloqueado),
-    minutosDesligado: num(r.minutos_desligado),
+    minutos: mapearMinutos(r),
     diasComExpediente: num(r.dias_com_expediente),
+    diasComRegistro: num(r.dias_com_registro),
+    aproximado: !!r.aproximado,
     indice: numOuNulo(r.indice),
-    aderencia: numOuNulo(r.aderencia),
-  })) as LinhaProdutividade[];
+    cobertura: numOuNulo(r.aderencia),
+  }));
+}
+
+/** As colunas minutos_* das RPCs de expediente viram um MinutosExpediente. */
+function mapearMinutos(r: any): MinutosExpediente {
+  return {
+    expediente: num(r.minutos_expediente),
+    registrados: num(r.minutos_registrados),
+    ativos: num(r.minutos_ativos),
+    produtivos: num(r.minutos_produtivos),
+    neutros: num(r.minutos_neutros),
+    improdutivos: num(r.minutos_improdutivos),
+    semClassificar: num(r.minutos_sem_classificar),
+    ociosos: num(r.minutos_ociosos),
+    bloqueado: num(r.minutos_bloqueado),
+    semDados: num(r.minutos_sem_dados),
+    ativosFora: num(r.minutos_ativos_fora),
+    sobrepostos: num(r.minutos_sobrepostos),
+  };
+}
+
+const horaCurtaSql = (v: string | null) => (v ? String(v).slice(0, 5) : null);
+
+/** A mesma medida por pessoa e por dia — base do relatório diário e do histórico. */
+export async function buscarProdutividadeDiaria(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  escopo: Escopo,
+): Promise<LinhaProdutividadeDia[]> {
+  const { data, error } = await supabase.rpc("painel_produtividade_diaria", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    dia: String(r.dia).slice(0, 10),
+    trabalha: !!r.trabalha,
+    escalaInicio: horaCurtaSql(r.escala_inicio),
+    escalaFim: horaCurtaSql(r.escala_fim),
+    intervaloInicio: horaCurtaSql(r.intervalo_inicio),
+    intervaloFim: horaCurtaSql(r.intervalo_fim),
+    minutos: mapearMinutos(r),
+    aproximado: !!r.aproximado,
+    indice: numOuNulo(r.indice),
+    cobertura: numOuNulo(r.cobertura),
+  }));
+}
+
+/**
+ * Índice do expediente balde a balde (migration 0035). Mesma régua do número
+ * grande do topo: a função do banco chama painel_produtividade em cada janela.
+ */
+export async function buscarSerieProdutividade(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  bucket: "day" | "week" | "month",
+  escopo: Escopo,
+): Promise<PontoProdutividade[]> {
+  const { data, error } = await supabase.rpc("painel_produtividade_serie", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_bucket: bucket,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    balde: String(r.balde).slice(0, 10),
+    pessoas: num(r.pessoas),
+    indice: numOuNulo(r.indice_medio),
+    cobertura: numOuNulo(r.aderencia_media),
+  }));
 }
 
 /** Último dia antes de `dia` em que a empresa tem expediente (para o "vs ontem"). */
@@ -623,120 +607,10 @@ export const CATALOGO_VAZIO: CatalogoApps = { linhas: [], total: 0 };
 //  KPIs
 // ----------------------------------------------------------------------------
 
-function mapearKpis(linha: any): Kpis {
-  return {
-    minutosRegistrados: num(linha?.minutos_registrados),
-    minutosAtivos: num(linha?.minutos_ativos),
-    minutosOciosos: num(linha?.minutos_ociosos),
-    minutosBloqueado: num(linha?.minutos_bloqueado),
-    minutosProdutivos: num(linha?.minutos_produtivos),
-    minutosNeutros: num(linha?.minutos_neutros),
-    minutosImprodutivos: num(linha?.minutos_improdutivos),
-    minutosSemClassificar: num(linha?.minutos_sem_classificar),
-    teclas: num(linha?.teclas),
-    cliques: num(linha?.cliques),
-    rolagens: num(linha?.rolagens),
-    indice: numOuNulo(linha?.indice),
-    colaboradores: num(linha?.colaboradores),
-    dispositivos: num(linha?.dispositivos),
-    diasComRegistro: num(linha?.dias_com_registro),
-    topAplicacao: linha?.top_aplicacao ?? null,
-    jornadaEsperada: num(linha?.jornada_esperada),
-  };
-}
 
-export async function buscarKpis(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-): Promise<Kpis> {
-  const { data, error } = await supabase.rpc("painel_kpis", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    ...paramsEscopo(escopo),
-  });
 
-  if (error) throw error;
-  return mapearKpis(Array.isArray(data) ? data[0] : data);
-}
 
-/**
- * KPIs do período com o período anterior de mesma duração ao lado.
- * É o que sustenta o "+12% vs. período anterior" — na primeira versão esse
- * número era uma constante zero no código.
- */
-export async function buscarKpisComparados(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-  fuso: string,
-): Promise<KpisComparados> {
-  const anterior = periodoAnterior(periodo, fuso);
 
-  const [atual, passado] = await Promise.all([
-    buscarKpis(supabase, periodo, escopo),
-    buscarKpis(supabase, anterior, escopo),
-  ]);
-
-  return {
-    atual,
-    anterior: passado,
-    variacao: {
-      minutosAtivos: variacao(atual.minutosAtivos, passado.minutosAtivos),
-      minutosProdutivos: variacao(atual.minutosProdutivos, passado.minutosProdutivos),
-      interacoes: variacao(
-        atual.teclas + atual.cliques,
-        passado.teclas + passado.cliques,
-      ),
-      indice:
-        atual.indice !== null && passado.indice !== null
-          ? Number((atual.indice - passado.indice).toFixed(1))
-          : null,
-    },
-  };
-}
-
-/** Índice separado entre o horário contratado e a hora extra. */
-export async function buscarKpisEscala(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-): Promise<KpisEscala> {
-  const { data, error } = await supabase.rpc("painel_kpis_escala", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    ...paramsEscopo(escopo),
-  });
-
-  if (error) throw error;
-  const r = (Array.isArray(data) ? data[0] : data) ?? {};
-
-  return {
-    temJanela: !!r.tem_janela,
-    minutosAtivosEscala: num(r.minutos_ativos_escala),
-    minutosProdutivosEscala: num(r.minutos_produtivos_escala),
-    minutosNeutrosEscala: num(r.minutos_neutros_escala),
-    minutosImprodutivosEscala: num(r.minutos_improdutivos_escala),
-    indiceEscala: numOuNulo(r.indice_escala),
-    minutosAtivosExtra: num(r.minutos_ativos_extra),
-    minutosProdutivosExtra: num(r.minutos_produtivos_extra),
-    indiceExtra: numOuNulo(r.indice_extra),
-    pessoasComExtra: num(r.pessoas_com_extra),
-  };
-}
-
-export const KPIS_ESCALA_VAZIO: KpisEscala = {
-  temJanela: false,
-  minutosAtivosEscala: 0,
-  minutosProdutivosEscala: 0,
-  minutosNeutrosEscala: 0,
-  minutosImprodutivosEscala: 0,
-  indiceEscala: null,
-  minutosAtivosExtra: 0,
-  minutosProdutivosExtra: 0,
-  indiceExtra: null,
-  pessoasComExtra: 0,
-};
 
 // ----------------------------------------------------------------------------
 //  Série temporal
@@ -773,135 +647,17 @@ export async function buscarSerie(
 //  Distribuição por aplicativo / site
 // ----------------------------------------------------------------------------
 
-export async function buscarDistribuicao(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-  limite = 10,
-): Promise<FatiaDistribuicao[]> {
-  const { data, error } = await supabase.rpc("painel_distribuicao", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-    p_limite: limite,
-  });
-
-  if (error) throw error;
-
-  return (data ?? []).map((r: any, i: number) => ({
-    nome: r.alvo ?? "—",
-    tipo: r.tipo ?? null,
-    minutos: num(r.minutos),
-    pessoas: num(r.pessoas),
-    cor: r.tipo ? CORES_TIPO[r.tipo] : PALETA_SERIES[i % PALETA_SERIES.length],
-  }));
-}
 
 // ----------------------------------------------------------------------------
 //  Rankings
 // ----------------------------------------------------------------------------
 
-export async function buscarRankingEquipes(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  orgId: string | null = null,
-): Promise<LinhaRankingEquipe[]> {
-  const { data, error } = await supabase.rpc("painel_ranking_equipes", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: orgId,
-  });
 
-  if (error) throw error;
-
-  return (data ?? []).map((r: any) => ({
-    equipeId: r.equipe_id,
-    equipe: r.equipe,
-    cor: r.cor,
-    pessoas: num(r.pessoas),
-    minutosAtivos: num(r.minutos_ativos),
-    minutosOciosos: num(r.minutos_ociosos),
-    minutosProdutivos: num(r.minutos_produtivos),
-    minutosNeutros: num(r.minutos_neutros),
-    minutosImprodutivos: num(r.minutos_improdutivos),
-    indice: numOuNulo(r.indice),
-    aderencia: numOuNulo(r.aderencia),
-  }));
-}
-
-export async function buscarRankingColaboradores(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  equipeId: string | null = null,
-  limite = 100,
-  orgId: string | null = null,
-): Promise<LinhaRankingColaborador[]> {
-  const { data, error } = await supabase.rpc("painel_ranking_colaboradores", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_equipe: equipeId,
-    p_limite: limite,
-    p_org: orgId,
-  });
-
-  if (error) throw error;
-
-  return (data ?? []).map((r: any) => ({
-    colaboradorId: r.colaborador_id,
-    colaborador: r.colaborador,
-    cargo: r.cargo,
-    equipeId: r.equipe_id,
-    equipe: r.equipe,
-    diasComRegistro: num(r.dias_com_registro),
-    minutosAtivos: num(r.minutos_ativos),
-    minutosOciosos: num(r.minutos_ociosos),
-    minutosProdutivos: num(r.minutos_produtivos),
-    minutosNeutros: num(r.minutos_neutros),
-    minutosImprodutivos: num(r.minutos_improdutivos),
-    teclas: num(r.teclas),
-    cliques: num(r.cliques),
-    indice: numOuNulo(r.indice),
-    aderencia: numOuNulo(r.aderencia),
-  }));
-}
 
 // ----------------------------------------------------------------------------
 //  Horas extras — atividade fora da janela de jornada esperada
 // ----------------------------------------------------------------------------
 
-export async function buscarHorasExtras(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-): Promise<LinhaHorasExtras[]> {
-  // Sem p_dispositivo: a RPC não tem esse parâmetro (horas extras são por
-  // colaborador, não por estação) — espalhar paramsEscopo() quebraria a chamada.
-  const { data, error } = await supabase.rpc("painel_horas_extras", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-  });
-
-  if (error) throw error;
-
-  return (data ?? []).map((r: any) => ({
-    colaboradorId: r.colaborador_id,
-    colaborador: r.colaborador,
-    cargo: r.cargo,
-    equipeId: r.equipe_id,
-    equipe: r.equipe,
-    temJanelaDefinida: !!r.tem_janela_definida,
-    minutosExtras: num(r.minutos_extras),
-    diasComHoraExtra: num(r.dias_com_hora_extra),
-    minutosAtivosTotais: num(r.minutos_ativos_totais),
-    percentualExtra: numOuNulo(r.percentual_extra),
-    janela: r.janela ?? null,
-  }));
-}
 
 // ----------------------------------------------------------------------------
 //  Tempo real
@@ -991,37 +747,7 @@ export async function buscarRegistros(
 //  Relatórios (linhas cruas — a formatação fica no exportador)
 // ----------------------------------------------------------------------------
 
-export async function buscarRelatorioDiario(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-) {
-  const { data, error } = await supabase.rpc("painel_relatorio_diario", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-  });
-  if (error) throw error;
-  return data ?? [];
-}
 
-export async function buscarRelatorioAplicativos(
-  supabase: SupabaseClient,
-  periodo: Periodo,
-  escopo: Escopo,
-) {
-  const { data, error } = await supabase.rpc("painel_relatorio_aplicativos", {
-    p_inicio: periodo.inicio,
-    p_fim: periodo.fim,
-    p_org: escopo.orgId,
-    p_equipe: escopo.equipeId,
-    p_colaborador: escopo.colaboradorId,
-  });
-  if (error) throw error;
-  return data ?? [];
-}
 
 // ----------------------------------------------------------------------------
 //  Plataforma (revenda)
@@ -1046,4 +772,280 @@ export async function buscarEmpresasClientes(
     ultimaSincronizacao: r.ultima_sincronizacao,
     criadaEm: r.criada_em,
   }));
+}
+
+// ----------------------------------------------------------------------------
+//  Telas do redesenho (migration 0037) — paginação e filtros no banco
+// ----------------------------------------------------------------------------
+
+export type OrdemPessoas = "nome" | "equipe" | "indice" | "ativos" | "cobertura" | "ultimo";
+export type SituacaoPessoas = "todas" | "com_registro" | "sem_registro" | "pendente" | "inativas";
+
+export interface PaginaPessoas {
+  linhas: LinhaPessoa[];
+  total: number;
+}
+
+export async function buscarPessoasLista(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  escopo: Escopo,
+  opcoes: {
+    busca?: string | null;
+    situacao?: SituacaoPessoas;
+    ordem?: OrdemPessoas;
+    decrescente?: boolean;
+    limite?: number;
+    pagina?: number;
+  } = {},
+): Promise<PaginaPessoas> {
+  const limite = opcoes.limite ?? 25;
+  const pagina = Math.max(1, opcoes.pagina ?? 1);
+  const { data, error } = await supabase.rpc("painel_pessoas_lista", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_busca: opcoes.busca || null,
+    p_situacao: opcoes.situacao ?? "todas",
+    p_ordem: opcoes.ordem ?? "nome",
+    p_decrescente: !!opcoes.decrescente,
+    p_limite: limite,
+    p_deslocamento: (pagina - 1) * limite,
+  });
+  if (error) throw error;
+  const linhas = (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    nome: r.nome,
+    osUser: r.os_user,
+    cargo: r.cargo,
+    email: r.email,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    ativo: !!r.ativo,
+    perfilCompleto: !!r.perfil_completo,
+    minutosExpediente: numOuNulo(r.minutos_expediente),
+    minutosAtivos: numOuNulo(r.minutos_ativos),
+    minutosAtivosFora: numOuNulo(r.minutos_ativos_fora),
+    indice: numOuNulo(r.indice),
+    cobertura: numOuNulo(r.cobertura),
+    aproximado: !!r.aproximado,
+    ultimoRegistro: r.ultimo_registro ?? null,
+  })) as LinhaPessoa[];
+  return { linhas, total: num((data ?? [])[0]?.total) };
+}
+
+export async function buscarPessoasContagem(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  escopo: Escopo,
+): Promise<ContagemPessoas> {
+  const { data, error } = await supabase.rpc("painel_pessoas_contagem", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+  });
+  if (error) throw error;
+  const r = (Array.isArray(data) ? data[0] : data) ?? {};
+  return {
+    cadastradas: num(r.cadastradas),
+    comRegistro: num(r.com_registro),
+    semRegistro: num(r.sem_registro),
+    pendentes: num(r.pendentes),
+    semEquipe: num(r.sem_equipe),
+    inativas: num(r.inativas),
+  };
+}
+
+export interface PaginaAplicativos {
+  linhas: LinhaAplicativo[];
+  total: number;
+}
+
+export async function buscarAplicativosLista(
+  supabase: SupabaseClient,
+  periodo: { inicio: string; fim: string },
+  escopo: Escopo,
+  opcoes: { filtro?: FiltroAplicativos; busca?: string | null; limite?: number; pagina?: number } = {},
+): Promise<PaginaAplicativos> {
+  const limite = opcoes.limite ?? 25;
+  const pagina = Math.max(1, opcoes.pagina ?? 1);
+  const { data, error } = await supabase.rpc("painel_aplicativos_lista", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+    p_filtro: opcoes.filtro ?? "todos",
+    p_busca: opcoes.busca || null,
+    p_limite: limite,
+    p_deslocamento: (pagina - 1) * limite,
+  });
+  if (error) throw error;
+  const linhas = (data ?? []).map((r: any) => ({
+    alvo: r.alvo,
+    ehSite: !!r.eh_site,
+    tipo: r.tipo ?? null,
+    mapeamentoId: r.mapeamento_id ?? null,
+    categoriaId: r.categoria_id ?? null,
+    categoriaNome: r.categoria_nome ?? null,
+    regraPor: r.regra_por ?? null,
+    minutos: num(r.minutos),
+    pessoas: num(r.pessoas),
+    dias: num(r.dias),
+  })) as LinhaAplicativo[];
+  return { linhas, total: num((data ?? [])[0]?.total) };
+}
+
+export async function buscarAplicativosResumo(
+  supabase: SupabaseClient,
+  periodo: { inicio: string; fim: string },
+  escopo: Escopo,
+): Promise<ResumoAplicativos> {
+  const { data, error } = await supabase.rpc("painel_aplicativos_resumo", {
+    p_inicio: periodo.inicio,
+    p_fim: periodo.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  const r = (Array.isArray(data) ? data[0] : data) ?? {};
+  return {
+    identificados: num(r.identificados),
+    classificados: num(r.classificados),
+    semClassificacao: num(r.sem_classificacao),
+    aplicativos: num(r.aplicativos),
+    sites: num(r.sites),
+    qtdPorTipo: {
+      PRODUCTIVE: num(r.qtd_produtivo),
+      NEUTRAL: num(r.qtd_neutro),
+      UNPRODUCTIVE: num(r.qtd_improdutivo),
+    },
+    minutosTotal: num(r.minutos_total),
+    minutosPorTipo: {
+      PRODUCTIVE: num(r.minutos_produtivo),
+      NEUTRAL: num(r.minutos_neutro),
+      UNPRODUCTIVE: num(r.minutos_improdutivo),
+      SEM: num(r.minutos_sem),
+    },
+  };
+}
+
+export async function buscarJornadaPessoas(
+  supabase: SupabaseClient,
+  janela: { inicio: string; fim: string },
+  escopo: Escopo,
+): Promise<LinhaJornada[]> {
+  const { data, error } = await supabase.rpc("painel_jornada_pessoas", {
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipeId: r.equipe_id,
+    equipe: r.equipe,
+    escala: r.escala,
+    diasComExpediente: num(r.dias_com_expediente),
+    diasComRegistro: num(r.dias_com_registro),
+    minutosExpediente: num(r.minutos_expediente),
+    minutosRegistrados: num(r.minutos_registrados),
+    minutosAtivosFora: num(r.minutos_ativos_fora),
+    cobertura: numOuNulo(r.cobertura),
+    primeiroRegistroMedio: numOuNulo(r.primeiro_registro_medio),
+    ultimoRegistroMedio: numOuNulo(r.ultimo_registro_medio),
+    horariosPorBloco: !!r.horarios_por_bloco,
+    aproximado: !!r.aproximado,
+  }));
+}
+
+export async function buscarJornadaDia(
+  supabase: SupabaseClient,
+  dia: string,
+  escopo: Escopo,
+): Promise<JornadaDia[]> {
+  const { data, error } = await supabase.rpc("painel_jornada_dia", {
+    p_dia: dia,
+    p_org: escopo.orgId,
+    p_equipe: escopo.equipeId,
+    p_colaborador: escopo.colaboradorId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    colaboradorId: r.colaborador_id,
+    colaborador: r.colaborador,
+    equipe: r.equipe,
+    trabalha: !!r.trabalha,
+    escalaInicio: horaCurtaSql(r.escala_inicio),
+    escalaFim: horaCurtaSql(r.escala_fim),
+    intervaloInicio: horaCurtaSql(r.intervalo_inicio),
+    intervaloFim: horaCurtaSql(r.intervalo_fim),
+    minutosExpediente: num(r.minutos_expediente),
+    minutosRegistrados: num(r.minutos_registrados),
+    minutosAtivosFora: num(r.minutos_ativos_fora),
+    primeiroRegistro: r.primeiro_registro ?? null,
+    ultimoRegistro: r.ultimo_registro ?? null,
+    blocos: (r.blocos ?? []).map((b: any[]) => [num(b[0]), num(b[1]), num(b[2])]),
+  }));
+}
+
+export async function buscarSessoes(
+  supabase: SupabaseClient,
+  colaboradorId: string,
+  janela: { inicio: string; fim: string },
+  dispositivoId?: string | null,
+): Promise<Sessao[]> {
+  const { data, error } = await supabase.rpc("painel_sessoes", {
+    p_colaborador: colaboradorId,
+    p_inicio: janela.inicio,
+    p_fim: janela.fim,
+    p_dispositivo: dispositivoId ?? null,
+  });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    inicio: r.inicio,
+    fim: r.fim,
+    alvo: r.alvo,
+    tipo: r.tipo ?? null,
+    estado: r.estado,
+    minutos: num(r.minutos),
+    maquina: r.maquina ?? null,
+  }));
+}
+
+export async function buscarEstacoes(
+  supabase: SupabaseClient,
+  orgId: string | null,
+): Promise<Estacao[]> {
+  const { data, error } = await supabase.rpc("painel_estacoes", { p_org: orgId });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    id: r.dispositivo_id,
+    maquina: r.maquina,
+    usuarioWindows: r.usuario_windows ?? null,
+    versao: r.versao ?? null,
+    ultimoEnvio: r.ultimo_envio ?? null,
+    ultimoRegistro: r.ultimo_registro ?? null,
+    minutosSemEnvio: numOuNulo(r.minutos_sem_envio),
+    limiarMinutos: num(r.limiar_minutos),
+    situacao: r.situacao,
+    colaboradorId: r.colaborador_id ?? null,
+    colaborador: r.colaborador ?? null,
+    equipeId: r.equipe_id ?? null,
+    equipe: r.equipe ?? null,
+    emExpedienteAgora: !!r.em_expediente_agora,
+  }));
+}
+
+/** Quando os resumos foram atualizados pela última vez (consolidação). */
+export async function buscarUltimaConsolidacao(supabase: SupabaseClient): Promise<string | null> {
+  const { data, error } = await supabase.from("estado_consolidacao").select("executado_em").maybeSingle();
+  if (error) throw error;
+  return (data as { executado_em?: string } | null)?.executado_em ?? null;
 }

@@ -15,6 +15,11 @@ const ROTAS_PROTEGIDAS = ["/painel", "/plataforma"];
 export async function atualizarSessao(request: NextRequest) {
   let resposta = NextResponse.next({ request });
 
+  // Banco local de desenvolvimento: não há Supabase Auth para renovar.
+  if (process.env.NODE_ENV === "development" && process.env.FOCUS_BANCO_LOCAL) {
+    return resposta;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
