@@ -402,6 +402,32 @@ export async function girarCodigoInstalacao(
   return OK(`Código novo gerado: ${String(data).replace(/(\d{4})(?=\d)/g, "$1-")}`);
 }
 
+/**
+ * Define o código manualmente. Ao contrário do girar, NÃO troca a chave interna
+ * das estações — serve para escolher um código fácil de ditar, não para
+ * invalidar o que já foi distribuído.
+ */
+export async function definirCodigoInstalacao(
+  _anterior: ResultadoAcao | null,
+  dados: FormData,
+): Promise<ResultadoAcao> {
+  const supabase = await criarClienteServidor();
+  const contexto = await carregarContexto(supabase);
+  if (!contexto) return FALHA("Sessão expirada.");
+
+  const bruto = (texto(dados, "codigo") ?? "").replace(/\D/g, "");
+  if (bruto.length !== 12) return FALHA("O código precisa ter 12 dígitos.");
+
+  const { data, error } = await supabase.rpc("definir_codigo_instalacao", {
+    p_org: contexto.empresa.id,
+    p_codigo: bruto,
+  });
+  if (error) return FALHA(error.message);
+
+  atualizarTelas();
+  return OK(`Código salvo: ${String(data).replace(/(\d{4})(?=\d)/g, "$1-")}`);
+}
+
 // ----------------------------------------------------------------------------
 //  Configuração do agente (aplicada remotamente na frota)
 // ----------------------------------------------------------------------------

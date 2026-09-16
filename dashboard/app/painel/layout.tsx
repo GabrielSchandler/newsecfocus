@@ -4,6 +4,7 @@ import { NavegacaoLateral } from "@/components/painel/navegacao-lateral";
 import { NavegacaoInferior } from "@/components/painel/navegacao-inferior";
 import { itensDoMenu } from "@/lib/menu";
 import { BarraTopo } from "@/components/painel/barra-topo";
+import { PrimeiroAcesso } from "@/components/painel/primeiro-acesso";
 import { BannerPendencias } from "@/components/painel/banner-pendencias";
 import { ConviteInstalar } from "@/components/painel/convite-instalar";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -30,6 +31,12 @@ export default async function LayoutPainel({ children }: { children: React.React
     } catch {
       // Sem a lista, o seletor some e o painel segue na empresa do perfil.
     }
+  }
+
+  // Senha criada por um administrador: o dono decide trocar ou manter antes de
+  // usar o painel. Fica sobre tudo, porque adiar essa decisão é nunca tomá-la.
+  if (contexto.senhaProvisoria) {
+    return <PrimeiroAcesso nome={contexto.nome} />;
   }
 
   return (

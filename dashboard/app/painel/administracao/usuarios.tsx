@@ -84,10 +84,12 @@ export function PainelUsuarios({
       <Card className="p-5">
         <h3 className="flex items-center gap-2 text-sm font-medium text-slate-200">
           <UserPlus className="h-4 w-4 text-cyan-400" />
-          Convidar alguém
+          Dar acesso a alguém
         </h3>
-        <p className="mt-1 text-xs text-slate-500">
-          A pessoa recebe um e-mail para criar a senha e já entra com o papel escolhido.
+        <p className="mt-1 text-xs leading-relaxed text-slate-500">
+          Defina uma senha e entregue o acesso na hora — no primeiro login a pessoa escolhe
+          trocá-la ou mantê-la. Deixando a senha em branco, ela recebe um e-mail para criar a
+          própria.
         </p>
 
         <form action={convidar} className="mt-4 space-y-4">
@@ -100,6 +102,16 @@ export function PainelUsuarios({
             </Campo>
             <Campo rotulo="Nome">
               <Input name="nome" maxLength={80} placeholder="Como aparece no painel" />
+            </Campo>
+            <Campo rotulo="Senha" dica="mínimo 8 caracteres · vazio = convite por e-mail">
+              <Input
+                type="text"
+                name="senha"
+                minLength={8}
+                maxLength={72}
+                autoComplete="off"
+                placeholder="Defina uma senha"
+              />
             </Campo>
             <Campo
               rotulo="Papel"

@@ -28,6 +28,12 @@ interface Entrada {
   /** Só a operação da plataforma pode informar: convida para outra empresa. */
   org_id?: string | null;
   url_retorno?: string;
+  /**
+   * Senha definida pelo administrador. Quando vem preenchida, o acesso é criado
+   * já pronto para usar (sem e-mail de convite) e marcado como provisório: o
+   * dono decide, no primeiro acesso, trocar ou manter.
+   */
+  senha?: string | null;
 }
 
 const PAPEIS = ["OWNER", "MANAGER", "TEAM_LEAD", "VIEWER"];
@@ -97,27 +103,57 @@ Deno.serve(async (req) => {
     if (!equipe) return erro("Equipe não encontrada nesta empresa.");
   }
 
-  // Convida ou reaproveita o usuário, se ele já existir no Auth.
+  const senha = (entrada.senha ?? "").trim();
+  if (senha && senha.length < 8) {
+    return erro("A senha precisa ter pelo menos 8 caracteres.");
+  }
+
+  // Dois caminhos: com senha, o acesso nasce pronto; sem senha, convite por
+  // e-mail como antes.
   let idUsuario: string | null = null;
   let jaExistia = false;
 
-  const { data: convite, error: erroConvite } = await admin.auth.admin.inviteUserByEmail(
-    email,
-    { redirectTo: entrada.url_retorno },
-  );
+  if (senha) {
+    const { data: criado, error: erroCriar } = await admin.auth.admin.createUser({
+      email,
+      password: senha,
+      email_confirm: true,
+    });
 
-  if (convite?.user) {
-    idUsuario = convite.user.id;
-  } else {
-    const jaCadastrado = (erroConvite?.message ?? "").toLowerCase().includes("already");
-    if (!jaCadastrado) {
-      return erro(`Não foi possível enviar o convite: ${erroConvite?.message}`, 500);
+    if (criado?.user) {
+      idUsuario = criado.user.id;
+    } else {
+      const jaCadastrado = (erroCriar?.message ?? "").toLowerCase().includes("already");
+      if (!jaCadastrado) {
+        return erro(`Não foi possível criar o acesso: ${erroCriar?.message}`, 500);
+      }
+      // Já existe: troca a senha da conta existente, que é o que o
+      // administrador espera ao redefinir o acesso de alguém.
+      const { data: lista } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      idUsuario = lista?.users?.find((u) => u.email?.toLowerCase() === email)?.id ?? null;
+      jaExistia = true;
+      if (idUsuario) {
+        await admin.auth.admin.updateUserById(idUsuario, { password: senha });
+      }
     }
+  } else {
+    const { data: convite, error: erroConvite } = await admin.auth.admin.inviteUserByEmail(
+      email,
+      { redirectTo: entrada.url_retorno },
+    );
 
-    // Já tem conta: procura o id para apenas vincular o perfil.
-    const { data: lista } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    idUsuario = lista?.users?.find((u) => u.email?.toLowerCase() === email)?.id ?? null;
-    jaExistia = true;
+    if (convite?.user) {
+      idUsuario = convite.user.id;
+    } else {
+      const jaCadastrado = (erroConvite?.message ?? "").toLowerCase().includes("already");
+      if (!jaCadastrado) {
+        return erro(`Não foi possível enviar o convite: ${erroConvite?.message}`, 500);
+      }
+
+      const { data: lista } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      idUsuario = lista?.users?.find((u) => u.email?.toLowerCase() === email)?.id ?? null;
+      jaExistia = true;
+    }
   }
 
   if (!idUsuario) return erro("Não foi possível localizar o usuário convidado.", 500);
@@ -130,6 +166,9 @@ Deno.serve(async (req) => {
       role: entrada.papel,
       team_id: entrada.papel === "TEAM_LEAD" ? entrada.equipe_id : null,
       ativo: true,
+      // Senha que passou pela mão de outra pessoa é provisória até o dono
+      // decidir trocar ou manter, no primeiro acesso.
+      senha_provisoria: senha ? true : false,
     },
     { onConflict: "id" },
   );
@@ -142,8 +181,11 @@ Deno.serve(async (req) => {
     id: idUsuario,
     email,
     ja_tinha_conta: jaExistia,
+    com_senha: !!senha,
     aviso: jaExistia
-      ? "Essa pessoa já tinha conta; o acesso foi vinculado sem enviar convite novo."
+      ? (senha
+          ? "Essa pessoa já tinha conta; a senha foi redefinida e o acesso vinculado."
+          : "Essa pessoa já tinha conta; o acesso foi vinculado sem enviar convite novo.")
       : null,
   });
 });

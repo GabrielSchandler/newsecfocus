@@ -41,6 +41,8 @@ export interface ContextoSessao {
   };
   /** Operador da revenda: administra contas de clientes, não vê telemetria. */
   adminPlataforma: boolean;
+  /** Senha definida por um administrador, ainda pendente de decisão do dono. */
+  senhaProvisoria: boolean;
 }
 
 // ----------------------------------------------------------------------------

@@ -10,6 +10,7 @@ import { Campo, Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SINCRONIZACAO_PADRAO_MINUTOS } from "@/lib/agente";
 import { ROTULOS_TIPO, formatarHorasCurto } from "@/lib/formato";
+import { PlanilhaEditavel } from "@/components/painel/planilha-editavel";
 import { CodigoInstalacao } from "./codigo-instalacao";
 import {
   aplicarCatalogoPadrao,
@@ -113,100 +114,77 @@ function BotaoExcluir({
 // ----------------------------------------------------------------------------
 
 export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
-  const [estado, enviar] = useFormState(salvarEquipe, null);
-  const [editando, setEditando] = useState<Equipe | null>(null);
-
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <h3 className="text-sm font-medium text-slate-200">
-          {editando ? `Editar ${editando.nome}` : "Nova equipe"}
-        </h3>
-
-        <form action={enviar} className="mt-4 space-y-4">
-          {editando && <input type="hidden" name="id" value={editando.id} />}
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Campo rotulo="Nome">
-              <Input
-                name="nome"
-                required
-                maxLength={60}
-                defaultValue={editando?.nome ?? ""}
-                placeholder="Comercial"
+    <PlanilhaEditavel<Equipe>
+      titulo="Equipes"
+      descricao="Clique numa equipe para editar na própria linha. O horário de trabalho dela fica em Expediente — é lá que o índice e a aderência da equipe são definidos."
+      rotuloNovo="Nova equipe"
+      linhas={equipes}
+      chave={(e) => e.id}
+      acao={salvarEquipe}
+      vazio="Nenhuma equipe cadastrada. Crie a primeira para poder comparar setores."
+      colunas={[
+        {
+          chave: "nome",
+          rotulo: "Equipe",
+          render: (e) => (
+            <span className="flex min-w-0 items-center gap-2">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ background: e.cor ?? "#22d3ee" }}
               />
-            </Campo>
-            <Campo rotulo="Descrição" className="sm:col-span-2">
-              <Input
-                name="descricao"
-                maxLength={140}
-                defaultValue={editando?.descricao ?? ""}
-                placeholder="O que essa equipe faz"
-              />
-            </Campo>
-            <Campo rotulo="Cor" dica="usada nos gráficos">
-              <Input
-                type="color"
-                name="cor"
-                defaultValue={editando?.cor ?? "#22d3ee"}
-                className="h-10 p-1"
-              />
-            </Campo>
-          </div>
+              <span className="truncate font-medium text-slate-100">{e.nome}</span>
+            </span>
+          ),
+        },
+        {
+          chave: "descricao",
+          rotulo: "Descrição",
+          ocultarMobile: true,
+          render: (e) => <span className="text-slate-400">{e.descricao ?? "—"}</span>,
+        },
+        {
+          chave: "pessoas",
+          rotulo: "Pessoas",
+          alinhar: "direita",
+          render: (e) => <span className="tabular-nums text-slate-300">{e.total_pessoas ?? 0}</span>,
+        },
+      ]}
+      editor={(e) => (
+        <>
+          <input type="hidden" name="id" value={e.id} />
+          <CamposEquipe equipe={e} />
+        </>
+      )}
+      editorNovo={<CamposEquipe equipe={null} />}
+      extraLinha={(e) => (
+        <BotaoExcluir
+          acao={excluirEquipe}
+          id={e.id}
+          confirmacao="Excluir esta equipe?"
+        />
+      )}
+    />
+  );
+}
 
-          <div className="flex flex-wrap items-center gap-3">
-            <BotaoEnviar>{editando ? "Salvar alterações" : "Criar equipe"}</BotaoEnviar>
-            {editando && (
-              <Button
-                type="button"
-                variante="fantasma"
-                tamanho="sm"
-                onClick={() => setEditando(null)}
-              >
-                Cancelar
-              </Button>
-            )}
-            <Mensagem estado={estado} />
-          </div>
-        </form>
-      </Card>
-
-      <Card className="overflow-hidden">
-        {equipes.length === 0 ? (
-          <p className="p-8 text-center text-sm text-slate-500">
-            Nenhuma equipe ainda. Crie a primeira acima.
-          </p>
-        ) : (
-          <ul className="divide-y divide-slate-800/70">
-            {equipes.map((e) => (
-              <li key={e.id} className="flex flex-wrap items-center gap-3 p-4">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ background: e.cor ?? "#475569" }}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-100">{e.nome}</p>
-                  {e.descricao && (
-                    <p className="truncate text-xs text-slate-500">{e.descricao}</p>
-                  )}
-                </div>
-                <Badge variante="neutro">
-                  {e.total_pessoas ?? 0} {e.total_pessoas === 1 ? "pessoa" : "pessoas"}
-                </Badge>
-                <button
-                  type="button"
-                  onClick={() => setEditando(e)}
-                  aria-label={`Editar ${e.nome}`}
-                  className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-800/60 hover:text-slate-300"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </button>
-                <BotaoExcluir acao={excluirEquipe} id={e.id} confirmacao="Confirma?" />
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+function CamposEquipe({ equipe }: { equipe: Equipe | null }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Campo rotulo="Nome">
+        <Input name="nome" required maxLength={60} defaultValue={equipe?.nome ?? ""} placeholder="Comercial" />
+      </Campo>
+      <Campo rotulo="Descrição" className="sm:col-span-2">
+        <Input
+          name="descricao"
+          maxLength={140}
+          defaultValue={equipe?.descricao ?? ""}
+          placeholder="O que essa equipe faz"
+        />
+      </Campo>
+      <Campo rotulo="Cor" dica="usada nos gráficos">
+        <Input type="color" name="cor" defaultValue={equipe?.cor ?? "#22d3ee"} className="h-10 p-1" />
+      </Campo>
     </div>
   );
 }
@@ -218,11 +196,11 @@ export function PainelEquipes({ equipes }: { equipes: Equipe[] }) {
 export function PainelColaboradores({
   colaboradores,
   equipes,
-  jornadaPadrao,
 }: {
   colaboradores: Colaborador[];
   equipes: Equipe[];
-  jornadaPadrao: number;
+  /** Mantido por compatibilidade de chamada; o expediente agora vem da escala. */
+  jornadaPadrao?: number;
 }) {
   const [busca, setBusca] = useState("");
 
@@ -235,143 +213,133 @@ export function PainelColaboradores({
   });
 
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <h3 className="text-sm font-medium text-slate-200">Colaboradores</h3>
-        <p className="mt-1 text-xs leading-relaxed text-slate-500">
-          As pessoas aparecem sozinhas minutos depois da instalação, com o nome digitado no
-          instalador — ou, se ninguém digitou, com o usuário do Windows. Aqui você ajusta o nome,
-          o cargo, a equipe e a jornada esperada — a jornada é a base do indicador de aderência.
-        </p>
-        <div className="mt-4">
-          <Input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome, usuário, cargo ou equipe…"
-            aria-label="Buscar colaborador"
-          />
-        </div>
-      </Card>
-
-      {filtrados.length === 0 ? (
-        <Card className="p-8 text-center text-sm text-slate-500">
-          {colaboradores.length === 0
-            ? "Nenhum colaborador ainda. Eles aparecem quando o primeiro agente sincronizar."
-            : "Nenhum resultado para essa busca."}
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {filtrados.map((c) => (
-            <FormularioColaborador
-              key={c.id}
-              colaborador={c}
-              equipes={equipes}
-              jornadaPadrao={jornadaPadrao}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <PlanilhaEditavel<Colaborador>
+      titulo="Colaboradores"
+      descricao="As pessoas aparecem sozinhas minutos depois da instalação, com o nome digitado no instalador — ou, se ninguém digitou, com o usuário do Windows. Clique numa linha para ajustar nome, cargo e equipe. O horário de trabalho fica em Expediente."
+      linhas={filtrados}
+      chave={(c) => c.id}
+      acao={salvarColaborador}
+      vazio={
+        colaboradores.length === 0
+          ? "Nenhum colaborador ainda. Eles aparecem quando o primeiro agente sincronizar."
+          : "Nenhum resultado para essa busca."
+      }
+      filtro={
+        <Input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por nome, usuário, cargo ou equipe…"
+          aria-label="Buscar colaborador"
+        />
+      }
+      colunas={[
+        {
+          chave: "nome",
+          rotulo: "Pessoa",
+          render: (c) => (
+            <span className="min-w-0">
+              <span className="block truncate font-medium text-slate-100">
+                {c.nome ?? c.os_user}
+              </span>
+              <span className="block truncate text-xs text-slate-500">{c.os_user}</span>
+            </span>
+          ),
+        },
+        {
+          chave: "cargo",
+          rotulo: "Cargo",
+          ocultarMobile: true,
+          render: (c) => <span className="text-slate-400">{c.cargo ?? "—"}</span>,
+        },
+        {
+          chave: "equipe",
+          rotulo: "Equipe",
+          render: (c) =>
+            c.equipe_nome ? (
+              <span className="text-slate-300">{c.equipe_nome}</span>
+            ) : (
+              <Badge variante="ocioso">sem equipe</Badge>
+            ),
+        },
+        {
+          chave: "estado",
+          rotulo: "Estado",
+          alinhar: "direita",
+          render: (c) =>
+            !c.ativo ? (
+              <Badge variante="offline">inativo</Badge>
+            ) : !c.perfil_completo ? (
+              <Badge variante="ocioso">aguardando configuração</Badge>
+            ) : (
+              <Badge variante="ativo">ativo</Badge>
+            ),
+        },
+      ]}
+      editor={(c) => <CamposColaborador colaborador={c} equipes={equipes} />}
+    />
   );
 }
 
-function FormularioColaborador({
+function CamposColaborador({
   colaborador,
   equipes,
-  jornadaPadrao,
 }: {
   colaborador: Colaborador;
   equipes: Equipe[];
-  jornadaPadrao: number;
 }) {
-  const [estado, enviar] = useFormState(salvarColaborador, null);
   const [equipeId, setEquipeId] = useState(colaborador.team_id ?? "");
 
   return (
-    <Card className="p-4">
-      <form action={enviar} className="space-y-3">
-        <input type="hidden" name="id" value={colaborador.id} />
-        <input type="hidden" name="team_id" value={equipeId} />
+    <>
+      <input type="hidden" name="id" value={colaborador.id} />
+      <input type="hidden" name="team_id" value={equipeId} />
+      {/* O expediente mudou de lugar (aba Expediente). Estes campos viajam
+          ocultos para que salvar aqui não apague o horário de quem já tinha. */}
+      <input
+        type="hidden"
+        name="jornada_minutos_dia"
+        value={colaborador.jornada_minutos_dia ?? ""}
+      />
+      <input
+        type="hidden"
+        name="jornada_hora_inicio"
+        value={colaborador.jornada_hora_inicio ?? ""}
+      />
+      <input type="hidden" name="jornada_hora_fim" value={colaborador.jornada_hora_fim ?? ""} />
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variante="neutro">{colaborador.os_user}</Badge>
-          {!colaborador.ativo && <Badge variante="offline">inativo</Badge>}
-          {!colaborador.team_id && <Badge variante="ocioso">sem equipe</Badge>}
-          {!colaborador.perfil_completo && (
-            <Badge variante="ocioso">aguardando configuração</Badge>
-          )}
-        </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Campo rotulo="Nome">
+          <Input name="nome" defaultValue={colaborador.nome ?? ""} maxLength={80} />
+        </Campo>
+        <Campo rotulo="Cargo">
+          <Input name="cargo" defaultValue={colaborador.cargo ?? ""} maxLength={60} />
+        </Campo>
+        <Campo rotulo="E-mail">
+          <Input type="email" name="email" defaultValue={colaborador.email ?? ""} />
+        </Campo>
+        <Campo rotulo="Equipe">
+          <Select
+            aria-label="Equipe do colaborador"
+            valor={equipeId}
+            aoMudar={setEquipeId}
+            opcoes={[
+              { valor: "", rotulo: "Sem equipe" },
+              ...equipes.map((e) => ({ valor: e.id, rotulo: e.nome })),
+            ]}
+          />
+        </Campo>
+      </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <Campo rotulo="Nome">
-            <Input name="nome" defaultValue={colaborador.nome ?? ""} maxLength={80} />
-          </Campo>
-          <Campo rotulo="Cargo">
-            <Input name="cargo" defaultValue={colaborador.cargo ?? ""} maxLength={60} />
-          </Campo>
-          <Campo rotulo="E-mail">
-            <Input type="email" name="email" defaultValue={colaborador.email ?? ""} />
-          </Campo>
-          <Campo rotulo="Equipe">
-            <Select
-              aria-label="Equipe do colaborador"
-              valor={equipeId}
-              aoMudar={setEquipeId}
-              opcoes={[
-                { valor: "", rotulo: "Sem equipe" },
-                ...equipes.map((e) => ({ valor: e.id, rotulo: e.nome })),
-              ]}
-            />
-          </Campo>
-          <Campo
-            rotulo="Jornada (min/dia)"
-            dica={
-              colaborador.jornada_minutos_dia === null
-                ? `vazio = padrão da empresa (${formatarHorasCurto(jornadaPadrao)})`
-                : formatarHorasCurto(colaborador.jornada_minutos_dia)
-            }
-          >
-            <Input
-              type="number"
-              name="jornada_minutos_dia"
-              min={60}
-              max={1440}
-              step={30}
-              placeholder={String(jornadaPadrao)}
-              defaultValue={colaborador.jornada_minutos_dia ?? ""}
-            />
-          </Campo>
-          <Campo rotulo="Início do expediente" dica="vazio = padrão da empresa">
-            <Input
-              type="time"
-              name="jornada_hora_inicio"
-              defaultValue={colaborador.jornada_hora_inicio ?? ""}
-            />
-          </Campo>
-          <Campo rotulo="Fim do expediente" dica="atividade fora disso conta como hora extra">
-            <Input
-              type="time"
-              name="jornada_hora_fim"
-              defaultValue={colaborador.jornada_hora_fim ?? ""}
-            />
-          </Campo>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-xs text-slate-400">
-            <input
-              type="checkbox"
-              name="ativo"
-              defaultChecked={colaborador.ativo}
-              className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
-            />
-            Ativo
-          </label>
-          <BotaoEnviar />
-          <Mensagem estado={estado} />
-        </div>
-      </form>
-    </Card>
+      <label className="flex items-center gap-2 text-xs text-slate-400">
+        <input
+          type="checkbox"
+          name="ativo"
+          defaultChecked={colaborador.ativo}
+          className="h-4 w-4 rounded border-borda bg-fundo-suave accent-cyan-500"
+        />
+        Ativo
+      </label>
+    </>
   );
 }
 

@@ -47,12 +47,18 @@ export async function convidarUsuario(
     return FALHA("Líder de equipe precisa de uma equipe: sem ela, não enxergaria nada.");
   }
 
+  const senha = texto(dados, "senha");
+  if (senha && senha.length < 8) {
+    return FALHA("A senha precisa ter pelo menos 8 caracteres.");
+  }
+
   const { data, error } = await supabase.functions.invoke("convidar-usuario", {
     body: {
       email,
       nome: texto(dados, "nome"),
       papel,
       equipe_id: texto(dados, "equipe_id"),
+      senha,
     },
   });
 

@@ -29,7 +29,7 @@ export const carregarContexto = cache(async (
     supabase
       .from("profiles")
       .select(
-        "full_name, role, team_id, org_id, organizations(id, name, slug, status, plano, fuso, max_dispositivos, retencao_dias, jornada_padrao_minutos, jornada_padrao_hora_inicio, jornada_padrao_hora_fim, codigo_instalacao)",
+        "full_name, role, team_id, org_id, senha_provisoria, organizations(id, name, slug, status, plano, fuso, max_dispositivos, retencao_dias, jornada_padrao_minutos, jornada_padrao_hora_inicio, jornada_padrao_hora_fim, codigo_instalacao)",
       )
       .eq("id", user.id)
       .maybeSingle(),
@@ -63,6 +63,9 @@ export const carregarContexto = cache(async (
       codigoInstalacao: org?.codigo_instalacao ?? null,
     },
     adminPlataforma: !!admin,
+    // Senha criada por um administrador e ainda não resolvida pelo dono do
+    // acesso: o painel cobra a decisão antes de deixar navegar.
+    senhaProvisoria: !!perfil?.senha_provisoria,
   };
 });
 

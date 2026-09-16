@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import { Check, Copy, KeyRound, Loader2, RefreshCw, TriangleAlert } from "lucide-react";
+import { Check, Copy, KeyRound, Loader2, Pencil, RefreshCw, TriangleAlert } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatarCodigoInstalacao } from "@/lib/formato";
-import { girarCodigoInstalacao, type ResultadoAcao } from "./acoes";
+import { Campo, Input } from "@/components/ui/input";
+import { definirCodigoInstalacao, girarCodigoInstalacao, type ResultadoAcao } from "./acoes";
 
 /**
  * O código que o TI do cliente digita no instalador do agente.
@@ -23,6 +24,8 @@ export function CodigoInstalacao({
   podeGirar: boolean;
 }) {
   const [estado, enviar] = useFormState(girarCodigoInstalacao, null);
+  const [estadoDefinir, definir] = useFormState(definirCodigoInstalacao, null);
+  const [editando, setEditando] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
 
@@ -66,7 +69,50 @@ export function CodigoInstalacao({
       </p>
 
       {podeGirar && (
-        <div className="mt-4 border-t border-borda pt-4">
+        <div className="mt-4 space-y-3 border-t border-borda pt-4">
+          {/* Escolher o código é diferente de girar: aqui o objetivo é ter um
+              número fácil de ditar no roteiro de implantação, e as estações já
+              instaladas não são afetadas. */}
+          {!editando ? (
+            <button
+              type="button"
+              onClick={() => setEditando(true)}
+              className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-cyan-300"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Escolher outro código
+            </button>
+          ) : (
+            <form action={definir} className="space-y-2">
+              <Campo rotulo="Novo código" dica="12 dígitos, com ou sem hífens">
+                <Input
+                  name="codigo"
+                  inputMode="numeric"
+                  maxLength={14}
+                  placeholder="1234-5678-9012"
+                  defaultValue={formatado}
+                  required
+                />
+              </Campo>
+              <p className="text-xs leading-relaxed text-slate-500">
+                Vale para as próximas instalações. As máquinas já instaladas continuam
+                normalmente — elas usam uma credencial própria desde a primeira conexão.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <BotaoSalvarCodigo />
+                <Button
+                  type="button"
+                  variante="fantasma"
+                  tamanho="sm"
+                  onClick={() => setEditando(false)}
+                >
+                  Cancelar
+                </Button>
+                <Mensagem estado={estadoDefinir} />
+              </div>
+            </form>
+          )}
+
           {!confirmando ? (
             <button
               type="button"
@@ -74,7 +120,7 @@ export function CodigoInstalacao({
               className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-amber-300"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              Gerar um código novo
+              Gerar um código aleatório
             </button>
           ) : (
             <form action={enviar} className="space-y-2">
@@ -101,6 +147,16 @@ export function CodigoInstalacao({
         </div>
       )}
     </Card>
+  );
+}
+
+function BotaoSalvarCodigo() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" tamanho="sm" disabled={pending}>
+      {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+      Salvar código
+    </Button>
   );
 }
 
